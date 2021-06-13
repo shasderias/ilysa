@@ -1,0 +1,5 @@
+package light
+
+func New() {
+
+}

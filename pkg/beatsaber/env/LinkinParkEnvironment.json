@@ -1,0 +1,78 @@
+{
+  "colorScheme" : {
+    "_colorLeft" : {"r":0.66274512,"g":0.16436081,"b":0.16901872},
+    "_colorRight" : {"r":0.38701963,"g":0.5168997,"b":0.55686277},
+    "_envColorLeft" : {"r":0.75294119,"g":0.67275298,"b":0.5925647},
+    "_envColorRight" : {"r":0.6241197,"g":0.68902814,"b":0.70899999},
+    "_obstacleColor" : {"r":0.66274512,"g":0.16470589,"b":0.17254902},
+    "_envColorLeftBoost" : {"r":0.92199999,"g":0.59578854,"b":0.25539395},
+    "_envColorRightBoost" : {"r":0.28235295,"g":0.45862746,"b":0.62352943}
+  },
+  "props" : {
+    "0" : [
+      {"_type":0,"_propId":0,"_lightId":1,"name":"LaserFloor (3)","position":{"x":-2,"y":0.1,"z":0}},
+      {"_type":0,"_propId":0,"_lightId":2,"name":"LaserFloor (4)","position":{"x":-2,"y":0.1,"z":0}},
+      {"_type":0,"_propId":0,"_lightId":3,"name":"LaserFloor (2)","position":{"x":2,"y":0.1,"z":0}}
+    ],
+    "1" : [
+      {"_type":1,"_propId":5,"_lightId":6,"name":"LaserTop (3)","position":{"x":0,"y":4.75,"z":12.5}},
+      {"_type":1,"_propId":7,"_lightId":8,"name":"LaserTop","position":{"x":0,"y":4.75,"z":22.5}},
+      {"_type":1,"_propId":1,"_lightId":2,"name":"LaserTop (1)","position":{"x":0,"y":4.75,"z":32.5}},
+      {"_type":1,"_propId":0,"_lightId":1,"name":"LaserTop (2)","position":{"x":0,"y":4.75,"z":42.5}},
+      {"_type":1,"_propId":2,"_lightId":3,"name":"LaserTop (4)","position":{"x":0,"y":4.75,"z":52.5}},
+      {"_type":1,"_propId":6,"_lightId":7,"name":"LaserTop (5)","position":{"x":0,"y":4.75,"z":62.5}},
+      {"_type":1,"_propId":4,"_lightId":5,"name":"LaserTop (6)","position":{"x":0,"y":4.75,"z":72.5}},
+      {"_type":1,"_propId":3,"_lightId":4,"name":"LaserTop (7)","position":{"x":0,"y":4.75,"z":82.5}}
+    ],
+    "2" : [
+      {"_type":2,"_propId":1,"_lightId":19,"name":"LaserL","position":{"x":-2.8,"y":3.2,"z":10}},
+      {"_type":2,"_propId":1,"_lightId":20,"name":"LaserL (2)","position":{"x":-2.4,"y":3.7,"z":10}},
+      {"_type":2,"_propId":0,"_lightId":1,"name":"Laser","position":{"x":-2.2,"y":2.2,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":2,"name":"Laser","position":{"x":-1.556,"y":3.756,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":3,"name":"Laser","position":{"x":-1.262,"y":4.002,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":4,"name":"Laser","position":{"x":-0.382,"y":4.367,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":5,"name":"Laser","position":{"x":-2.167,"y":2.582,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":6,"name":"Laser","position":{"x":-0.192,"y":4.392,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":7,"name":"Laser","position":{"x":-2.192,"y":2.392,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":8,"name":"Laser","position":{"x":-1.802,"y":3.462,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":9,"name":"Laser","position":{"x":-1.994,"y":3.13,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":10,"name":"Laser","position":{"x":-1.414,"y":3.885,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":11,"name":"Laser","position":{"x":-2.125,"y":2.769,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":12,"name":"Laser","position":{"x":-1.905,"y":3.3,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":13,"name":"Laser","position":{"x":-2.067,"y":2.952,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":14,"name":"Laser","position":{"x":-0.569,"y":4.325,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":15,"name":"Laser","position":{"x":-0.93,"y":4.194,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":16,"name":"Laser","position":{"x":-0.752,"y":4.267,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":17,"name":"Laser","position":{"x":-1.685,"y":3.614,"z":150}},
+      {"_type":2,"_propId":0,"_lightId":18,"name":"Laser","position":{"x":-1.1,"y":4.105,"z":150}}
+    ],
+    "3" : [
+      {"_type":3,"_propId":1,"_lightId":19,"name":"LarerR","position":{"x":2.8,"y":3.2,"z":10}},
+      {"_type":3,"_propId":1,"_lightId":20,"name":"LarerR (2)","position":{"x":2.4,"y":3.7,"z":10}},
+      {"_type":3,"_propId":0,"_lightId":1,"name":"Laser","position":{"x":2.192,"y":2.392,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":2,"name":"Laser","position":{"x":1.802,"y":3.462,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":3,"name":"Laser","position":{"x":0.192,"y":4.392,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":4,"name":"Laser","position":{"x":1.994,"y":3.13,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":5,"name":"Laser","position":{"x":2.167,"y":2.582,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":6,"name":"Laser","position":{"x":1.262,"y":4.002,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":7,"name":"Laser","position":{"x":0.382,"y":4.367,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":8,"name":"Laser","position":{"x":1.556,"y":3.756,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":9,"name":"Laser","position":{"x":1.1,"y":4.105,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":10,"name":"Laser","position":{"x":1.685,"y":3.614,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":11,"name":"Laser","position":{"x":0.569,"y":4.325,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":12,"name":"Laser","position":{"x":2.067,"y":2.952,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":13,"name":"Laser","position":{"x":1.905,"y":3.3,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":14,"name":"Laser","position":{"x":0.752,"y":4.267,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":15,"name":"Laser","position":{"x":0.93,"y":4.194,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":16,"name":"Laser","position":{"x":2.125,"y":2.769,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":17,"name":"Laser","position":{"x":1.414,"y":3.885,"z":150}},
+      {"_type":3,"_propId":0,"_lightId":18,"name":"Laser","position":{"x":2.2,"y":2.2,"z":150}}
+    ],
+    "4" : [
+      {"_type":4,"_propId":0,"_lightId":0,"name":"Feet","position":{"x":0,"y":0.005,"z":0}},
+      {"_type":4,"_propId":0,"_lightId":2,"name":"RectangleFakeGlow","position":{"x":0,"y":0.01,"z":0}},
+      {"_type":4,"_propId":1,"_lightId":1,"name":"LogoLight","position":{"x":0,"y":2,"z":80}},
+      {"_type":4,"_propId":1,"_lightId":4,"name":"Logo","position":{"x":0,"y":2,"z":80}}
+    ]
+  }
+}
