@@ -9,7 +9,7 @@ import (
 )
 
 type Event interface {
-	Base() BaseEvent
+	Base() *BaseEvent
 	CustomData() (json.RawMessage, error)
 }
 
@@ -19,48 +19,7 @@ type BaseEvent struct {
 	Value beatsaber.EventValue
 }
 
-func (e BaseEvent) Base() BaseEvent {
-	return e
-}
-
-type LightingEvent struct {
-	BaseEvent
-}
-
-func (c *Context) NewLightingEvent(typ beatsaber.EventType, val beatsaber.EventValue) *LightingEvent {
-	e := &LightingEvent{
-		BaseEvent: BaseEvent{
-			Beat:  c.B,
-			Type:  typ,
-			Value: val,
-		},
-	}
-
-	c.events = append(c.events, e)
-
-	return e
-}
-
-func (e *LightingEvent) CustomData() (json.RawMessage, error) { return nil, nil }
-
-type RGBLightingEvent struct {
-	BaseEvent
-	chroma.RGB
-}
-
-func (c *Context) NewRGBLightingEvent(typ beatsaber.EventType, val beatsaber.EventValue) *RGBLightingEvent {
-	if !beatsaber.IsLightingEvent(typ) {
-		panic(fmt.Sprintf("context.NewRGBLightingEvent: %v is not a lighting event", typ))
-	}
-
-	e := &RGBLightingEvent{
-		BaseEvent: BaseEvent{
-			Beat:  c.B,
-			Type:  typ,
-			Value: val,
-		},
-	}
-	c.events = append(c.events, e)
+func (e *BaseEvent) Base() *BaseEvent {
 	return e
 }
 
@@ -69,15 +28,15 @@ type RotationEvent struct {
 }
 
 func (c *Context) NewRotationEvent() *RotationEvent {
-	event := &RotationEvent{BaseEvent: BaseEvent{
+	e := &RotationEvent{BaseEvent: BaseEvent{
 		Beat:  c.B,
 		Type:  beatsaber.EventTypeRingSpin,
 		Value: 0,
 	}}
 
-	c.events = append(c.events, event)
-
-	return event
+	c.applyModifiers(e)
+	c.events = append(c.events, e)
+	return e
 }
 
 func (e *RotationEvent) CustomData() (json.RawMessage, error) { return nil, nil }
@@ -88,7 +47,7 @@ type PreciseRotationEvent struct {
 }
 
 func (c *Context) NewPreciseRotationEvent() *PreciseRotationEvent {
-	event := &PreciseRotationEvent{
+	e := &PreciseRotationEvent{
 		BaseEvent: BaseEvent{
 			Beat:  c.B,
 			Type:  beatsaber.EventTypeRingSpin,
@@ -96,9 +55,42 @@ func (c *Context) NewPreciseRotationEvent() *PreciseRotationEvent {
 		},
 	}
 
-	c.events = append(c.events, event)
+	c.applyModifiers(e)
+	c.events = append(c.events, e)
+	return e
+}
 
-	return event
+func (e *PreciseRotationEvent) SetNameFilter(nf string) *PreciseRotationEvent {
+	e.NameFilter = nf
+	return e
+}
+func (e *PreciseRotationEvent) SetReset(r bool) *PreciseRotationEvent {
+	e.Reset = r
+	return e
+}
+func (e *PreciseRotationEvent) SetRotation(r float64) *PreciseRotationEvent {
+	e.Rotation = r
+	return e
+}
+func (e *PreciseRotationEvent) SetStep(s float64) *PreciseRotationEvent {
+	e.Step = s
+	return e
+}
+func (e *PreciseRotationEvent) SetProp(p float64) *PreciseRotationEvent {
+	e.Prop = p
+	return e
+}
+func (e *PreciseRotationEvent) SetSpeed(s float64) *PreciseRotationEvent {
+	e.Speed = s
+	return e
+}
+func (e *PreciseRotationEvent) SetDirection(d chroma.SpinDirection) *PreciseRotationEvent {
+	e.Direction = d
+	return e
+}
+func (e *PreciseRotationEvent) SetCounterSpin(c bool) *PreciseRotationEvent {
+	e.CounterSpin = c
+	return e
 }
 
 type ZoomEvent struct {
@@ -113,6 +105,7 @@ func (c *Context) NewZoomEvent() *ZoomEvent {
 			Value: 0,
 		},
 	}
+	c.applyModifiers(e)
 	c.events = append(c.events, e)
 	return e
 }
@@ -132,7 +125,13 @@ func (c *Context) NewPreciseZoomEvent() *PreciseZoomEvent {
 			Value: 0,
 		},
 	}
+	c.applyModifiers(e)
 	c.events = append(c.events, e)
+	return e
+}
+
+func (e *PreciseZoomEvent) SetStep(s float64) *PreciseZoomEvent {
+	e.Step = s
 	return e
 }
 
@@ -176,7 +175,18 @@ type PreciseRotationSpeedEvent struct {
 	chroma.PreciseLaser
 }
 
-func (c Context) NewPreciseRotationSpeedEvent(l DirectionalLaser, value int) *PreciseRotationSpeedEvent {
+func (c Context) NewPreciseRotationSpeedEvent() *PreciseRotationSpeedEvent {
+	e := &PreciseRotationSpeedEvent{
+		BaseEvent: BaseEvent{
+			Beat: c.B,
+		},
+	}
+	c.applyModifiers(e)
+	c.events = append(c.events, e)
+	return e
+}
+
+func (e *PreciseRotationSpeedEvent) SetLaser(l DirectionalLaser) *PreciseRotationSpeedEvent {
 	var typ beatsaber.EventType
 	switch l {
 	case LeftLaser:
@@ -187,13 +197,26 @@ func (c Context) NewPreciseRotationSpeedEvent(l DirectionalLaser, value int) *Pr
 		panic(fmt.Sprintf("NewRotationSpeedEvent: unsupported direction %v", typ))
 	}
 
-	e := &PreciseRotationSpeedEvent{
-		BaseEvent: BaseEvent{
-			Beat:  c.B,
-			Type:  typ,
-			Value: beatsaber.EventValue(value),
-		},
-	}
-	c.events = append(c.events, e)
+	e.Type = typ
+	return e
+}
+
+func (e *PreciseRotationSpeedEvent) SetValue(value int) *PreciseRotationSpeedEvent {
+	e.Value = beatsaber.EventValue(value)
+	return e
+}
+
+func (e *PreciseRotationSpeedEvent) SetLockPosition(lp bool) *PreciseRotationSpeedEvent {
+	e.LockPosition = lp
+	return e
+}
+
+func (e *PreciseRotationSpeedEvent) SetSpeed(s float64) *PreciseRotationSpeedEvent {
+	e.Speed = s
+	return e
+}
+
+func (e *PreciseRotationSpeedEvent) SetDirection(d chroma.SpinDirection) *PreciseRotationSpeedEvent {
+	e.Direction = d
 	return e
 }

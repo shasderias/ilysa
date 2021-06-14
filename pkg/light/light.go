@@ -1,5 +1,4 @@
 package light
 
-func New() {
+type Profile struct{}
 
-}

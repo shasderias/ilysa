@@ -29,7 +29,6 @@ type CustomData interface {
 	json.Marshaler
 }
 
-type EventValue float64
 type EventType int
 
 const (
@@ -52,6 +51,16 @@ const (
 	EventTypeInterscopeLowerHydraulics        EventType = 16
 	EventTypeInterscopeRaiseHydraulics        EventType = 17
 )
+
+func (t EventType) EventType() EventType {
+	return t
+}
+
+type EventTyper interface {
+	EventType() EventType
+}
+
+type EventValue float64
 
 const (
 	EventValueLightOff       EventValue = 0

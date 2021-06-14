@@ -23,35 +23,35 @@ func New(bsMap *beatsaber.Map) *Project {
 }
 
 func (p *Project) EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, generator EventGenerator) {
-	ctx := Context{Project: p}
+	ctx := newContext(p)
 	posScaler := util.ScaleToUnitInterval(0, float64(steps-1))
 
 	for i := 0; i < steps; i++ {
 		pos := posScaler(float64(i))
 		beat := Ierp(startBeat, endBeat, pos, easeFunc)
-		ctx.Timing = NewTiming(startBeat, endBeat, beat, i)
-		generator(&ctx)
+		ctx.newTiming(startBeat, endBeat, beat, i)
+		generator(ctx)
 	}
 }
 
 func (p *Project) EventForBeat(targetBeat float64, generator EventGenerator) {
-	ctx := Context{Project: p}
-	ctx.Timing = NewTiming(targetBeat, targetBeat, targetBeat, 0)
-	generator(&ctx)
+	ctx := newContext(p)
+	ctx.newTiming(targetBeat, targetBeat, targetBeat, 0)
+	generator(ctx)
 }
 
 func (p *Project) EventsForBeats(startBeat, duration float64, count int, generator EventGenerator) {
-	ctx := Context{Project: p}
+	ctx := newContext(p)
 	endBeat := startBeat + (duration * float64(count-1))
 
 	for i := 0; i < count; i++ {
-		ctx.Timing = NewTiming(startBeat, endBeat, startBeat+duration*float64(i), i)
-		generator(&ctx)
+		ctx.newTiming(startBeat, endBeat, startBeat+duration*float64(i), i)
+		generator(ctx)
 	}
 }
 
 func (p *Project) EventsForSequence(startBeat float64, sequence []float64, generator EventGenerator) {
-	ctx := Context{Project: p}
+	ctx := newContext(p)
 
 	if len(sequence) == 0 {
 		panic("EventsForSequence: sequence must contain at least 1 beat")
@@ -61,8 +61,8 @@ func (p *Project) EventsForSequence(startBeat float64, sequence []float64, gener
 
 	for i, offset := range sequence {
 		beat := startBeat + offset
-		ctx.Timing = NewTiming(startBeat, endBeat, beat, i)
-		generator(&ctx)
+		ctx.newTiming(startBeat, endBeat, beat, i)
+		generator(ctx)
 	}
 }
 
@@ -88,7 +88,7 @@ startFound:
 		}
 	}
 
-	ctx := Context{Project: p}
+	ctx := newContext(p)
 
 	events := p.events[startIdx : endIdx+1]
 
@@ -96,8 +96,8 @@ startFound:
 		if !filter(events[i]) {
 			continue
 		}
-		ctx.Timing = NewTiming(startBeat, endBeat, events[i].Base().Beat, i)
-		modder(&ctx, events[i])
+		ctx.newTiming(startBeat, endBeat, events[i].Base().Beat, i)
+		modder(ctx, events[i])
 	}
 }
 

@@ -20,7 +20,7 @@ func TestLightIDDiv(t *testing.T) {
 		want []int
 	}{
 		{
-			name: "All",
+			name: "AllIndividual",
 			args: args{
 				min:       1,
 				max:       4,

@@ -7,7 +7,7 @@ import (
 	"ilysa/pkg/util"
 )
 
-func GradientProp(ctx *ilysa.Context, typ beatsaber.EventType, val beatsaber.EventValue, table gradient.Table, minLightID, maxLightID int) {
+func GradientProp(ctx ilysa.Context, typ beatsaber.EventType, val beatsaber.EventValue, table gradient.Table, minLightID, maxLightID int) {
 	scale := util.Scale(float64(minLightID), float64(maxLightID), 0, 1)
 	for i := minLightID; i < maxLightID; i++ {
 		e := ctx.NewRGBLightingEvent(typ, val)

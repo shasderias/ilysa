@@ -94,8 +94,6 @@
       {"_type":3,"_propId":7,"_lightId":9,"name":"Laser","position":{"x":8,"y":-5,"z":44}}
     ],
     "4" : [
-      {"_type":4,"_propId":0,"_lightId":0,"name":"Feet","position":{"x":0,"y":0.005,"z":0}},
-      {"_type":4,"_propId":0,"_lightId":1,"name":"RectangleFakeGlow","position":{"x":0,"y":0.01,"z":0}},
       {"_type":4,"_propId":1,"_lightId":2,"name":"NeonTube (1)","position":{"x":0.05,"y":4.65,"z":65}},
       {"_type":4,"_propId":1,"_lightId":4,"name":"NeonTube","position":{"x":-0.05,"y":4.65,"z":65}}
     ]
