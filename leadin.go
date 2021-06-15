@@ -25,6 +25,13 @@ func LeadIn(p *ilysa.Project) {
 }
 
 func LeadInBrokenChord(p *ilysa.Project, startBeat float64) {
+	p.EventsForRange(0, 10, 30, ease.Linear, func(ctx ilysa.Context) {
+		ctx.UseLight(backLasers, func(ctx ilysa.Context) {
+			ctx.NewRGBLightingEvent().SetValue(off).SetColor()
+
+		})
+	})
+
 	p.EventsForBeats(startBeat, 0.25, 4, func(ctx ilysa.Context) {
 		lights := beatsaber.NewEventTypeSet(beatsaber.EventTypeLeftRotatingLasers, beatsaber.EventTypeRightRotatingLasers)
 		values := beatsaber.NewEventValueSet(

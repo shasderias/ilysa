@@ -6,7 +6,7 @@ import (
 )
 
 type RGB struct {
-	LightID LightID     `json:"_lightID,omitempty"`
+	LightID LightID    `json:"_lightID,omitempty"`
 	Color   color.Color `json:"_color,omitempty"`
 }
 
@@ -18,7 +18,7 @@ func (r *RGB) CustomData() (json.RawMessage, error) {
 	cd := map[string]interface{}{}
 
 	if r.LightID != nil {
-		cd["_lightID"] = r.LightID
+		cd["_lightID"] = LightID(r.LightID)
 	}
 	if r.Color != nil {
 		cd["_color"] = ColorFromColor(r.Color)

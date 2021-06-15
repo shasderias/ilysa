@@ -261,7 +261,7 @@ func (p Intro) Rhythm(startBeat, endBeat float64) {
 //		set := magnetColors
 //
 //		br := ctx.NewRGBLightingEvent(beatsaber.EventTypeRingLights, beatsaber.EventValueLightRedFlash)
-//		br.SetColor(set.Pick(ctx.Ordinal))
+//		br.SetColor(set.Index(ctx.Ordinal))
 //
 //	})
 //}
@@ -325,7 +325,7 @@ func (p Intro) Melody2(startBeat float64, reverseZoom bool) {
 		})
 		//e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightBlueOn)
 		//e.SetColor(magnetPink)
-		//e.SetLightID(lightIDSet.Pick(ctx.Ordinal))
+		//e.SetLightID(lightIDSet.Index(ctx.Ordinal))
 
 		ze := ctx.NewPreciseZoomEvent()
 		if reverseZoom {
@@ -700,12 +700,16 @@ func (p Intro) OutroSplash(startBeat float64) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
 		})
 
+	const (
+		splashDuration = 0.495
+	)
+
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.Context) {
 		g := append(gradient.Table{}, grad...)
 		rand.Shuffle(len(g), func(i, j int) {
 			g[i].Col, g[j].Col = g[j].Col, g[i].Col
 		})
-		p.EventsForRange(ctx.B, ctx.B+0.5, 15, ease.Linear, func(ctx ilysa.Context) {
+		p.EventsForRange(ctx.B, ctx.B+splashDuration, 15, ease.Linear, func(ctx ilysa.Context) {
 			ctx.RangeLightIDs(leftLaser, lightid.AllIndividual, func(ctx ilysa.RangeLightIDContext) {
 				e := fx.Gradient(ctx, beatsaber.EventValueLightBlueOn, g)
 				e.SetAlpha(float64(ctx.Ordinal)*0.5)
@@ -716,7 +720,7 @@ func (p Intro) OutroSplash(startBeat float64) {
 			})
 		})
 
-		p.ModEventsInRange(ctx.B, ctx.B+0.5, ilysa.FilterRGBLights(), func(ctx ilysa.Context, event ilysa.Event) {
+		p.ModEventsInRange(ctx.B, ctx.B+splashDuration, ilysa.FilterRGBLights(), func(ctx ilysa.Context, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.InCirc)
 		})
 	})

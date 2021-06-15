@@ -54,7 +54,7 @@ func TestSetPick(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			for i := 0; i < len(tt.n); i++ {
 				if got := tt.s.Pick(tt.n[i]); !reflect.DeepEqual(got, tt.want[i]) {
-					t.Errorf("Pick() = %v, want %v", got, tt.want[i])
+					t.Errorf("Index() = %v, want %v", got, tt.want[i])
 				}
 			}
 		})

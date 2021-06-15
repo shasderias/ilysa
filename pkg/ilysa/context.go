@@ -5,6 +5,7 @@ import (
 
 	"ilysa/pkg/chroma"
 	"ilysa/pkg/chroma/lightid"
+	"ilysa/pkg/light"
 	"ilysa/pkg/util"
 )
 
@@ -58,6 +59,11 @@ func (c Context) WithModifier(modifiers ...EventModifier) Context {
 	}
 }
 
+func (c Context) addEvent(e Event) {
+	c.applyModifiers(e)
+	c.Project.events = append(c.Project.events, e)
+}
+
 func (c Context) applyModifiers(e Event) {
 	if len(c.modifiers) == 0 {
 		return
@@ -73,8 +79,8 @@ type RangeLightIDContext struct {
 
 	MinLightID     int
 	MaxLightID     int
-	CurLightID     chroma.LightID
-	PreLightID     chroma.LightID
+	CurLightID     light.ID
+	PreLightID     light.ID
 	LightIDPos     float64
 	LightIDOrdinal int
 	LightIDSet     lightid.Set
@@ -107,7 +113,33 @@ func (c Context) RangeLightIDs(light Light, picker lightid.Picker, callback func
 	}
 }
 
+func (c Context) RangeLight(l light.Light, callback func(ctx RangeLightIDContext)) {
+	for i := l.LightIDMin(); i <= l.LightIDMax(); i++ {
+		ctx := c.WithModifier(func(e Event) {
+			le, ok := e.(*RGBLightingEvent)
+			if !ok {
+				return
+			}
+			le.BaseEvent.Type = l.EventType(i)
+			le.SetLightID(l.LightID(i))
+		})
+		callback(RangeLightIDContext{
+			Context: ctx,
+			MinLightID: l.LightIDMin(),
+			MaxLightID: l.LightIDMax(),
+			CurLightID: l.LightID(i),
+			LightIDPos: float64(i)/float64(l.LightIDLen()),
+		})
+	}
+}
+
 type EventModifier func(e Event)
 type EventGenerator func(ctx Context)
 type EventModder func(ctx Context, event Event)
 type EventFilter func(event Event) bool
+
+
+// time - 0.25 - 0.50
+// light - back lasers
+// color rainbow, varying with time
+// alpha

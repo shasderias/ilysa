@@ -93,6 +93,9 @@ func do() error {
 		startBeat: 0,
 	}.Play()
 
+	v := Verse{Project: p}
+	v.PlayVerse1(52)
+
 	//
 	//BassTwang(p, 18.5)
 	//

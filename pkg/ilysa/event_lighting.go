@@ -8,6 +8,7 @@ import (
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
 	"ilysa/pkg/colorful"
+	"ilysa/pkg/light"
 )
 
 type LightingEvent struct {
@@ -22,9 +23,7 @@ func (c *Context) NewLightingEvent(typ beatsaber.EventType, val beatsaber.EventV
 			Value: val,
 		},
 	}
-
-	c.events = append(c.events, e)
-
+	c.addEvent(e)
 	return e
 }
 
@@ -41,8 +40,7 @@ func (c *Context) NewRGBLightingEvent() *RGBLightingEvent {
 			Beat: c.B,
 		},
 	}
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
+	c.addEvent(e)
 	return e
 }
 
@@ -76,19 +74,12 @@ func (e *RGBLightingEvent) SetAlpha(a float64) *RGBLightingEvent {
 	return e
 }
 
-func (e *RGBLightingEvent) FirstLightID() int {
-	if len(e.LightID) == 0 {
-		panic("RGB.FirstLightID: lightID is nil or contains no lightIDs")
-	}
-	return e.LightID[0]
-}
-
 func (e *RGBLightingEvent) SetSingleLightID(id int) *RGBLightingEvent {
 	e.LightID = []int{id}
 	return e
 }
 
-func (e *RGBLightingEvent) SetLightID(ids chroma.LightID) *RGBLightingEvent {
-	e.LightID = ids
+func (e *RGBLightingEvent) SetLightID(id light.ID) *RGBLightingEvent {
+	e.LightID = chroma.LightID(id)
 	return e
 }

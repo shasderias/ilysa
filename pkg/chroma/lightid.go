@@ -26,4 +26,3 @@ func (l LightID) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal([]int(l))
 }
-
