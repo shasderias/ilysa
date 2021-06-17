@@ -4,7 +4,7 @@ import "ilysa/pkg/beatsaber"
 
 var FilterAllLightingEvents EventFilter = func(event Event) bool {
 	switch event.(type) {
-	case *LightingEvent:
+	case *BasicLightingEvent:
 		return true
 	case *RGBLightingEvent:
 		return true
@@ -37,6 +37,6 @@ func FilterRGBLight(light Light) EventFilter {
 			return false
 		}
 
-		return event.Base().Type == light.EventType()
+		return light.EventType().Has(event.Base().Type)
 	}
 }

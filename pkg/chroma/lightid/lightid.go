@@ -6,8 +6,8 @@ import (
 )
 
 type LightProfile interface {
-	MinLightID() int
-	MaxLightID() int
+	LightIDMin() int
+	LightIDMax() int
 }
 
 type Picker func(profile LightProfile) Set
@@ -15,7 +15,7 @@ type Picker func(profile LightProfile) Set
 func AllIndividual(profile LightProfile) Set {
 	set := Set{}
 
-	for i := profile.MinLightID(); i < profile.MaxLightID(); i++ {
+	for i := profile.LightIDMin(); i < profile.LightIDMax(); i++ {
 		set.Add(chroma.LightID{i})
 	}
 
@@ -25,21 +25,21 @@ func AllIndividual(profile LightProfile) Set {
 func All(profile LightProfile) Set {
 	set := Set{}
 
-	set.Add(FromInterval(profile.MinLightID(), profile.MaxLightID()))
+	set.Add(FromInterval(profile.LightIDMin(), profile.LightIDMax()))
 
 	return set
 }
 
 func GroupDivide(divisor int) func(profile LightProfile) Set {
 	return func(profile LightProfile) Set {
-		allIDs := FromInterval(profile.MinLightID(), profile.MaxLightID())
+		allIDs := FromInterval(profile.LightIDMin(), profile.LightIDMax())
 
 		return Divide(allIDs, divisor)
 	}
 }
 
-func For(maxLightID int, typ beatsaber.EventType) chroma.LightID {
-	return FromInterval(1, maxLightID)
+func For(LightIDMax int, typ beatsaber.EventType) chroma.LightID {
+	return FromInterval(1, LightIDMax)
 }
 
 func FromInterval(a, b int) chroma.LightID {
@@ -62,8 +62,8 @@ func EveryNthLightID(min, max, div, remainder int) []int {
 
 func Fan(groups int) func(profile LightProfile) Set {
 	return func(profile LightProfile) Set {
-		min := profile.MinLightID()
-		max := profile.MaxLightID()
+		min := profile.LightIDMin()
+		max := profile.LightIDMax()
 		if (max - min) < groups {
 			panic("Fan: not enough lights to fan")
 		}

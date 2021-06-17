@@ -6,7 +6,6 @@ import (
 
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/ease"
-	"ilysa/pkg/util"
 )
 
 type Project struct {
@@ -22,48 +21,24 @@ func New(bsMap *beatsaber.Map) *Project {
 	}
 }
 
-func (p *Project) EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, generator EventGenerator) {
-	ctx := newContext(p)
-	posScaler := util.ScaleToUnitInterval(0, float64(steps-1))
-
-	for i := 0; i < steps; i++ {
-		pos := posScaler(float64(i))
-		beat := Ierp(startBeat, endBeat, pos, easeFunc)
-		ctx.newTiming(startBeat, endBeat, beat, i)
-		generator(ctx)
-	}
+func (p *Project) EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(TimingContext)) {
+	ctx := newBaseContext(p)
+	ctx.eventsForRange(startBeat, endBeat, steps, easeFunc, callback)
 }
 
-func (p *Project) EventForBeat(targetBeat float64, generator EventGenerator) {
-	ctx := newContext(p)
-	ctx.newTiming(targetBeat, targetBeat, targetBeat, 0)
-	generator(ctx)
+func (p *Project) EventForBeat(beat float64, callback func(ctx TimingContext)) {
+	ctx := newBaseContext(p)
+	ctx.eventForBeat(beat, callback)
 }
 
-func (p *Project) EventsForBeats(startBeat, duration float64, count int, generator EventGenerator) {
-	ctx := newContext(p)
-	endBeat := startBeat + (duration * float64(count-1))
-
-	for i := 0; i < count; i++ {
-		ctx.newTiming(startBeat, endBeat, startBeat+duration*float64(i), i)
-		generator(ctx)
-	}
+func (p *Project) EventsForBeats(startBeat, duration float64, count int, callback func(ctx TimingContext)) {
+	ctx := newBaseContext(p)
+	ctx.eventsForBeats(startBeat, duration, count, callback)
 }
 
-func (p *Project) EventsForSequence(startBeat float64, sequence []float64, generator EventGenerator) {
-	ctx := newContext(p)
-
-	if len(sequence) == 0 {
-		panic("EventsForSequence: sequence must contain at least 1 beat")
-	}
-
-	endBeat := startBeat + sequence[len(sequence)-1]
-
-	for i, offset := range sequence {
-		beat := startBeat + offset
-		ctx.newTiming(startBeat, endBeat, beat, i)
-		generator(ctx)
-	}
+func (p *Project) EventsForSequence(startBeat float64, sequence []float64, callback func(ctx SequenceContext)) {
+	ctx := newBaseContext(p)
+	ctx.eventsForSequence(startBeat, sequence, callback)
 }
 
 func (p *Project) ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder EventModder) {
@@ -88,7 +63,7 @@ startFound:
 		}
 	}
 
-	ctx := newContext(p)
+	ctx := newBaseContext(p)
 
 	events := p.events[startIdx : endIdx+1]
 
@@ -96,8 +71,7 @@ startFound:
 		if !filter(events[i]) {
 			continue
 		}
-		ctx.newTiming(startBeat, endBeat, events[i].Base().Beat, i)
-		modder(ctx, events[i])
+		modder(ctx.withTiming(events[i].Base().Beat, startBeat, endBeat, i), events[i])
 	}
 }
 

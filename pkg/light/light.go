@@ -72,43 +72,5 @@ func (l Basic) LightIDLen() int {
 	return len(l.id)
 }
 
-type SetBuilder func(ID) *Set
+type SetBuilder func(ID) *LightIDSet
 
-func Identity(id ID) *Set {
-	return NewSet(id)
-}
-
-func DivideSingle(id ID) *Set {
-	set := NewSet()
-	for _, lightID := range id {
-		set.Add(ID{lightID})
-	}
-	return set
-}
-
-func Divide(divisor int) SetBuilder {
-	return func(id ID) *Set {
-		set := NewSet()
-
-		for len(id) > divisor {
-			set.Add(id[0:divisor])
-			id = id[divisor:]
-		}
-
-		set.AppendToIndex(set.Len()-1, id...)
-
-		return set
-	}
-}
-
-func Fan(groupCount int) SetBuilder {
-	return func(id ID) *Set {
-		set := make(Set, groupCount)
-
-		for i, lightID := range id {
-			set[i%groupCount] = append(set[i%groupCount], lightID)
-		}
-
-		return &set
-	}
-}

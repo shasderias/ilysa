@@ -5,7 +5,7 @@ import (
 	"ilysa/pkg/ilysa"
 )
 
-func OffAll(ctx ilysa.Context) {
+func OffAll(ctx ilysa.Timing) {
 	var (
 		lights = beatsaber.NewEventTypeSet(
 			beatsaber.EventTypeBackLasers,

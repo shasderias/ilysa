@@ -14,7 +14,7 @@ func RGBAlphaFade(p *ilysa.Project, target beatsaber.EventType,
 
 	p.ModEventsInRange(startBeat, endBeat,
 		ilysa.FilterLightingEvents(target),
-		func(ctx ilysa.Context, event ilysa.Event) {
+		func(ctx ilysa.Timing, event ilysa.Event) {
 			e := event.(*ilysa.RGBLightingEvent)
 
 			alphaMut := alphaScale(fadeEase(ctx.Pos))

@@ -13,15 +13,15 @@ import (
 //	alphaScale := util.ScaleFromUnitInterval(startAlpha, endAlpha)
 //
 //	p.ModEventsInRange(startBeat, endBeat, ilysa.FilterRGBLight(light),
-//		func(ctx ilysa.Context, event ilysa.Event) {
+//		func(ctx ilysa.Timing, event ilysa.Event) {
 //			e := event.(*ilysa.RGBLightingEvent)
-//			e.SetAlpha(e.GetAlpha() * alphaScale(easeFn(ctx.Pos)))
+//			e.SetAlpha(e.GetAlpha() * alphaScale(easeFn(ctx.t)))
 //		})
 //}
 
-func RGBAlphaBlend(ctx ilysa.Context, event ilysa.Event, startAlpha, endAlpha float64, easeFn ease.Func) {
+func RGBAlphaBlend(ctx ilysa.TimingContext, event ilysa.Event, startAlpha, endAlpha float64, easeFn ease.Func) {
 	alphaScale := util.ScaleFromUnitInterval(startAlpha, endAlpha)
 
-	e := event.(*ilysa.RGBLightingEvent)
-	e.SetAlpha(e.GetAlpha() * alphaScale(easeFn(ctx.Pos)))
+	e := event.(ilysa.EventWithAlpha)
+	e.SetAlpha(e.GetAlpha() * alphaScale(easeFn(ctx.T())))
 }

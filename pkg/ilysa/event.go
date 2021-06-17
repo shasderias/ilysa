@@ -2,10 +2,16 @@ package ilysa
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
+)
+
+type DirectionalLaser int
+
+const (
+	LeftLaser  DirectionalLaser = 0
+	RightLaser DirectionalLaser = 1
 )
 
 type Event interface {
@@ -19,204 +25,66 @@ type BaseEvent struct {
 	Value beatsaber.EventValue
 }
 
+func (e *BaseEvent) ScaleBeat(scaler func(float64) float64) {
+	e.Beat = scaler(e.Beat)
+}
+
 func (e *BaseEvent) Base() *BaseEvent {
 	return e
 }
 
-type RotationEvent struct {
-	BaseEvent
+func (e *BaseEvent) SetValue(v beatsaber.EventValue) {
+	e.Value = v
 }
 
-func (c *Context) NewRotationEvent() *RotationEvent {
-	e := &RotationEvent{BaseEvent: BaseEvent{
-		Beat:  c.B,
-		Type:  beatsaber.EventTypeRingSpin,
-		Value: 0,
-	}}
-
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *RotationEvent) CustomData() (json.RawMessage, error) { return nil, nil }
-
-type PreciseRotationEvent struct {
-	BaseEvent
-	chroma.PreciseRotation
-}
-
-func (c *Context) NewPreciseRotationEvent() *PreciseRotationEvent {
-	e := &PreciseRotationEvent{
-		BaseEvent: BaseEvent{
-			Beat:  c.B,
-			Type:  beatsaber.EventTypeRingSpin,
-			Value: 0,
-		},
-	}
-
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *PreciseRotationEvent) SetNameFilter(nf string) *PreciseRotationEvent {
-	e.NameFilter = nf
-	return e
-}
-func (e *PreciseRotationEvent) SetReset(r bool) *PreciseRotationEvent {
-	e.Reset = r
-	return e
-}
-func (e *PreciseRotationEvent) SetRotation(r float64) *PreciseRotationEvent {
-	e.Rotation = r
-	return e
-}
-func (e *PreciseRotationEvent) SetStep(s float64) *PreciseRotationEvent {
-	e.Step = s
-	return e
-}
-func (e *PreciseRotationEvent) SetProp(p float64) *PreciseRotationEvent {
-	e.Prop = p
-	return e
-}
-func (e *PreciseRotationEvent) SetSpeed(s float64) *PreciseRotationEvent {
-	e.Speed = s
-	return e
-}
-func (e *PreciseRotationEvent) SetDirection(d chroma.SpinDirection) *PreciseRotationEvent {
-	e.Direction = d
-	return e
-}
-func (e *PreciseRotationEvent) SetCounterSpin(c bool) *PreciseRotationEvent {
-	e.CounterSpin = c
-	return e
-}
-
-type ZoomEvent struct {
-	BaseEvent
-}
-
-func (c *Context) NewZoomEvent() *ZoomEvent {
-	e := &ZoomEvent{
-		BaseEvent{
-			Beat:  c.B,
-			Type:  beatsaber.EventTypeRingZoom,
-			Value: 0,
-		},
-	}
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *ZoomEvent) CustomData() (json.RawMessage, error) { return nil, nil }
-
-type PreciseZoomEvent struct {
-	BaseEvent
-	chroma.PreciseZoom
-}
-
-func (c *Context) NewPreciseZoomEvent() *PreciseZoomEvent {
-	e := &PreciseZoomEvent{
-		BaseEvent: BaseEvent{
-			Beat:  c.B,
-			Type:  beatsaber.EventTypeRingZoom,
-			Value: 0,
-		},
-	}
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *PreciseZoomEvent) SetStep(s float64) *PreciseZoomEvent {
-	e.Step = s
-	return e
-}
-
-type RotationSpeedEvent struct {
-	BaseEvent
-}
-
-type DirectionalLaser int
-
-const (
-	LeftLaser  DirectionalLaser = 0
-	RightLaser DirectionalLaser = 1
-)
-
-func (c *Context) NewRotationSpeedEvent(d DirectionalLaser, value int) *RotationSpeedEvent {
-	var typ beatsaber.EventType
-	switch d {
-	case LeftLaser:
-		typ = beatsaber.EventTypeLeftRotatingLasersRotationSpeed
-	case RightLaser:
-		typ = beatsaber.EventTypeRightRotatingLasersRotationSpeed
-	default:
-		panic(fmt.Sprintf("NewRotationSpeedEvent: unsupported direction %v", typ))
-	}
-
-	e := &RotationSpeedEvent{
-		BaseEvent{
-			Beat:  c.B,
-			Type:  typ,
-			Value: beatsaber.EventValue(value),
-		},
-	}
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *RotationSpeedEvent) CustomData() (json.RawMessage, error) { return nil, nil }
-
-type PreciseRotationSpeedEvent struct {
-	BaseEvent
-	chroma.PreciseLaser
-}
-
-func (c Context) NewPreciseRotationSpeedEvent() *PreciseRotationSpeedEvent {
-	e := &PreciseRotationSpeedEvent{
-		BaseEvent: BaseEvent{
-			Beat: c.B,
-		},
-	}
-	c.applyModifiers(e)
-	c.events = append(c.events, e)
-	return e
-}
-
-func (e *PreciseRotationSpeedEvent) SetLaser(l DirectionalLaser) *PreciseRotationSpeedEvent {
-	var typ beatsaber.EventType
-	switch l {
-	case LeftLaser:
-		typ = beatsaber.EventTypeLeftRotatingLasersRotationSpeed
-	case RightLaser:
-		typ = beatsaber.EventTypeRightRotatingLasersRotationSpeed
-	default:
-		panic(fmt.Sprintf("NewRotationSpeedEvent: unsupported direction %v", typ))
-	}
-
+func (e *BaseEvent) SetType(typ beatsaber.EventType) {
 	e.Type = typ
-	return e
 }
 
-func (e *PreciseRotationSpeedEvent) SetValue(value int) *PreciseRotationSpeedEvent {
-	e.Value = beatsaber.EventValue(value)
-	return e
+type withStepOpt struct {
+	step float64
 }
 
-func (e *PreciseRotationSpeedEvent) SetLockPosition(lp bool) *PreciseRotationSpeedEvent {
-	e.LockPosition = lp
-	return e
+func WithStep(s float64) withStepOpt {
+	return withStepOpt{s}
 }
 
-func (e *PreciseRotationSpeedEvent) SetSpeed(s float64) *PreciseRotationSpeedEvent {
-	e.Speed = s
-	return e
+func (o withStepOpt) applyPreciseRotationEvent(e *PreciseRotationEvent) {
+	e.Step = o.step
 }
 
-func (e *PreciseRotationSpeedEvent) SetDirection(d chroma.SpinDirection) *PreciseRotationSpeedEvent {
-	e.Direction = d
-	return e
+func (o withStepOpt) applyPreciseZoomEvent(e *PreciseZoomEvent) {
+	e.Step = o.step
+}
+
+type withSpeedOpt struct {
+	speed float64
+}
+
+func WithSpeed(s float64) withSpeedOpt {
+	return withSpeedOpt{s}
+}
+
+func (o withSpeedOpt) applyPreciseRotationEvent(e *PreciseRotationEvent) {
+	e.Speed = o.speed
+}
+
+func (o withSpeedOpt) applyPreciseRotationSpeedEvent(e *PreciseRotationSpeedEvent) {
+	e.Speed = o.speed
+}
+
+type withDirectionOpt struct {
+	direction chroma.SpinDirection
+}
+
+func WithDirection(d chroma.SpinDirection) withDirectionOpt {
+	return withDirectionOpt{d}
+}
+
+func (o withDirectionOpt) applyPreciseRotationEvent(e *PreciseRotationEvent) {
+	e.Direction = o.direction
+}
+
+func (o withDirectionOpt) applyPreciseRotationSpeedEvent(e *PreciseRotationSpeedEvent) {
+	e.Direction = o.direction
 }

@@ -83,7 +83,7 @@ func LoadEnv(envName string) (*EnvProfile, error) {
 	return &info, nil
 }
 
-func (p *EnvProfile) MaxLightID(eventType EventType) int {
+func (p *EnvProfile) LightIDMax(eventType EventType) int {
 	if p == nil {
 		return -1
 	}
