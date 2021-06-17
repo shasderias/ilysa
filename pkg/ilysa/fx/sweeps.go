@@ -14,27 +14,25 @@ var (
 	sin = math.Sin
 )
 
-//func SinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimingContextWithLight) float64 {
-//	return func(ctx ilysa.TimingContextWithLight) float64 {
-//		return sin(ctx.t*ctx.duration*sweepSpeed + float64(ctx.CurLightID[0])/float64(ctx.LightIDMax)*pi + offset)
-//	}
-//}
-//
+func SinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimingContextWithLight) float64 {
+	return func(ctx ilysa.TimingContextWithLight) float64 {
+		return sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset)
+	}
+}
+
 func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimingContextWithLight) float64 {
 	return func(ctx ilysa.TimingContextWithLight) float64 {
 		return abs(sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset))
 	}
 }
 
-//
-//func BiasedColorSweep(ctx ilysa.TimingContextWithLight, intensity, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
-//	gradPos := SinSweepLightID(sweepSpeed, ctx.randFloat64)
-//	return ctx.NewRGBLightingEvent().
-//		SetValue(beatsaber.EventValueLightRedOn).
-//		SetColor(grad.GetInterpolatedColorFor(gradPos(ctx))).
-//		SetAlpha(intensity)
-//}
-//
+func BiasedColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
+	gradPos := SinSweepLightID(sweepSpeed, ctx.FixedRand())
+	return ctx.NewRGBLightingEvent(
+		ilysa.WithColor(grad.GetInterpolatedColorFor(gradPos(ctx))),
+	)
+}
+
 func ColorSweep(ctx ilysa.TimingContextWithLight, intensity, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
 	e := ctx.NewRGBLightingEvent(

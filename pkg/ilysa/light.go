@@ -59,6 +59,24 @@ func (l BasicLight) Split(splitter LightIDSplitter) SplitLight {
 	}
 }
 
+func (l BasicLight) SplitToSequence(splitter LightIDSplitter) *SequenceLight {
+	maxLightID := l.project.ActiveDifficultyProfile().LightIDMax(l.eventType)
+
+	sl := NewSequenceLight()
+	set := splitter(NewLightIDFromInterval(1, maxLightID))
+
+	for _, lightID := range *set {
+		sl.Add(SplitLight{
+			project:   l.project,
+			eventType: l.eventType,
+			set:       &LightIDSet{lightID},
+		})
+
+	}
+
+	return sl
+}
+
 type SplitLight struct {
 	project   *Project
 	eventType beatsaber.EventType

@@ -52,7 +52,22 @@ func DivideSingle(id LightID) *LightIDSet {
 	return set
 }
 
-func Divide(divisor int) LightIDSplitter {
+func Divide(groups int) LightIDSplitter {
+	return func(id LightID) *LightIDSet {
+		groupSize := len(id) / groups
+
+		set := NewSet()
+		for i := 0; i < groups; i++ {
+			set.Add(id[0:groupSize])
+			id = id[groupSize:]
+		}
+		(*set)[groups-1] = append((*set)[groups-1], id...)
+
+		return set
+	}
+}
+
+func DivideIntoGroupsOf(divisor int) LightIDSplitter {
 	return func(id LightID) *LightIDSet {
 		set := NewSet()
 

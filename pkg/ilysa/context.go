@@ -29,6 +29,7 @@ type Timing interface {
 type LightContext interface {
 	LightIDMin() int
 	LightIDMax() int
+	LightIDLen() int
 	LightIDCur() int
 	LightIDOrdinal() int
 	LightIDT() float64
@@ -261,7 +262,7 @@ func (c lightContext) LightIDCur() int {
 }
 
 func (c lightContext) LightIDT() float64 {
-	return float64(c.LightIDCur()) / float64(c.LightIDMax())
+	return float64(c.LightIDOrdinal()) / float64(c.LightIDLen())
 }
 
 func (c contextWithLight) NewLightingEvent(opts ...BasicLightingEventOpt) *CompoundBasicLightingEvent {
@@ -317,7 +318,7 @@ func (c sequenceContext) PrevBOffset() float64 {
 
 func (c sequenceContext) UseLight(light Light, callback func(ctx SequenceContextWithLight)) {
 	ctx := c.withLight(light)
-	for i := light.LightIDMin(); i <= light.LightIDMax(); i++ {
+	for i := 0; i < light.LightIDLen(); i++ {
 		callback(ctx.withLightIDOrdinal(i))
 	}
 }
