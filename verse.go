@@ -1,99 +1,125 @@
 package main
 
-//
-//type Verse struct {
-//	*ilysa.Project
-//	offset float64
-//}
-//
-//func (p Verse) PlayVerse1(startBeat float64) {
-//	p.offset = startBeat
-//
-//	p.EventForBeat(startBeat-0.001, func(ctx ilysa.Context) {
-//		gen.OffAll(ctx)
-//		ctx.NewPreciseRotationSpeedEvent().SetLaser(ilysa.LeftLaser).SetSpeed(1.5)
-//		ctx.NewPreciseRotationSpeedEvent().SetLaser(ilysa.RightLaser).SetSpeed(1.5)
-//	})
-//
-//	p.Rhythm(0)
-//	p.Rhythm(4)
-//	p.Rhythm(8)
-//	p.Rhythm(12)
-//	p.Rhythm(16)
-//	p.Rhythm(20)
-//	p.Rhythm(24)
-//	p.Rhythm(28)
-//
-//	//p.Lyrics(0)
-//	p.PianoBackstep(7)
-//
-//	//p.Lyrics(8)
-//	//p.PianoBackstep(15)
-//
-//}
-//
-//func (p Verse) Rhythm(startBeat float64) {
-//	var (
-//		kickDrumLights = []ilysa.Light{
-//			p.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers),
-//			p.NewBasicLight(beatsaber.EventTypeRightRotatingLasers),
-//		}
-//		kickDrumSequence = []float64{0, 2.5}
-//		kickDrumColors   = shirayukiColors
-//	)
-//	p.EventsForSequence(startBeat+p.offset, kickDrumSequence, func(ctx ilysa.Context) {
-//		for _, light := range kickDrumLights {
-//			e := ctx.NewRGBLightingEvent().SetLight(light).
-//				SetValue(beatsaber.EventValueLightRedFade).
-//				SetColor(kickDrumColors.Next())
-//			if startBeat == 0 && ctx.ordinal == 0 {
-//				e.SetAlpha(10)
-//			} else {
-//				e.SetAlpha(0.7)
-//			}
-//		}
-//	})
-//
-//	const (
-//		rippleDuration = 2
-//	)
-//
-//	var (
-//		rippleStart  = startBeat + p.offset
-//		rippleEnd    = rippleStart + rippleDuration
-//		rippleLights = p.NewBasicLight(beatsaber.EventTypeRingLights)
-//		rippleStep   = 0.6
-//		grad         = gradient.Table{
-//			{shirayukiPurple, 0.0},
-//			{shirayukiGold, 0.3},
-//			{shirayukiGold, 0.7},
-//			{shirayukiPurple, 1.0},
-//		}
-//	)
-//	p.EventForBeat(rippleStart, func(ctx ilysa.Context) {
-//		ctx.NewPreciseRotationEvent().
-//			SetRotation(90).
-//			SetStep(22.5).
-//			SetSpeed(2).
-//			SetProp(0.3)
-//	})
-//
-//	p.EventsForRange(rippleStart, rippleEnd, 30, ease.Linear, func(ctx ilysa.Context) {
-//		ctx.UseLight(rippleLights, lightid.AllIndividual, func(ctx ilysa.ContextWithLight) {
-//			e := fx.ColorSweep(ctx, 1.5, 1.4, grad)
-//			e.Beat += ctx.LightIDT * rippleStep
-//			switch {
-//			case ctx.t <= 0.5:
-//				alphaScale := util.ScaleToUnitInterval(0, 0.5)
-//				e.SetAlpha(e.GetAlpha() * ease.InOutQuart(alphaScale(ctx.t)))
-//			case ctx.t > 0.8:
-//				alphaScale := util.ScaleToUnitInterval(0.8, 1)
-//				e.SetAlpha(e.GetAlpha() * ease.InExpo(1-alphaScale(ctx.t)))
-//			}
-//		})
-//	})
-//}
-//
+import (
+	"ilysa/pkg/beatsaber"
+	"ilysa/pkg/chroma"
+	"ilysa/pkg/colorful/gradient"
+	"ilysa/pkg/ease"
+	"ilysa/pkg/gen"
+	"ilysa/pkg/ilysa"
+	"ilysa/pkg/ilysa/fx"
+	"ilysa/pkg/util"
+)
+
+type Verse struct {
+	ilysa.BareContext
+	project *ilysa.Project
+	offset  float64
+}
+
+func NewVerse(p *ilysa.Project, offset float64) Verse {
+	ctx := p.WithBeatOffset(offset)
+	return Verse{
+		BareContext: ctx,
+		project:     p,
+		offset:      offset,
+	}
+}
+
+func (p Verse) Play() {
+	p.EventForBeat(-0.01, func(ctx ilysa.TimingContext) {
+		gen.OffAll(ctx)
+		ctx.NewPreciseRotationSpeedEvent(
+			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithSpeed(1.5))
+		ctx.NewPreciseRotationSpeedEvent(
+			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithSpeed(1.5))
+	})
+
+	p.Rhythm(0)
+	p.Rhythm(4)
+	p.Rhythm(8)
+	p.Rhythm(12)
+	p.Rhythm(16)
+	p.Rhythm(20)
+	p.Rhythm(24)
+	p.Rhythm(28)
+
+	//p.Lyrics(0)
+	p.PianoBackstep(7)
+
+	//p.Lyrics(8)
+	p.PianoBackstep(15)
+
+}
+
+func (p Verse) Rhythm(startBeat float64) {
+	var (
+		kickDrumLight = ilysa.NewSequenceLight(
+			p.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers),
+			p.NewBasicLight(beatsaber.EventTypeRightRotatingLasers),
+		)
+		kickDrumSequence = []float64{0, 2.5}
+		kickDrumColors   = shirayukiColors
+	)
+	p.EventsForSequence(startBeat, kickDrumSequence, func(ctx ilysa.SequenceContext) {
+		ctx.UseLight(kickDrumLight, func(ctx ilysa.SequenceContextWithLight) {
+			e := ctx.NewRGBLightingEvent(
+				ilysa.WithValue(beatsaber.EventValueLightRedFade),
+				ilysa.WithColor(kickDrumColors.Next()),
+			)
+
+			if startBeat == 0 && ctx.Ordinal() == 0 {
+				e.SetAlpha(10)
+			} else {
+				e.SetAlpha(0.7)
+			}
+		})
+	})
+
+	const (
+		rippleDuration = 2
+	)
+
+	var (
+		rippleStart  = startBeat
+		rippleEnd    = rippleStart + rippleDuration
+		rippleLights = p.NewBasicLight(beatsaber.EventTypeRingLights).Split(ilysa.DivideSingle)
+		rippleStep   = 0.6
+		grad         = gradient.Table{
+			{shirayukiPurple, 0.0},
+			{shirayukiGold, 0.3},
+			{shirayukiGold, 0.7},
+			{shirayukiPurple, 1.0},
+		}
+	)
+	p.EventForBeat(rippleStart, func(ctx ilysa.TimingContext) {
+		ctx.NewPreciseRotationEvent(
+			ilysa.WithRotation(90),
+			ilysa.WithStep(22.5),
+			ilysa.WithSpeed(2),
+			ilysa.WithProp(0.3),
+		)
+	})
+
+	p.EventsForRange(rippleStart, rippleEnd, 30, ease.Linear, func(ctx ilysa.TimingContext) {
+		ctx.UseLight(rippleLights, func(ctx ilysa.TimingContextWithLight) {
+			events := fx.ColorSweep(ctx, 1.4, grad)
+			events.Mod(ilysa.WithAlpha(1.5))
+			for _, ee := range *events {
+				ee.ShiftBeat(ctx.LightIDT() * rippleStep)
+			}
+			switch {
+			case ctx.T() <= 0.5:
+				alphaScale := util.ScaleToUnitInterval(0, 0.5)
+				events.Mod(ilysa.WithAlpha(events.GetAlpha() * ease.InOutQuart(alphaScale(ctx.T()))))
+			case ctx.T() > 0.8:
+				alphaScale := util.ScaleToUnitInterval(0.8, 1)
+				events.Mod(ilysa.WithAlpha(events.GetAlpha() * ease.InExpo(1-alphaScale(ctx.T()))))
+			}
+		})
+	})
+}
+
 //func (p Verse) Lyrics(startBeat float64) {
 //	var (
 //		// 52-58.5
@@ -101,7 +127,7 @@ package main
 //		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers)
 //	)
 //
-//	p.EventsForSequence(startBeat+p.offset, sequence, func(ctx ilysa.Context) {
+//	p.EventsForSequence(startBeat+, sequence, func(ctx ilysa.Context) {
 //		ctx.UseLight(light, lightid.GroupDivide(3), func(ctx ilysa.ContextWithLight) {
 //			if ctx.ordinal%ctx.LightIDSetLen != ctx.LightIDOrdinal {
 //				return
@@ -118,44 +144,45 @@ package main
 //	})
 //}
 //
-//func (p Verse) PianoBackstep(startBeat float64) {
-//	var (
-//		sequence  = []float64{0, 0.5}
-//		backLight = p.NewBasicLight(beatsaber.EventTypeBackLasers)
-//	)
-//
-//	p.EventsForSequence(startBeat+p.offset, sequence, func(ctx ilysa.Context) {
-//		e := ctx.NewPreciseRotationEvent().
-//			SetRotation(5).
-//			SetStep(5).
-//			SetProp(12).
-//			SetSpeed(10)
-//
-//		if ctx.ordinal%2 == 0 {
-//			e.SetDirection(chroma.Clockwise)
-//		} else {
-//			e.SetDirection(chroma.CounterClockwise)
-//		}
-//
-//		p.EventsForRange(ctx.b, ctx.b+0.25, 6, ease.Linear, func(ctx ilysa.Context) {
-//			ctx.UseLight(backLight, lightid.GroupDivide(2), func(ctx ilysa.ContextWithLight) {
-//				fx.Gradient(ctx, beatsaber.EventValueLightRedOn, magnetGradient)
-//			})
-//		})
-//
-//		//ctx.ModEventsInRange(ctx.b, ctx.b+0.10, ilysa.FilterRGBLight(backLight), func(ctx ilysa.Context, event ilysa.Event) {
-//		//	fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCirc)
-//		//})
-//		ctx.ModEventsInRange(ctx.b, ctx.b+0.25, ilysa.FilterRGBLight(backLight), func(ctx ilysa.Context, event ilysa.Event) {
-//			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
-//		})
-//
-//		//ctx.UseLight(backLight, lightid.GroupDivide(2), func(ctx ilysa.ContextWithLight) {
-//		//	if ctx.ordinal != ctx.LightIDOrdinal {
-//		//		return
-//		//	}
-//		//
-//		//	fx.BiasedColorSweep(ctx, 2, 0.8, gradient.Rainbow)
-//		//})
-//	})
-//}
+func (p Verse) PianoBackstep(startBeat float64) {
+	var (
+		sequence  = []float64{0, 0.5}
+		backLight = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.Divide(2))
+	)
+
+	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
+		e := ctx.NewPreciseRotationEvent(
+			ilysa.WithRotation(5),
+			ilysa.WithStep(5),
+			ilysa.WithProp(12),
+			ilysa.WithSpeed(10),
+		)
+
+		if ctx.Ordinal()%2 == 0 {
+			e.Mod(ilysa.WithDirection(chroma.Clockwise))
+		} else {
+			e.Mod(ilysa.WithDirection(chroma.CounterClockwise))
+		}
+
+		ctx.EventsForRange(ctx.B(), ctx.B()+0.25, 6, ease.Linear, func(ctx ilysa.TimingContext) {
+			ctx.UseLight(backLight, func(ctx ilysa.TimingContextWithLight) {
+				fx.Gradient(ctx, magnetGradient)
+			})
+		})
+
+		//ctx.ModEventsInRange(ctx.b, ctx.b+0.10, ilysa.FilterRGBLight(backLight), func(ctx ilysa.Context, event ilysa.Event) {
+		//	fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCirc)
+		//})
+		ctx.ModEventsInRange(ctx.B(), ctx.B()+0.25, ilysa.FilterRGBLight(backLight), func(ctx ilysa.TimingContext, event ilysa.Event) {
+			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
+		})
+
+		//ctx.UseLight(backLight, lightid.GroupDivide(2), func(ctx ilysa.ContextWithLight) {
+		//	if ctx.ordinal != ctx.LightIDOrdinal {
+		//		return
+		//	}
+		//
+		//	fx.BiasedColorSweep(ctx, 2, 0.8, gradient.Rainbow)
+		//})
+	})
+}

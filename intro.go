@@ -474,7 +474,7 @@ func (p Intro) Trill(startBeat float64) {
 	})
 	p.EventsForRange(startBeat+0.5, startBeat+0.5+1.2, 30, ease.Linear, func(ctx ilysa.TimingContext) {
 		ctx.UseLight(ringLasers, func(ctx ilysa.TimingContextWithLight) {
-			fx.ColorSweep(ctx, 1, 0.4, gradient.Rainbow)
+			fx.ColorSweep(ctx, 0.4, gradient.Rainbow)
 		})
 	})
 
@@ -650,8 +650,9 @@ func (p Intro) Bridge(startBeat float64) {
 		} else {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithType(beatsaber.EventTypeBackLasers),
-				ilysa.WithValue(beatsaber.EventValueLightRedFade),
+				ilysa.WithValue(beatsaber.EventValueLightRedOn),
 				ilysa.WithColor(magnetWhite),
+				ilysa.WithAlpha(8),
 			)
 		}
 	})
@@ -669,11 +670,6 @@ func (p Intro) Outro(startBeat float64) {
 				ilysa.WithColor(allColorsGradient.GetInterpolatedColorFor(ctx.LightIDT())),
 			)
 		})
-		//for i := 1; i <= maxLaserID; i++ {
-		//	e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedFlash)
-		//	e.SetSingleLightID(i)
-		//	e.SetColor(allColorsGradient.GetInterpolatedColorFor(float64(i) / float64(maxLaserID)))
-		//}
 	})
 
 	p.EventsForSequence(startBeat, sequence[:len(sequence)-1], func(ctx ilysa.SequenceContext) {

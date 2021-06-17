@@ -21,24 +21,29 @@ func New(bsMap *beatsaber.Map) *Project {
 	}
 }
 
+func (p *Project) WithBeatOffset(offset float64) BareContext{
+	ctx := newBaseContext(p)
+	return ctx.WithBeatOffset(offset)
+}
+
 func (p *Project) EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(TimingContext)) {
 	ctx := newBaseContext(p)
-	ctx.eventsForRange(startBeat, endBeat, steps, easeFunc, callback)
+	ctx.EventsForRange(startBeat, endBeat, steps, easeFunc, callback)
 }
 
 func (p *Project) EventForBeat(beat float64, callback func(ctx TimingContext)) {
 	ctx := newBaseContext(p)
-	ctx.eventForBeat(beat, callback)
+	ctx.EventForBeat(beat, callback)
 }
 
 func (p *Project) EventsForBeats(startBeat, duration float64, count int, callback func(ctx TimingContext)) {
 	ctx := newBaseContext(p)
-	ctx.eventsForBeats(startBeat, duration, count, callback)
+	ctx.EventsForBeats(startBeat, duration, count, callback)
 }
 
 func (p *Project) EventsForSequence(startBeat float64, sequence []float64, callback func(ctx SequenceContext)) {
 	ctx := newBaseContext(p)
-	ctx.eventsForSequence(startBeat, sequence, callback)
+	ctx.EventsForSequence(startBeat, sequence, callback)
 }
 
 func (p *Project) ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder EventModder) {

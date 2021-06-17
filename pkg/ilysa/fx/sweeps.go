@@ -33,13 +33,11 @@ func BiasedColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad
 	)
 }
 
-func ColorSweep(ctx ilysa.TimingContextWithLight, intensity, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
+func ColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
-	e := ctx.NewRGBLightingEvent(
+	return ctx.NewRGBLightingEvent(
 		ilysa.WithColor(grad.GetInterpolatedColorFor(gradPos(ctx))),
-		ilysa.WithAlpha(intensity),
 	)
-	return e
 }
 
 func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shimmerSpeed float64) {

@@ -29,6 +29,10 @@ func (e *BaseEvent) ScaleBeat(scaler func(float64) float64) {
 	e.Beat = scaler(e.Beat)
 }
 
+func (e *BaseEvent) ShiftBeat(offset float64) {
+	e.Beat += offset
+}
+
 func (e *BaseEvent) Base() *BaseEvent {
 	return e
 }

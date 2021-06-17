@@ -28,7 +28,7 @@ func (p *Project) NewBasicLight(typ beatsaber.EventType) BasicLight {
 	}
 }
 
-func (l BasicLight) CreateRGBEvent(ctx TimingContext) *CompoundRGBLightingEvent {
+func (l BasicLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
 		ctx.NewRGBLightingEvent().SetLight(l.eventType),
 	)

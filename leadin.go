@@ -76,7 +76,8 @@ func LeadInBrokenChord(p *ilysa.Project, startBeat float64) {
 
 	p.EventsForRange(shimmerStart, shimmerEnd, 30, ease.Linear, func(ctx ilysa.TimingContext) {
 		ctx.UseLight(backLasers, func(ctx ilysa.TimingContextWithLight) {
-			e := fx.ColorSweep(ctx, intensity, colorSweepSpeed, grad)
+			e := fx.ColorSweep(ctx, colorSweepSpeed, grad)
+			e.Mod(ilysa.WithAlpha(intensity))
 			fx.AlphaShimmer(ctx, e, shimmerSweepSpeed)
 		})
 	})

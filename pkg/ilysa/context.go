@@ -3,6 +3,7 @@ package ilysa
 import (
 	"math/rand"
 
+	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/ease"
 	"ilysa/pkg/util"
 )
@@ -12,6 +13,8 @@ type BareContext interface {
 	EventsForBeats(startBeat, duration float64, count int, callback func(ctx TimingContext))
 	EventsForRange(startBeat, endBeat float64, steps int, fn ease.Func, callback func(ctx TimingContext))
 	EventsForSequence(startBeat float64, sequence []float64, callback func(ctx SequenceContext))
+	ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder EventModder)
+	NewBasicLight(eventType beatsaber.EventType) BasicLight
 }
 
 type Timing interface {
@@ -63,6 +66,7 @@ type Sequencer interface {
 }
 
 type SequenceContext interface {
+	BareContext
 	Timing
 	Lighter
 	Eventer
@@ -107,6 +111,17 @@ type baseContext struct {
 
 func (c baseContext) FixedRand() float64 {
 	return c.fixedRand
+}
+
+func (c baseContext) WithBeatOffset(offset float64) baseContext {
+	return baseContext{
+		Project: c.Project,
+		timing:  c.timing,
+
+		beatOffset: offset,
+		fixedRand:  c.fixedRand,
+		modifiers:  c.modifiers,
+	}
 }
 
 type timing struct {
@@ -157,10 +172,12 @@ func newBaseContext(p *Project) baseContext {
 
 func (c baseContext) withTiming(beat, startBeat, endBeat float64, ordinal int) baseContext {
 	return baseContext{
-		Project:   c.Project,
-		timing:    newTiming(beat, startBeat, endBeat, ordinal),
-		fixedRand: c.fixedRand,
-		modifiers: c.modifiers,
+		Project: c.Project,
+		timing:  newTiming(beat, startBeat, endBeat, ordinal),
+
+		beatOffset: c.beatOffset,
+		fixedRand:  c.fixedRand,
+		modifiers:  c.modifiers,
 	}
 }
 
@@ -175,10 +192,12 @@ func newTiming(beat, startBeat, endBeat float64, ordinal int) timing {
 
 func (c baseContext) WithModifier(modifiers ...EventModifier) baseContext {
 	return baseContext{
-		Project:   c.Project,
-		timing:    c.timing,
-		fixedRand: c.fixedRand,
-		modifiers: append([]EventModifier{}, modifiers...),
+		Project: c.Project,
+		timing:  c.timing,
+
+		beatOffset: c.beatOffset,
+		fixedRand:  c.fixedRand,
+		modifiers:  append([]EventModifier{}, modifiers...),
 	}
 }
 
