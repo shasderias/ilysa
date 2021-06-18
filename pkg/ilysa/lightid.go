@@ -16,9 +16,13 @@ func NewLightIDFromInterval(startID, endID int) LightID {
 
 type LightIDSet []LightID
 
-func NewSet(ids ...LightID) LightIDSet {
+func NewLightIDSet(ids ...LightID) LightIDSet {
 	set := append(LightIDSet{}, ids...)
 	return set
+}
+
+func (s *LightIDSet) Add(id ...LightID) {
+	*s = append(*s, id...)
 }
 
 func (s LightIDSet) Index(i int) LightID {
@@ -30,20 +34,16 @@ func (s *LightIDSet) Len() int {
 	return len(*s)
 }
 
-func (s *LightIDSet) Add(id ...LightID) {
-	*s = append(*s, id...)
-}
-
 func (s *LightIDSet) AppendToIndex(index int, id ...int) {
 	(*s)[index] = append((*s)[index], id...)
 }
 
 func Identity(id LightID) LightIDSet {
-	return NewSet(id)
+	return NewLightIDSet(id)
 }
 
 func DivideSingle(id LightID) LightIDSet {
-	set := NewSet()
+	set := NewLightIDSet()
 	for _, lightID := range id {
 		set.Add(LightID{lightID})
 	}
@@ -54,7 +54,7 @@ func Divide(groups int) LightIDTransformer {
 	return func(id LightID) LightIDSet {
 		groupSize := len(id) / groups
 
-		set := NewSet()
+		set := NewLightIDSet()
 		for i := 0; i < groups; i++ {
 			set.Add(id[0:groupSize])
 			id = id[groupSize:]
@@ -67,7 +67,7 @@ func Divide(groups int) LightIDTransformer {
 
 func DivideIntoGroupsOf(divisor int) LightIDTransformer {
 	return func(id LightID) LightIDSet {
-		set := NewSet()
+		set := NewLightIDSet()
 
 		for len(id) > divisor {
 			set.Add(id[0:divisor])

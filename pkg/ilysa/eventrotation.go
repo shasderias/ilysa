@@ -5,10 +5,11 @@ import (
 
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
+	"ilysa/pkg/ilysa/event"
 )
 
 type RotationEvent struct {
-	BaseEvent
+	event.BaseEvent
 }
 
 type RotationEventOpt interface {
@@ -16,7 +17,7 @@ type RotationEventOpt interface {
 }
 
 func (c baseContext) NewRotationEvent(opts ...RotationEventOpt) *RotationEvent {
-	e := &RotationEvent{BaseEvent: BaseEvent{
+	e := &RotationEvent{BaseEvent: event.BaseEvent{
 		Beat:  c.B(),
 		Type:  beatsaber.EventTypeRingSpin,
 		Value: 0,
@@ -36,7 +37,7 @@ func (e RotationEvent) Mod(opts ...RotationEventOpt) {
 }
 
 type PreciseRotationEvent struct {
-	BaseEvent
+	event.BaseEvent
 	chroma.PreciseRotation
 }
 
@@ -46,7 +47,7 @@ type PreciseRotationEventOpt interface {
 
 func (c baseContext) NewPreciseRotationEvent(opts ...PreciseRotationEventOpt) *PreciseRotationEvent {
 	e := &PreciseRotationEvent{
-		BaseEvent: BaseEvent{
+		BaseEvent: event.BaseEvent{
 			Beat:  c.B(),
 			Type:  beatsaber.EventTypeRingSpin,
 			Value: 0,

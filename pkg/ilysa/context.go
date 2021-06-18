@@ -77,8 +77,6 @@ type SequenceContextWithLight interface {
 	LightContext
 	CompoundLighter
 	Sequencer
-
-	//EventsForRange(startBeat, endBeat float64, steps int, fn ease.Func, callback func(ctx TimingContextWithLight))
 }
 
 type Lighter interface {
@@ -291,7 +289,7 @@ func (c contextWithLight) NewLightingEvent(opts ...BasicLightingEventOpt) *Compo
 		return &events
 	}
 
-	for _, et := range c.Light.EventType() {
+	for _, et := range c.Light.EventTypeSet() {
 		opts := append([]BasicLightingEventOpt{WithType(et)}, opts...)
 		events.Add(c.baseContext.NewLightingEvent(opts...))
 	}
@@ -360,16 +358,16 @@ type sequenceContextWithLight struct {
 }
 
 //func (c sequenceContextWithLight) EventsForRange(startBeat, endBeat float64, steps int, easeFn ease.Func, callback func(light TimingContextWithLight)) {
-	//tScaler := util.ScaleToUnitInterval(0, float64(steps-1))
-	//
-	//ctx := timingContextWithLight{
-	//
-	//}
-	//
-	//for i := 0; i < steps; i++ {
-	//	beat := Ierp(startBeat, endBeat, tScaler(float64(i)), easeFn)
-	//	callback(c.withTiming(beat, startBeat, endBeat, i).WithBeatOffset(0))
-	//}
+//tScaler := util.ScaleToUnitInterval(0, float64(steps-1))
+//
+//ctx := timingContextWithLight{
+//
+//}
+//
+//for i := 0; i < steps; i++ {
+//	beat := Ierp(startBeat, endBeat, tScaler(float64(i)), easeFn)
+//	callback(c.withTiming(beat, startBeat, endBeat, i).WithBeatOffset(0))
+//}
 //}
 
 func (c sequenceContextWithLight) withLightIDOrdinal(ordinal int) sequenceContextWithLight {
@@ -390,7 +388,7 @@ func (c sequenceContextWithLight) NewLightingEvent(opts ...BasicLightingEventOpt
 		return &events
 	}
 
-	for _, et := range c.Light.EventType() {
+	for _, et := range c.Light.EventTypeSet() {
 		opts := append([]BasicLightingEventOpt{WithType(et)}, opts...)
 		events.Add(c.baseContext.NewLightingEvent(opts...))
 	}

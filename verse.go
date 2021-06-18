@@ -193,7 +193,7 @@ func (p Verse) RinPun(startBeat float64) {
 
 	p.EventsForRange(startBeat, startBeat+0.95, 30, ease.Linear, func(ctx ilysa.TimingContext) {
 		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
-			fx.BiasedColorSweep(ctx, 2, gradient.Rainbow)
+			fx.BiasedColorSweep(ctx, 1.2, gradient.Rainbow)
 		})
 	})
 
@@ -223,15 +223,18 @@ func (p Verse) RinPun(startBeat float64) {
 	seqLight := p.NewBasicLight(beatsaber.EventTypeBackLasers).LightIDTransformSequence(ilysa.Fan(2))
 	seqLight = seqLight.ApplyLightIDTransform(ilysa.DivideSingle)
 
+	backLasers := ilysa.FanBasicLight(2)(ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p.project.ActiveDifficultyProfile()))
+
 	p.EventsForSequence(startBeat+1, []float64{0, 1}, func(ctx ilysa.SequenceContext) {
 		seqOrdinal := ctx.Ordinal()
 		ctx.EventsForRange(ctx.B(), ctx.B()+1, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(seqLight.Slice(seqOrdinal, seqOrdinal+1), func(ctx ilysa.TimingContextWithLight) {
-				 fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
-				//for _, e := range event {
-				//}
+			ctx.UseLight(backLasers[seqOrdinal].LightIDTransform(ilysa.DivideSingle), func(ctx ilysa.TimingContextWithLight) {
+				events := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
+				fx.Ripple(ctx, events, 0.3,
+					fx.WithAlphaBlend(0, 0.3, 0, 2, ease.InCubic),
+					fx.WithAlphaBlend(0.5, 1, 2, 0, ease.OutCirc),
+				)
 			})
 		})
 	})
-
 }

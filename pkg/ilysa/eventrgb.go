@@ -7,10 +7,11 @@ import (
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
 	"ilysa/pkg/colorful"
+	"ilysa/pkg/ilysa/event"
 )
 
 type RGBLightingEvent struct {
-	BaseEvent
+	event.BaseEvent
 	chroma.RGB
 }
 
@@ -20,7 +21,7 @@ type RGBLightingEventOpt interface {
 
 func (c baseContext) NewRGBLightingEvent(opts ...RGBLightingEventOpt) *RGBLightingEvent {
 	e := &RGBLightingEvent{
-		BaseEvent: BaseEvent{
+		BaseEvent: event.BaseEvent{
 			Beat:  c.B(),
 			Value: beatsaber.EventValueLightRedOn,
 		},

@@ -9,90 +9,21 @@ import (
 
 type Light interface {
 	CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent
-	EventType() beatsaber.EventTypeSet
+	EventTypeSet() beatsaber.EventTypeSet
 	LightIDLen() int
 }
 
-// BasicLight represents a light with the base game's attributes
-type BasicLight struct {
-	eventType  beatsaber.EventType
-	lightIDMax int
+type LightIDMaxer interface {
+	LightIDMax(beatsaber.EventType) int
 }
 
-func (p *Project) NewBasicLight(typ beatsaber.EventType) BasicLight {
-	return BasicLight{
-		eventType:  typ,
-		lightIDMax: p.ActiveDifficultyProfile().LightIDMax(typ),
-	}
-}
-
-func (l BasicLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
-	return NewCompoundRGBLightingEvent(
-		ctx.NewRGBLightingEvent().SetLight(l.eventType),
-	)
-}
-
-func (l BasicLight) EventType() beatsaber.EventTypeSet {
-	return beatsaber.NewEventTypeSet(l.eventType)
-}
-
-func (l BasicLight) LightIDLen() int {
-	return 1
-}
-
-func (l BasicLight) LightIDMax() int {
-	return l.lightIDMax
-}
-
-func (l BasicLight) LightIDTransform(tfer LightIDTransformer) Light {
-	return CompoundLight{
-		eventType: l.eventType,
-		set:       tfer(NewLightIDFromInterval(1, l.lightIDMax)),
-	}
-}
-
-func (l BasicLight) LightIDTransformSequence(tfer LightIDTransformer) SequenceLight {
-	sl := NewSequenceLight()
-	set := tfer(NewLightIDFromInterval(1, l.lightIDMax))
-
-	for _, lightID := range set {
-		sl.Add(CompoundLight{
-			eventType: l.eventType,
-			set:       LightIDSet{lightID},
-		})
-
-	}
-	return sl
-}
-
-func (l BasicLight) Transform(tfer LightIDTransformer) CompoundLight {
-	return CompoundLight{
-		eventType: l.eventType,
-		set:       tfer(NewLightIDFromInterval(1, l.lightIDMax)),
-	}
-}
-
-// [1,2,3,4] => [1], [2], [3], [4]
-func (l BasicLight) TransformToSequence(tfer LightIDTransformer) SequenceLight {
-	sl := NewSequenceLight()
-	set := tfer(NewLightIDFromInterval(1, l.lightIDMax))
-
-	for _, lightID := range set {
-		sl.Add(CompoundLight{
-			eventType: l.eventType,
-			set:       LightIDSet{lightID},
-		})
-
-	}
-	return sl
-}
-
-type CompoundLight struct {
+// CompositeLight represents a single base game light and a set of LightIDs.
+type CompositeLight struct {
 	eventType beatsaber.EventType
 	set       LightIDSet
 }
 
-func (cl CompoundLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
+func (cl CompositeLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
 		ctx.NewRGBLightingEvent(
 			WithType(cl.eventType),
@@ -101,26 +32,38 @@ func (cl CompoundLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLi
 	)
 }
 
-func (cl CompoundLight) EventType() beatsaber.EventTypeSet {
+func (cl CompositeLight) EventTypeSet() beatsaber.EventTypeSet {
 	return beatsaber.NewEventTypeSet(cl.eventType)
 }
 
-func (cl CompoundLight) LightIDLen() int {
+func (cl CompositeLight) LightIDLen() int {
 	return cl.set.Len()
 }
 
-func (cl CompoundLight) LightIDTransform(tfer LightIDTransformer) Light {
+func (cl CompositeLight) LightIDTransform(tfer LightIDTransformer) Light {
 	newSet := LightIDSet{}
 
 	for _, lid := range cl.set {
 		newSet.Add(tfer(lid)...)
 	}
 
-	return CompoundLight{
+	return CompositeLight{
 		eventType: cl.eventType,
 		set:       newSet,
 	}
 }
+
+func (cl CompositeLight) LightIDTransformSequence(tfer LightIDTransformer) Light {
+	sl := NewSequenceLight()
+
+	for _, lid := range cl.set {
+		transformed := tfer(lid)
+		transformed.Len()
+	}
+
+	return sl
+}
+
 
 type CombinedLight struct {
 	lights []Light
@@ -156,10 +99,10 @@ func (cl *CombinedLight) Add(lights ...Light) {
 	cl.lights = append(cl.lights, lights...)
 }
 
-func (cl CombinedLight) EventType() beatsaber.EventTypeSet {
+func (cl CombinedLight) EventTypeSet() beatsaber.EventTypeSet {
 	et := beatsaber.NewEventTypeSet()
 	for _, l := range cl.lights {
-		et = et.Union(l.EventType())
+		et = et.Union(l.EventTypeSet())
 	}
 	return et
 }
@@ -192,10 +135,10 @@ func (sl SequenceLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLi
 	return light.CreateRGBEvent(ctx)
 }
 
-func (sl SequenceLight) EventType() beatsaber.EventTypeSet {
+func (sl SequenceLight) EventTypeSet() beatsaber.EventTypeSet {
 	et := beatsaber.NewEventTypeSet()
 	for _, l := range sl.lights {
-		et = et.Union(l.EventType())
+		et = et.Union(l.EventTypeSet())
 	}
 	return et
 }

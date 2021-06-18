@@ -37,6 +37,6 @@ func FilterRGBLight(light Light) EventFilter {
 			return false
 		}
 
-		return light.EventType().Has(event.Base().Type)
+		return light.EventTypeSet().Has(event.Base().Type)
 	}
 }

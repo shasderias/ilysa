@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 
 	"ilysa/pkg/beatsaber"
+	"ilysa/pkg/ilysa/event"
 )
 
 type BasicLightingEvent struct {
-	BaseEvent
+	event.BaseEvent
 }
 type BasicLightingEventOpt interface {
 	applyBasicLightingEvent(event *BasicLightingEvent)
@@ -15,7 +16,7 @@ type BasicLightingEventOpt interface {
 
 func (c baseContext) NewLightingEvent(opts ...BasicLightingEventOpt) *BasicLightingEvent {
 	e := &BasicLightingEvent{
-		BaseEvent: BaseEvent{
+		BaseEvent: event.BaseEvent{
 			Beat:  c.B(),
 			Type:  beatsaber.EventTypeBackLasers,
 			Value: 0,

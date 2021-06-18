@@ -44,7 +44,7 @@ func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shim
 	e.SetAlpha(e.GetAlpha() * util.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT()))
 }
 
-//func SweepLightID(light beatsaber.EventType, lightIDPicker lightid.Picker) func(ctx ilysa.Timing) {
+//func SweepLightID(light beatsaber.EventTypeSet, lightIDPicker lightid.Picker) func(ctx ilysa.Timing) {
 //	return func(ctx ilysa.Timing) {
 //		lidSet := lightIDPicker(ctx, light)
 //
@@ -58,7 +58,7 @@ func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shim
 //	}
 //}
 //
-//func Shimmer(p *ilysa.Project, startBeat, endBeat float64, steps int, light beatsaber.EventType, intensity, colorSweepSpeed float64) {
+//func Shimmer(p *ilysa.Project, startBeat, endBeat float64, steps int, light beatsaber.EventTypeSet, intensity, colorSweepSpeed float64) {
 //	var (
 //		sin        = math.Sin
 //		pi         = math.Pi

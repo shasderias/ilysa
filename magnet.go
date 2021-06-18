@@ -107,7 +107,7 @@ func do() error {
 	return p.Save()
 }
 
-//func Shimmer(p *ilysa.Project, startBeat, endBeat float64, steps int, light beatsaber.EventType, colorSweepSpeed, shimmerSweepSpeed float64) {
+//func Shimmer(p *ilysa.Project, startBeat, endBeat float64, steps int, light beatsaber.EventTypeSet, colorSweepSpeed, shimmerSweepSpeed float64) {
 //	var (
 //		duration   = endBeat - startBeat
 //		offset     = rand.Float64() * math.Pi * 2

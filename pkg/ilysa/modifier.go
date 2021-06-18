@@ -1,6 +1,6 @@
 package ilysa
 
-//func DefaultType(typ beatsaber.EventType) func(e Event) {
+//func DefaultType(typ beatsaber.EventTypeSet) func(e Event) {
 //	return func(e Event) {
 //		e.SetType = typ
 //	}
