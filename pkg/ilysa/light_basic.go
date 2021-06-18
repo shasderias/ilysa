@@ -1,6 +1,8 @@
 package ilysa
 
-import "ilysa/pkg/beatsaber"
+import (
+	"ilysa/pkg/beatsaber"
+)
 
 // BasicLight represents a light with the base game's attributes. Lighting events
 // created by BasicLight do not set _customData._lightID,
@@ -55,7 +57,7 @@ func (bl BasicLight) LightIDTransform(tfer LightIDTransformer) Light {
 	}
 }
 
-func (bl BasicLight) LightIDTransformSequence(tfer LightIDTransformer) SequenceLight {
+func (bl BasicLight) LightIDSequenceTransform(tfer LightIDTransformer) Light {
 	sl := NewSequenceLight()
 	set := tfer(NewLightIDFromInterval(1, bl.maxLightID))
 

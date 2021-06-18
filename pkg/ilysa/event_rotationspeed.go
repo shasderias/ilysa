@@ -6,11 +6,10 @@ import (
 
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
-	"ilysa/pkg/ilysa/event"
 )
 
 type RotationSpeedEvent struct {
-	event.BaseEvent
+	BaseEvent
 }
 
 type RotationSpeedEventOpt interface {
@@ -19,7 +18,7 @@ type RotationSpeedEventOpt interface {
 
 func (c baseContext) NewRotationSpeedEvent(opts ...RotationSpeedEventOpt) *RotationSpeedEvent {
 	e := &RotationSpeedEvent{
-		event.BaseEvent{
+		BaseEvent{
 			Beat:  c.B(),
 			Type:  beatsaber.EventTypeLeftRotatingLasersRotationSpeed,
 			Value: 0,
@@ -39,7 +38,7 @@ func (e *RotationSpeedEvent) Mod(opts ...RotationSpeedEventOpt) {
 func (e RotationSpeedEvent) CustomData() (json.RawMessage, error) { return nil, nil }
 
 type PreciseRotationSpeedEvent struct {
-	event.BaseEvent
+	BaseEvent
 	chroma.PreciseLaser
 }
 
@@ -49,7 +48,7 @@ type PreciseRotationSpeedEventOpt interface {
 
 func (c baseContext) NewPreciseRotationSpeedEvent(opts ...PreciseRotationSpeedEventOpt) *PreciseRotationSpeedEvent {
 	e := &PreciseRotationSpeedEvent{
-		BaseEvent: event.BaseEvent{
+		BaseEvent: BaseEvent{
 			Beat: c.B(),
 		},
 	}

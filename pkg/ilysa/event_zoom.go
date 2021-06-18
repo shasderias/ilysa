@@ -5,7 +5,6 @@ import (
 
 	"ilysa/pkg/beatsaber"
 	"ilysa/pkg/chroma"
-	"ilysa/pkg/ilysa/event"
 )
 
 type ZoomEventOpt interface {
@@ -13,12 +12,12 @@ type ZoomEventOpt interface {
 }
 
 type ZoomEvent struct {
-	event.BaseEvent
+	BaseEvent
 }
 
 func (c baseContext) NewZoomEvent(opts ...ZoomEventOpt) *ZoomEvent {
 	e := &ZoomEvent{
-		event.BaseEvent{
+		BaseEvent{
 			Beat:  c.B(),
 			Type:  beatsaber.EventTypeRingZoom,
 			Value: 0,
@@ -42,13 +41,13 @@ type PreciseZoomEventOpt interface {
 }
 
 type PreciseZoomEvent struct {
-	event.BaseEvent
+	BaseEvent
 	chroma.PreciseZoom
 }
 
 func (c baseContext) NewPreciseZoomEvent(opts ...PreciseZoomEventOpt) *PreciseZoomEvent {
 	e := &PreciseZoomEvent{
-		BaseEvent: event.BaseEvent{
+		BaseEvent: BaseEvent{
 			Beat:  c.B(),
 			Type:  beatsaber.EventTypeRingZoom,
 			Value: 0,

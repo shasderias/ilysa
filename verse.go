@@ -12,7 +12,7 @@ import (
 )
 
 type Verse struct {
-	ilysa.BareContext
+	ilysa.BaseContext
 	project *ilysa.Project
 	offset  float64
 }
@@ -20,7 +20,7 @@ type Verse struct {
 func NewVerse(p *ilysa.Project, offset float64) Verse {
 	ctx := p.WithBeatOffset(offset)
 	return Verse{
-		BareContext: ctx,
+		BaseContext: ctx,
 		project:     p,
 		offset:      offset,
 	}
@@ -148,8 +148,8 @@ func (p Verse) PianoBackstep(startBeat float64) {
 	)
 
 	backLasers := p.NewBasicLight(beatsaber.EventTypeBackLasers)
-	backLasersSplit := backLasers.LightIDTransformSequence(ilysa.Divide(2))
-	backLasersSplitSingle := backLasersSplit.ApplyLightIDTransform(ilysa.DivideSingle)
+	backLasersSplit := backLasers.LightIDSequenceTransform(ilysa.Divide(2))
+	backLasersSplitSingle := backLasersSplit.(ilysa.SequenceLight).LightIDTransform(ilysa.DivideSingle)
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
 		e := ctx.NewPreciseRotationEvent(
@@ -220,15 +220,21 @@ func (p Verse) RinPun(startBeat float64) {
 		)
 	})
 
-	seqLight := p.NewBasicLight(beatsaber.EventTypeBackLasers).LightIDTransformSequence(ilysa.Fan(2))
-	seqLight = seqLight.ApplyLightIDTransform(ilysa.DivideSingle)
+	//seqLight := p.NewBasicLight(beatsaber.EventTypeBackLasers).LightIDSequenceTransform(light.Fan(2))
+	//seqLight = seqLight.ApplyLightIDTransform(light.DivideSingle)
+	//
+	//backLasers := light.FanBasicLight(2)(ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p.project.ActiveDifficultyProfile()))
 
-	backLasers := ilysa.FanBasicLight(2)(ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p.project.ActiveDifficultyProfile()))
+	backLasers := ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p.project.ActiveDifficultyProfile())
+	sl := ilysa.TransformLight(backLasers,
+		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
+		ilysa.ToLightTransformer(ilysa.DivideSingle),
+	).(ilysa.SequenceLight)
 
 	p.EventsForSequence(startBeat+1, []float64{0, 1}, func(ctx ilysa.SequenceContext) {
 		seqOrdinal := ctx.Ordinal()
 		ctx.EventsForRange(ctx.B(), ctx.B()+1, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(backLasers[seqOrdinal].LightIDTransform(ilysa.DivideSingle), func(ctx ilysa.TimingContextWithLight) {
+			ctx.UseLight(sl.Index(seqOrdinal), func(ctx ilysa.TimingContextWithLight) {
 				events := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
 				fx.Ripple(ctx, events, 0.3,
 					fx.WithAlphaBlend(0, 0.3, 0, 2, ease.InCubic),

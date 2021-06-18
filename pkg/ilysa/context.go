@@ -8,7 +8,7 @@ import (
 	"ilysa/pkg/util"
 )
 
-type BareContext interface {
+type BaseContext interface {
 	EventForBeat(beat float64, callback func(ctx TimingContext))
 	EventsForBeats(startBeat, duration float64, count int, callback func(ctx TimingContext))
 	EventsForRange(startBeat, endBeat float64, steps int, fn ease.Func, callback func(ctx TimingContext))
@@ -64,7 +64,7 @@ type Sequencer interface {
 }
 
 type SequenceContext interface {
-	BareContext
+	BaseContext
 	Timing
 	Lighter
 	Eventer
@@ -413,8 +413,3 @@ type EventModifier func(e Event)
 type EventGenerator func(ctx Timing)
 type EventModder func(ctx TimingContext, event Event)
 type EventFilter func(event Event) bool
-
-// time - 0.25 - 0.50
-// light - back lasers
-// color rainbow, varying with time
-// alpha

@@ -21,7 +21,7 @@ func New(bsMap *beatsaber.Map) *Project {
 	}
 }
 
-func (p *Project) WithBeatOffset(offset float64) BareContext {
+func (p *Project) WithBeatOffset(offset float64) BaseContext {
 	ctx := newBaseContext(p)
 	return ctx.WithBeatOffset(offset)
 }
