@@ -15,6 +15,7 @@ type BaseContext interface {
 	EventsForSequence(startBeat float64, sequence []float64, callback func(ctx SequenceContext))
 	ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder EventModder)
 	NewBasicLight(eventType beatsaber.EventType) BasicLight
+	LightIDMax(beatsaber.EventType) int
 }
 
 type Timing interface {
@@ -109,6 +110,10 @@ type baseContext struct {
 
 func (c baseContext) FixedRand() float64 {
 	return c.fixedRand
+}
+
+func (c baseContext) LightIDMax(typ beatsaber.EventType) int {
+	return c.Project.ActiveDifficultyProfile().LightIDMax(typ)
 }
 
 func (c baseContext) WithBeatOffset(offset float64) baseContext {

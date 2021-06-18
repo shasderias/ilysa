@@ -51,7 +51,7 @@ func (cl CompositeLight) LightIDTransform(tfer LightIDTransformer) Light {
 	}
 }
 
-func (cl CompositeLight) LightIDTransformSequence(tfer LightIDTransformer) Light {
+func (cl CompositeLight) LightIDSequenceTransform(tfer LightIDTransformer) Light {
 	max := 0
 	for _, lid := range cl.set {
 		set := tfer(lid)
@@ -60,7 +60,7 @@ func (cl CompositeLight) LightIDTransformSequence(tfer LightIDTransformer) Light
 		}
 	}
 
-	compositeLights := make([]CompositeLight, 0, max)
+	compositeLights := make([]CompositeLight, max)
 
 	for i := 0; i < max; i++ {
 		compositeLights[i] = NewCompositeLight(cl.eventType, NewLightIDSet())
@@ -76,6 +76,25 @@ func (cl CompositeLight) LightIDTransformSequence(tfer LightIDTransformer) Light
 	seqLight := NewSequenceLight()
 	for _, l := range compositeLights {
 		seqLight.Add(l)
+	}
+
+	return seqLight
+}
+
+func (cl CompositeLight) LightIDSetTransform(tfer LightIDSetTransformer) Light {
+	return CompositeLight{
+		eventType: cl.eventType,
+		set:       tfer(cl.set),
+	}
+}
+
+func (cl CompositeLight) LightIDSetSequenceTransform(tfer LightIDSetTransformer) Light {
+	newSet := tfer(cl.set)
+
+	seqLight := NewSequenceLight()
+
+	for _, lightID := range newSet {
+		seqLight.Add(NewCompositeLight(cl.eventType, NewLightIDSet(lightID)))
 	}
 
 	return seqLight

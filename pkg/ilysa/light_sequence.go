@@ -62,3 +62,16 @@ func (sl SequenceLight) LightIDTransform(tfer LightIDTransformer) Light {
 	}
 	return NewSequenceLight(tfedLights...)
 }
+
+func (sl SequenceLight) LightIDSetTransform(tfer LightIDSetTransformer) Light {
+	tfedLights := []Light{}
+	for _, l := range sl.lights {
+		tfl, ok := l.(LightIDSetTransformable)
+		if !ok {
+			tfedLights = append(tfedLights, l)
+			continue
+		}
+		tfedLights = append(tfedLights, tfl.LightIDSetTransform(tfer))
+	}
+	return NewSequenceLight(tfedLights...)
+}

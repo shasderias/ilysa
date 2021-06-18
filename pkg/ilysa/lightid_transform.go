@@ -3,6 +3,7 @@ package ilysa
 import "ilysa/pkg/beatsaber"
 
 type LightIDTransformer func(id LightID) LightIDSet
+type LightIDSetTransformer func(set LightIDSet) LightIDSet
 
 func Fan(groupCount int) LightIDTransformer {
 	return func(id LightID) LightIDSet {
@@ -17,6 +18,18 @@ func Fan(groupCount int) LightIDTransformer {
 		}
 
 		return set
+	}
+}
+
+func ToLightIDSetTransformer(tfer LightIDTransformer) LightIDSetTransformer {
+	return func(set LightIDSet) LightIDSet {
+		newSet := NewLightIDSet()
+
+		for _, id := range set {
+			newSet.Add(tfer(id)...)
+		}
+
+		return newSet
 	}
 }
 
@@ -61,6 +74,14 @@ func DivideIntoGroupsOf(groupSize int) LightIDTransformer {
 	}
 }
 
+func Reverse(set LightIDSet) LightIDSet {
+	for i := len(set)/2 - 1; i >= 0; i-- {
+		opp := len(set) - 1 - i
+		set[i], set[opp] = set[opp], set[i]
+	}
+	return set
+}
+
 type SingleLight interface {
 	EventType() beatsaber.EventType
 	LightIDSet() LightIDSet
@@ -73,7 +94,9 @@ type LightIDTransformable interface {
 func ToLightTransformer(tfer LightIDTransformer) LightTransformer {
 	return func(l Light) Light {
 		tfl, ok := l.(LightIDTransformable)
-		if !ok { return l}
+		if !ok {
+			return l
+		}
 		return tfl.LightIDTransform(tfer)
 	}
 }
@@ -85,7 +108,9 @@ type LightIDSequenceTransformable interface {
 func ToSequenceLightTransformer(tfer LightIDTransformer) LightTransformer {
 	return func(l Light) Light {
 		tfl, ok := l.(LightIDSequenceTransformable)
-		if !ok { return l}
+		if !ok {
+			return l
+		}
 		return tfl.LightIDSequenceTransform(tfer)
 		//sl, ok := l.(SingleLight)
 		//if !ok {
@@ -100,6 +125,20 @@ func ToSequenceLightTransformer(tfer LightIDTransformer) LightTransformer {
 		//	}
 		//}
 		//return seqLight
+	}
+}
+
+type LightIDSetTransformable interface {
+	LightIDSetTransform(LightIDSetTransformer) Light
+}
+
+func LightIDSetTransformerToLightTransformer(tfer LightIDSetTransformer) LightTransformer {
+	return func(l Light) Light {
+		tfl, ok := l.(LightIDSetTransformable)
+		if !ok {
+			return l
+		}
+		return tfl.LightIDSetTransform(tfer)
 	}
 }
 

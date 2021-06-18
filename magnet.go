@@ -53,6 +53,13 @@ var (
 		sukoyaPink,
 		sukoyaWhite,
 	)
+
+	crossickColors = colorful.NewSet(
+		shirayukiGold,
+		shirayukiPurple,
+		sukoyaPink,
+		sukoyaWhite,
+	)
 )
 
 var (
@@ -93,11 +100,14 @@ func do() error {
 		startBeat: 0,
 	}.Play()
 
-	verse1 := NewVerse(p, 52)
-	verse1.Play1a()
+	verse1 := NewVerse1a(p, 52)
+	verse1.Play()
+
+	verse2 := NewVerse1b(p, 84)
+	verse2.Play()
 
 	//v := Verse{Project: p}
-	//v.Play1a(52)
+	//v.Play(52)
 
 	//
 	//BassTwang(p, 18.5)

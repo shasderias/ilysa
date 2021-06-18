@@ -71,6 +71,27 @@ func (bl BasicLight) LightIDSequenceTransform(tfer LightIDTransformer) Light {
 	return sl
 }
 
+func (bl BasicLight) LightIDSetTransform(tfer LightIDSetTransformer) Light {
+	return CompositeLight{
+		eventType: bl.eventType,
+		set:       tfer(bl.LightIDSet()),
+	}
+}
+
+func (bl BasicLight) LightIDSetSequenceTransform(tfer LightIDSetTransformer) Light {
+	sl := NewSequenceLight()
+	set := tfer(bl.LightIDSet())
+
+	for _, lightID := range set {
+		sl.Add(CompositeLight{
+			eventType: bl.eventType,
+			set:       LightIDSet{lightID},
+		})
+
+	}
+	return sl
+}
+
 func (bl BasicLight) Transform(tfer LightIDTransformer) CompositeLight {
 	return CompositeLight{
 		eventType: bl.eventType,
