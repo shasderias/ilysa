@@ -10,21 +10,19 @@ import (
 type Light interface {
 	CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent
 	EventType() beatsaber.EventTypeSet
-	LightIDMin() int
-	LightIDMax() int
 	LightIDLen() int
 }
 
-// BasicLight represents c light with the base game + OOB Chroma attributes
+// BasicLight represents a light with the base game's attributes
 type BasicLight struct {
-	project   *Project
-	eventType beatsaber.EventType
+	eventType  beatsaber.EventType
+	lightIDMax int
 }
 
 func (p *Project) NewBasicLight(typ beatsaber.EventType) BasicLight {
 	return BasicLight{
-		project:   p,
-		eventType: typ,
+		eventType:  typ,
+		lightIDMax: p.ActiveDifficultyProfile().LightIDMax(typ),
 	}
 }
 
@@ -38,82 +36,98 @@ func (l BasicLight) EventType() beatsaber.EventTypeSet {
 	return beatsaber.NewEventTypeSet(l.eventType)
 }
 
-func (l BasicLight) LightIDMin() int {
-	return 1
-}
-
-func (l BasicLight) LightIDMax() int {
-	return 1
-}
-
 func (l BasicLight) LightIDLen() int {
 	return 1
 }
 
-func (l BasicLight) Split(splitter LightIDSplitter) SplitLight {
-	maxLightID := l.project.ActiveDifficultyProfile().LightIDMax(l.eventType)
-	return SplitLight{
-		project:   l.project,
+func (l BasicLight) LightIDMax() int {
+	return l.lightIDMax
+}
+
+func (l BasicLight) LightIDTransform(tfer LightIDTransformer) Light {
+	return CompoundLight{
 		eventType: l.eventType,
-		set:       splitter(NewLightIDFromInterval(1, maxLightID)),
+		set:       tfer(NewLightIDFromInterval(1, l.lightIDMax)),
 	}
 }
 
-func (l BasicLight) SplitToSequence(splitter LightIDSplitter) *SequenceLight {
-	maxLightID := l.project.ActiveDifficultyProfile().LightIDMax(l.eventType)
-
+func (l BasicLight) LightIDTransformSequence(tfer LightIDTransformer) SequenceLight {
 	sl := NewSequenceLight()
-	set := splitter(NewLightIDFromInterval(1, maxLightID))
+	set := tfer(NewLightIDFromInterval(1, l.lightIDMax))
 
-	for _, lightID := range *set {
-		sl.Add(SplitLight{
-			project:   l.project,
+	for _, lightID := range set {
+		sl.Add(CompoundLight{
 			eventType: l.eventType,
-			set:       &LightIDSet{lightID},
+			set:       LightIDSet{lightID},
 		})
 
 	}
-
 	return sl
 }
 
-type SplitLight struct {
-	project   *Project
-	eventType beatsaber.EventType
-	set       *LightIDSet
+func (l BasicLight) Transform(tfer LightIDTransformer) CompoundLight {
+	return CompoundLight{
+		eventType: l.eventType,
+		set:       tfer(NewLightIDFromInterval(1, l.lightIDMax)),
+	}
 }
 
-func (l SplitLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
+// [1,2,3,4] => [1], [2], [3], [4]
+func (l BasicLight) TransformToSequence(tfer LightIDTransformer) SequenceLight {
+	sl := NewSequenceLight()
+	set := tfer(NewLightIDFromInterval(1, l.lightIDMax))
+
+	for _, lightID := range set {
+		sl.Add(CompoundLight{
+			eventType: l.eventType,
+			set:       LightIDSet{lightID},
+		})
+
+	}
+	return sl
+}
+
+type CompoundLight struct {
+	eventType beatsaber.EventType
+	set       LightIDSet
+}
+
+func (cl CompoundLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
 		ctx.NewRGBLightingEvent(
-			WithType(l.eventType),
-			WithLightID(l.set.Index(ctx.LightIDOrdinal())),
+			WithType(cl.eventType),
+			WithLightID(cl.set.Index(ctx.LightIDOrdinal())),
 		),
 	)
 }
 
-func (l SplitLight) EventType() beatsaber.EventTypeSet {
-	return beatsaber.NewEventTypeSet(l.eventType)
+func (cl CompoundLight) EventType() beatsaber.EventTypeSet {
+	return beatsaber.NewEventTypeSet(cl.eventType)
 }
 
-func (l SplitLight) LightIDMin() int {
-	return 1
+func (cl CompoundLight) LightIDLen() int {
+	return cl.set.Len()
 }
 
-func (l SplitLight) LightIDMax() int {
-	return l.set.Len()
-}
+func (cl CompoundLight) LightIDTransform(tfer LightIDTransformer) Light {
+	newSet := LightIDSet{}
 
-func (l SplitLight) LightIDLen() int {
-	return l.set.Len()
+	for _, lid := range cl.set {
+		newSet.Add(tfer(lid)...)
+	}
+
+	return CompoundLight{
+		eventType: cl.eventType,
+		set:       newSet,
+	}
 }
 
 type CombinedLight struct {
 	lights []Light
 }
 
-func NewCombinedLight(lights ...Light) *CombinedLight {
-	return &CombinedLight{
+func NewCombinedLight(lights ...Light) CombinedLight {
+	return CombinedLight{
 		lights: append([]Light{}, lights...),
 	}
 }
@@ -150,43 +164,35 @@ func (cl CombinedLight) EventType() beatsaber.EventTypeSet {
 	return et
 }
 
-func (cl CombinedLight) LightIDMin() int {
-	return 1
-}
-
-func (cl CombinedLight) LightIDMax() int {
+func (cl CombinedLight) LightIDLen() int {
 	max := 0
 	for _, light := range cl.lights {
-		if light.LightIDMax() > max {
-			max = light.LightIDMax()
+		if light.LightIDLen() > max {
+			max = light.LightIDLen()
 		}
 	}
 	return max
-}
-
-func (cl CombinedLight) LightIDLen() int {
-	return cl.LightIDMax()
 }
 
 type SequenceLight struct {
 	lights []Light
 }
 
-func NewSequenceLight(lights ...Light) *SequenceLight {
-	return &SequenceLight{append([]Light{}, lights...)}
+func NewSequenceLight(lights ...Light) SequenceLight {
+	return SequenceLight{append([]Light{}, lights...)}
 }
 
 func (sl *SequenceLight) Add(lights ...Light) {
 	sl.lights = append(sl.lights, lights...)
 }
 
-func (sl *SequenceLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
+func (sl SequenceLight) CreateRGBEvent(ctx TimingContextForLight) *CompoundRGBLightingEvent {
 	light := sl.Index(ctx.Ordinal())
 
 	return light.CreateRGBEvent(ctx)
 }
 
-func (sl *SequenceLight) EventType() beatsaber.EventTypeSet {
+func (sl SequenceLight) EventType() beatsaber.EventTypeSet {
 	et := beatsaber.NewEventTypeSet()
 	for _, l := range sl.lights {
 		et = et.Union(l.EventType())
@@ -194,25 +200,34 @@ func (sl *SequenceLight) EventType() beatsaber.EventTypeSet {
 	return et
 }
 
-func (sl *SequenceLight) Index(idx int) Light {
+func (sl SequenceLight) Index(idx int) Light {
 	l := len(sl.lights)
 	return sl.lights[util.WraparoundIdx(l, idx)]
 }
 
-func (sl *SequenceLight) LightIDMin() int {
-	return 1
+func (sl SequenceLight) Slice(i, j int) SequenceLight {
+	return SequenceLight{lights: sl.lights[i:j]}
 }
 
-func (sl *SequenceLight) LightIDMax() int {
+func (sl SequenceLight) LightIDLen() int {
 	max := 0
 	for _, light := range sl.lights {
-		if light.LightIDMax() > max {
-			max = light.LightIDMax()
+		if light.LightIDLen() > max {
+			max = light.LightIDLen()
 		}
 	}
 	return max
 }
 
-func (sl *SequenceLight) LightIDLen() int {
-	return sl.LightIDMax()
+func (sl SequenceLight) ApplyLightIDTransform(tfer LightIDTransformer) SequenceLight {
+	newLights := []Light{}
+	for _, l := range sl.lights {
+		tfl, ok := l.(LightIDTransformable)
+		if !ok {
+			newLights = append(newLights, l)
+			continue
+		}
+		newLights = append(newLights, tfl.LightIDTransform(tfer))
+	}
+	return NewSequenceLight(newLights...)
 }

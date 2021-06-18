@@ -63,7 +63,7 @@ func LeadInBrokenChord(p *ilysa.Project, startBeat float64) {
 	})
 
 	var (
-		backLasers        = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.DivideSingle)
+		backLasers        = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
 		colorSweepSpeed   = 2.2
 		shimmerSweepSpeed = 0.8
 		intensity         = 0.8

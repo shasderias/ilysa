@@ -10,7 +10,7 @@ type RGB struct {
 	Color   color.Color `json:"_color,omitempty"`
 }
 
-func (r *RGB) CustomData() (json.RawMessage, error) {
+func (r RGB) CustomData() (json.RawMessage, error) {
 	if r.LightID == nil && r.Color == nil {
 		return nil, nil
 	}

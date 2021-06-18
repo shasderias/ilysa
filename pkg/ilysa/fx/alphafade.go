@@ -22,6 +22,7 @@ import (
 func RGBAlphaBlend(ctx ilysa.TimingContext, event ilysa.Event, startAlpha, endAlpha float64, easeFn ease.Func) {
 	alphaScale := util.ScaleFromUnitInterval(startAlpha, endAlpha)
 
-	e := event.(ilysa.EventWithAlpha)
+	e, ok := event.(ilysa.EventWithAlpha)
+	if !ok { return }
 	e.SetAlpha(e.GetAlpha() * alphaScale(easeFn(ctx.T())))
 }

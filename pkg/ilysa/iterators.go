@@ -47,3 +47,39 @@ func (c baseContext) EventsForSequence(startBeat float64, sequence []float64, ca
 		callback(c.withTiming(beat, startBeat, endBeat, i).WithBeatOffset(0).withSequence(sequence))
 	}
 }
+
+func (c baseContext) ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder EventModder) {
+	p := c.Project
+	p.sortEvents()
+
+	startBeat += c.beatOffset
+	endBeat += c.beatOffset
+
+	startIdx, endIdx := 0, len(p.events)
+
+	for i := 0; i < len(p.events); i++ {
+		if p.events[i].Base().Beat >= startBeat {
+			startIdx = i
+			goto startFound
+		}
+	}
+	// past last event
+	return
+startFound:
+
+	for i := len(p.events) - 1; i >= startIdx; i-- {
+		if p.events[i].Base().Beat <= endBeat {
+			endIdx = i
+			break
+		}
+	}
+
+	events := p.events[startIdx : endIdx+1]
+
+	for i := range events {
+		if !filter(events[i]) {
+			continue
+		}
+		modder(c.withTiming(events[i].Base().Beat, startBeat, endBeat, i).WithBeatOffset(0), events[i])
+	}
+}

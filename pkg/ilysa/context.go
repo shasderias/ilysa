@@ -30,8 +30,6 @@ type Timing interface {
 }
 
 type LightContext interface {
-	LightIDMin() int
-	LightIDMax() int
 	LightIDLen() int
 	LightIDCur() int
 	LightIDOrdinal() int
@@ -79,6 +77,8 @@ type SequenceContextWithLight interface {
 	LightContext
 	CompoundLighter
 	Sequencer
+
+	//EventsForRange(startBeat, endBeat float64, steps int, fn ease.Func, callback func(ctx TimingContextWithLight))
 }
 
 type Lighter interface {
@@ -358,6 +358,19 @@ type sequenceContextWithLight struct {
 	lightContext
 	sequenceContext
 }
+
+//func (c sequenceContextWithLight) EventsForRange(startBeat, endBeat float64, steps int, easeFn ease.Func, callback func(light TimingContextWithLight)) {
+	//tScaler := util.ScaleToUnitInterval(0, float64(steps-1))
+	//
+	//ctx := timingContextWithLight{
+	//
+	//}
+	//
+	//for i := 0; i < steps; i++ {
+	//	beat := Ierp(startBeat, endBeat, tScaler(float64(i)), easeFn)
+	//	callback(c.withTiming(beat, startBeat, endBeat, i).WithBeatOffset(0))
+	//}
+//}
 
 func (c sequenceContextWithLight) withLightIDOrdinal(ordinal int) sequenceContextWithLight {
 	return sequenceContextWithLight{

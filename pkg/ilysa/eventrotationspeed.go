@@ -35,7 +35,7 @@ func (e *RotationSpeedEvent) Mod(opts ...RotationSpeedEventOpt) {
 	}
 }
 
-func (e *RotationSpeedEvent) CustomData() (json.RawMessage, error) { return nil, nil }
+func (e RotationSpeedEvent) CustomData() (json.RawMessage, error) { return nil, nil }
 
 type PreciseRotationSpeedEvent struct {
 	BaseEvent

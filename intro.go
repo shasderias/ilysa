@@ -55,7 +55,7 @@ func (p Intro) PianoDoubles(startBeat float64) {
 	cl := ilysa.NewCombinedLight()
 
 	for _, light := range lights {
-		cl.Add(p.NewBasicLight(light).Split(ilysa.DivideSingle))
+		cl.Add(p.NewBasicLight(light).Transform(ilysa.DivideSingle))
 	}
 
 	values := beatsaber.NewEventValueSet(
@@ -86,9 +86,9 @@ func (p Intro) PianoDoubles(startBeat float64) {
 func (p Intro) LeadinDrums(startBeat float64) {
 	light := ilysa.NewSequenceLight(
 		p.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers).
-			Split(ilysa.Fan(2)),
+			Transform(ilysa.Fan(2)),
 		p.NewBasicLight(beatsaber.EventTypeRightRotatingLasers).
-			Split(ilysa.Fan(2)),
+			Transform(ilysa.Fan(2)),
 	)
 
 	p.EventsForSequence(startBeat, []float64{0, 0.25, 0.75, 1, 1.5}, func(ctx ilysa.SequenceContext) {
@@ -127,7 +127,7 @@ func (p Intro) BassTwang(startBeat float64) {
 	var (
 		endBeat    = startBeat + 1.495
 		midPoint   = (endBeat - startBeat) / 2.0
-		backLasers = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.DivideSingle)
+		backLasers = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
 		grad       = magnetGradient
 	)
 
@@ -255,7 +255,7 @@ func (p Intro) Rhythm(startBeat, endBeat float64) {
 func (p Intro) Melody1(startBeat float64) {
 	var (
 		sequence = []float64{0, 0.5, 1, 1.25, 1.75, 2.25, 2.75}
-		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Divide(3))
+		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(3))
 	)
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
@@ -294,7 +294,7 @@ func (p Intro) Melody1(startBeat float64) {
 func (p Intro) Melody2(startBeat float64, reverseZoom bool) {
 	var (
 		sequence = []float64{0, 0.25, 0.50}
-		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Fan(3))
+		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Fan(3))
 	)
 
 	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimingContext) {
@@ -331,7 +331,7 @@ func (p Intro) Melody2(startBeat float64, reverseZoom bool) {
 func (p Intro) Melody3(startBeat float64) {
 	var (
 		sequence = []float64{0, 0.5, 1, 1.25, 1.75, 2.25, 2.75, 3.00, 3.25, 3.50}
-		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Divide(3))
+		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(3))
 	)
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
@@ -354,7 +354,7 @@ func (p Intro) Melody3(startBeat float64) {
 func (p Intro) Chorus(startBeat float64) {
 	var (
 		sequence  = []float64{0, 1, 2, 2.75, 3.5, 4}
-		light     = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.DivideSingle)
+		light     = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
 		colorGrad = allColorsGradient
 	)
 
@@ -426,7 +426,7 @@ func (p Intro) Chorus(startBeat float64) {
 
 func (p Intro) PianoRoll(startBeat float64, count int) {
 	var (
-		light = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Divide(count))
+		light = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(count))
 	)
 
 	p.EventsForBeats(startBeat, 0.25, count, func(ctx ilysa.TimingContext) {
@@ -437,8 +437,8 @@ func (p Intro) PianoRoll(startBeat float64, count int) {
 }
 func (p Intro) Trill(startBeat float64) {
 	var (
-		backLasers = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.DivideSingle)
-		ringLasers = p.NewBasicLight(beatsaber.EventTypeRingLights).Split(ilysa.DivideSingle)
+		backLasers = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
+		ringLasers = p.NewBasicLight(beatsaber.EventTypeRingLights).Transform(ilysa.DivideSingle)
 		step       = 0.125
 		count      = 5
 		ratio      = 0.666
@@ -491,7 +491,7 @@ func (p Intro) Trill(startBeat float64) {
 
 func (p Intro) Climb(startBeat float64) {
 	var (
-		light           = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Divide(7))
+		light           = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(7))
 		step            = 0.25
 		lightIDSequence = []int{6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 1, 12}
 		count           = len(lightIDSequence)
@@ -607,7 +607,7 @@ func (p Intro) Fall(startBeat float64) {
 		//lightIDSets = light2.DivideIntoGroupsOf(lightIDs, count)
 		step     = 0.25
 		count    = 4
-		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Divide(count))
+		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(count))
 		colorSet = colorful.NewSet(magnetPurple, magnetPink)
 		values   = beatsaber.NewEventValueSet(
 			beatsaber.EventValueLightRedOn,
@@ -661,7 +661,7 @@ func (p Intro) Bridge(startBeat float64) {
 func (p Intro) Outro(startBeat float64) {
 	var (
 		sequence = []float64{0, 0.25, 0.50, 1.0, 1.25, 1.50, 2.0, 2.25, 2.50, 2.75, 3.25}
-		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).SplitToSequence(ilysa.Fan(len(sequence)))
+		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Fan(len(sequence)))
 	)
 
 	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimingContext) {
@@ -691,9 +691,9 @@ func (p Intro) OutroSplash(startBeat float64) {
 		sweepSpeed = 0.6
 		grad       = gradient.Rainbow
 		sequence   = []float64{0, 0.75, 1.5}
-		leftLaser  = p.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers).Split(ilysa.DivideSingle)
-		rightLaser = p.NewBasicLight(beatsaber.EventTypeRightRotatingLasers).Split(ilysa.DivideSingle)
-		backLaser  = p.NewBasicLight(beatsaber.EventTypeBackLasers).Split(ilysa.DivideSingle)
+		leftLaser  = p.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers).Transform(ilysa.DivideSingle)
+		rightLaser = p.NewBasicLight(beatsaber.EventTypeRightRotatingLasers).Transform(ilysa.DivideSingle)
+		backLaser  = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
 	)
 
 	p.EventsForRange(startBeat, startBeat+2, 60, ease.Linear, func(ctx ilysa.TimingContext) {

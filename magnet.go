@@ -86,18 +86,18 @@ func do() error {
 		return err
 	}
 
-	//LeadIn(p)
-	//
-	//Intro{
-	//	Project:   p,
-	//	startBeat: 0,
-	//}.Play()
+	LeadIn(p)
+
+	Intro{
+		Project:   p,
+		startBeat: 0,
+	}.Play()
 
 	verse1 := NewVerse(p, 52)
-	verse1.Play()
+	verse1.Play1a()
 
 	//v := Verse{Project: p}
-	//v.Play(52)
+	//v.Play1a(52)
 
 	//
 	//BassTwang(p, 18.5)

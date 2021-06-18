@@ -28,7 +28,7 @@ func (c baseContext) NewZoomEvent(opts ...ZoomEventOpt) *ZoomEvent {
 	return e
 }
 
-func (e *ZoomEvent) CustomData() (json.RawMessage, error) { return nil, nil }
+func (e ZoomEvent) CustomData() (json.RawMessage, error) { return nil, nil }
 
 func (e *ZoomEvent) Mod(opts ...ZoomEventOpt) {
 	for _, opt := range opts {
