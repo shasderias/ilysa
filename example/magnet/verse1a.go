@@ -1,14 +1,14 @@
 package main
 
 import (
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/chroma"
-	"ilysa/pkg/colorful/gradient"
-	"ilysa/pkg/ease"
-	"ilysa/pkg/gen"
-	"ilysa/pkg/ilysa"
-	"ilysa/pkg/ilysa/fx"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/colorful/gradient"
+	"github.com/shasderias/ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/gen"
+	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 type Verse struct {

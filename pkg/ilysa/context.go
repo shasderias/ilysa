@@ -3,9 +3,9 @@ package ilysa
 import (
 	"math/rand"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/ease"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 type BaseContext interface {

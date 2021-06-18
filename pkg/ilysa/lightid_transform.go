@@ -1,6 +1,6 @@
 package ilysa
 
-import "ilysa/pkg/beatsaber"
+import "github.com/shasderias/ilysa/pkg/beatsaber"
 
 type LightIDTransformer func(id LightID) LightIDSet
 type LightIDSetTransformer func(set LightIDSet) LightIDSet

@@ -1,6 +1,6 @@
 package ilysa
 
-import "ilysa/pkg/beatsaber"
+import "github.com/shasderias/ilysa/pkg/beatsaber"
 
 var FilterAllLightingEvents EventFilter = func(event Event) bool {
 	switch event.(type) {

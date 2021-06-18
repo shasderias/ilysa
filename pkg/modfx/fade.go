@@ -1,10 +1,10 @@
 package modfx
 
 import (
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/ease"
-	"ilysa/pkg/ilysa"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 func RGBAlphaFade(p *ilysa.Project, target beatsaber.EventType,

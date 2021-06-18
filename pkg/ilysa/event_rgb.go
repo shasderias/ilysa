@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"image/color"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/chroma"
-	"ilysa/pkg/colorful"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/colorful"
 )
 
 type RGBLightingEvent struct {

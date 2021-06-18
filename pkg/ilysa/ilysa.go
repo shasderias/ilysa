@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/ease"
 )
 
 type Project struct {

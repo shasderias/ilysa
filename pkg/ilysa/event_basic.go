@@ -3,7 +3,7 @@ package ilysa
 import (
 	"encoding/json"
 
-	"ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
 )
 
 type BasicLightingEvent struct {

@@ -1,6 +1,6 @@
 package gradient
 
-import "ilysa/pkg/colorful"
+import "github.com/shasderias/ilysa/pkg/colorful"
 
 // This table contains the "keypoints" of the colorgradient you want to generate.
 // The position of each keypoint has to live in the range [0,1]

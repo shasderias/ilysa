@@ -1,8 +1,8 @@
 package fx
 
 import (
-	"ilysa/pkg/colorful/gradient"
-	"ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/colorful/gradient"
+	"github.com/shasderias/ilysa/pkg/ilysa"
 )
 
 func Gradient(ctx ilysa.TimingContextWithLight, table gradient.Table) *ilysa.CompoundRGBLightingEvent {

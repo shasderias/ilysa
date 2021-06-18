@@ -1,7 +1,7 @@
 package lightid
 
 import (
-	"ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/chroma"
 )
 
 type Set []chroma.LightID

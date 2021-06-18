@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"ilysa/pkg/swallowjson"
+	"github.com/shasderias/ilysa/pkg/swallowjson"
 )
 
 type Map struct {

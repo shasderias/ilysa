@@ -3,8 +3,8 @@ package ilysa
 import (
 	"encoding/json"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/chroma"
 )
 
 type RotationEvent struct {

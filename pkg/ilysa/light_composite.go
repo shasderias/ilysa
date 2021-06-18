@@ -1,7 +1,7 @@
 package ilysa
 
 import (
-	"ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
 )
 
 // CompositeLight represents a single base game light and a set of LightIDs.

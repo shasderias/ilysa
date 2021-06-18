@@ -1,7 +1,7 @@
 package ilysa
 
 import (
-	"ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
 )
 
 type Light interface {

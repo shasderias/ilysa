@@ -1,9 +1,9 @@
 package fx
 
 import (
-	"ilysa/pkg/ease"
-	"ilysa/pkg/ilysa"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 type RippleOpt interface {

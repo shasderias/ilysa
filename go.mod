@@ -1,4 +1,4 @@
-module ilysa
+module github.com/shasderias/ilysa
 
 go 1.16
 

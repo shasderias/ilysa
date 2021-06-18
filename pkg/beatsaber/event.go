@@ -3,7 +3,7 @@ package beatsaber
 import (
 	"encoding/json"
 
-	"ilysa/pkg/swallowjson"
+	"github.com/shasderias/ilysa/pkg/swallowjson"
 )
 
 type Event struct {

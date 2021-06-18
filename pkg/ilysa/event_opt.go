@@ -1,6 +1,6 @@
 package ilysa
 
-import "ilysa/pkg/beatsaber"
+import "github.com/shasderias/ilysa/pkg/beatsaber"
 
 type withTypeOpt struct {
 	typ beatsaber.EventType

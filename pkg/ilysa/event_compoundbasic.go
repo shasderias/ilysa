@@ -1,6 +1,6 @@
 package ilysa
 
-import "ilysa/pkg/beatsaber"
+import "github.com/shasderias/ilysa/pkg/beatsaber"
 
 type CompoundBasicLightingEvent []*BasicLightingEvent
 type CompoundBasicLightingEventOpt interface {

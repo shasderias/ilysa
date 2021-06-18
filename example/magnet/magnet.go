@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/colorful"
-	"ilysa/pkg/colorful/gradient"
-	"ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/colorful"
+	"github.com/shasderias/ilysa/pkg/colorful/gradient"
+	"github.com/shasderias/ilysa/pkg/ilysa"
 )
 
 const mapPath = `D:\Beat Saber Data\CustomWIPLevels\MagnetLights`

@@ -3,7 +3,7 @@ package ilysa
 import (
 	"image/color"
 
-	"ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
 )
 
 type CompoundRGBLightingEvent []*RGBLightingEvent

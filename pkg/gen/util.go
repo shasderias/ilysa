@@ -1,8 +1,8 @@
 package gen
 
 import (
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/ilysa"
 )
 
 func OffAll(ctx ilysa.TimingContext) {

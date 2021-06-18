@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"ilysa/pkg/colorful"
+	"github.com/shasderias/ilysa/pkg/colorful"
 )
 
 // This table contains the "keypoints" of the colorgradient you want to generate.

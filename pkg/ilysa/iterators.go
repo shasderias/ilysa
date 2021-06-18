@@ -1,8 +1,8 @@
 package ilysa
 
 import (
-	"ilysa/pkg/ease"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 func (c baseContext) EventForBeat(beat float64, callback func(TimingContext)) {

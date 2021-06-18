@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/chroma"
 )
 
 func TestSetSanity(t *testing.T) {

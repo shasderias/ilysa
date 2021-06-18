@@ -3,8 +3,8 @@ package ilysa
 import (
 	"math"
 
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 type CombinedLight struct {

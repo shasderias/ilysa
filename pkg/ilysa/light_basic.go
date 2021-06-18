@@ -1,7 +1,7 @@
 package ilysa
 
 import (
-	"ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
 )
 
 // BasicLight represents a light with the base game's attributes. Lighting events

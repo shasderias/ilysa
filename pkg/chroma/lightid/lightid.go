@@ -1,8 +1,8 @@
 package lightid
 
 import (
-	"ilysa/pkg/beatsaber"
-	"ilysa/pkg/chroma"
+	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/chroma"
 )
 
 type LightProfile interface {

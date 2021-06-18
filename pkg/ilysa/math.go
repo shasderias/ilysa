@@ -3,7 +3,7 @@ package ilysa
 import (
 	"math"
 
-	"ilysa/pkg/ease"
+	"github.com/shasderias/ilysa/pkg/ease"
 )
 
 func Ierp(min, max float64, pos float64, easeFunc ease.Func) float64 {

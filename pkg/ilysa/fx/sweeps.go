@@ -3,9 +3,9 @@ package fx
 import (
 	"math"
 
-	"ilysa/pkg/colorful/gradient"
-	"ilysa/pkg/ilysa"
-	"ilysa/pkg/util"
+	"github.com/shasderias/ilysa/pkg/colorful/gradient"
+	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/pkg/util"
 )
 
 var (
