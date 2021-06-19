@@ -7,6 +7,6 @@ import (
 
 func Gradient(ctx ilysa.TimingContextWithLight, table gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	return ctx.NewRGBLightingEvent(
-		ilysa.WithColor(table.GetInterpolatedColorFor(ctx.LightIDT())),
+		ilysa.WithColor(table.Ierp(ctx.LightIDT())),
 	)
 }

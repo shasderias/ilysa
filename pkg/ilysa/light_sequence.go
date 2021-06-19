@@ -46,6 +46,10 @@ func (sl SequenceLight) Index(idx int) Light {
 	return sl.lights[util.WraparoundIdx(l, idx)]
 }
 
+func (sl SequenceLight) Len() int {
+	return len(sl.lights)
+}
+
 func (sl SequenceLight) Slice(i, j int) SequenceLight {
 	return SequenceLight{lights: sl.lights[i:j]}
 }

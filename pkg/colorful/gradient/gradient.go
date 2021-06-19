@@ -2,24 +2,42 @@ package gradient
 
 import "github.com/shasderias/ilysa/pkg/colorful"
 
+func New(colors ...colorful.Color) Table {
+	if len(colors) < 2 {
+		panic("gradient.New(): gradient must contain at least two colors")
+	}
+
+	table := Table{}
+
+	for i, color := range colors {
+		table = append(table, Point{
+			Col: color,
+			Pos: float64(i) / float64(len(colors)-1),
+		})
+	}
+
+	return table
+}
+
 // This table contains the "keypoints" of the colorgradient you want to generate.
 // The position of each keypoint has to live in the range [0,1]
-type Table []struct {
+type Table []Point
+
+type Point struct {
 	Col colorful.Color
 	Pos float64
 }
 
-// This is the meat of the gradient computation. It returns a HCL-blend between
-// the two colors around `t`.
-// Note: It relies heavily on the fact that the gradient keypoints are sorted.
-func (gt Table) GetInterpolatedColorFor(t float64) colorful.Color {
+// Ierp returns interpolated color at t. The interpolation is done in the Oklab
+// colorspace
+func (gt Table) Ierp(t float64) colorful.Color {
 	for i := 0; i < len(gt)-1; i++ {
 		c1 := gt[i]
 		c2 := gt[i+1]
 		if c1.Pos <= t && t <= c2.Pos {
 			// We are in between c1 and c2. Go blend them!
 			t := (t - c1.Pos) / (c2.Pos - c1.Pos)
-			return c1.Col.BlendOklab(c2.Col, t).Clamped()
+			return c1.Col.BlendOklab(c2.Col, t)
 		}
 	}
 
@@ -40,4 +58,3 @@ var Rainbow = Table{
 	{colorful.MustParseHex("#3288bd"), 0.9},
 	{colorful.MustParseHex("#5e4fa2"), 1.0},
 }
-

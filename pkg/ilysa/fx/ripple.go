@@ -38,10 +38,26 @@ func WithAlphaBlend(startT, endT, startAlpha, endAlpha float64, easeFn ease.Func
 	}
 }
 
-func (o withFadeInOpt) applyRipple(ctx ilysa.TimingContextWithLight, events *ilysa.CompoundRGBLightingEvent) {
+func (o withFadeInOpt) apply(ctx ilysa.TimingContextWithLight, events *ilysa.CompoundRGBLightingEvent) {
 	if ctx.T() < o.startT || ctx.T() > o.endT {
 		return
 	}
 	alphaScale := util.Scale(o.startT, o.endT, o.startAlpha, o.endAlpha)
 	events.Mod(ilysa.WithAlpha(events.GetAlpha() * o.easeFn(alphaScale(ctx.T()))))
+}
+
+func (o withFadeInOpt) applyRipple(ctx ilysa.TimingContextWithLight, events *ilysa.CompoundRGBLightingEvent) {
+	o.apply(ctx, events)
+}
+
+func (o withFadeInOpt) applyColorSweep(ctx ilysa.TimingContextWithLight, events *ilysa.CompoundRGBLightingEvent) {
+	o.apply(ctx, events)
+}
+
+func AlphaBlend(ctx ilysa.TimingContextWithLight, events *ilysa.CompoundRGBLightingEvent, startT, endT, startAlpha, endAlpha float64, easeFn ease.Func) {
+	if ctx.T() < startT || ctx.T() > endT {
+		return
+	}
+	alphaScale := util.Scale(startT, endT, startAlpha, endAlpha)
+	events.Mod(ilysa.WithAlpha(events.GetAlpha() * easeFn(alphaScale(ctx.T()))))
 }

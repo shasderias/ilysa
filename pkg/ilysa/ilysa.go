@@ -51,6 +51,10 @@ func (p *Project) ModEventsInRange(startBeat, endBeat float64, filter EventFilte
 	ctx.ModEventsInRange(startBeat, endBeat, filter, modder)
 }
 
+func (p *Project) LightIDMax(typ beatsaber.EventType) int {
+	return p.Map.ActiveDifficultyProfile().LightIDMax(typ)
+}
+
 func (p *Project) Save() error {
 	events := []beatsaber.Event{}
 

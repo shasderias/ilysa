@@ -5,6 +5,6 @@ package gen
 //	for i := LightIDMin; i < LightIDMax; i++ {
 //		e := ctx.NewRGBLightingEvent(typ, val)
 //		e.SetSingleLightID(i)
-//		e.SetColor(table.GetInterpolatedColorFor(scale(float64(i))))
+//		e.SetColor(table.Ierp(scale(float64(i))))
 //	}
 //}

@@ -23,10 +23,10 @@ func NewVerse1b(project *ilysa.Project, offset float64) Verse1b {
 func (v Verse1b) Play() {
 	v.EventForBeat(0, func(ctx ilysa.TimingContext) {
 		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithValue(5),
+			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithIntValue(5),
 		)
 		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithValue(5),
+			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithIntValue(5),
 		)
 	})
 
@@ -71,10 +71,10 @@ func (v Verse1b) Rhythm(startBeat float64) {
 		rippleLights   = v.NewBasicLight(beatsaber.EventTypeRingLights).Transform(ilysa.DivideSingle)
 		rippleStep     = 0.8
 		grad           = gradient.Table{
-			{magnetColors.Pick(0), 0.0},
-			{magnetColors.Pick(1), 0.05},
-			{magnetColors.Pick(2), 0.5},
-			{magnetColors.Pick(3), 1.0},
+			{magnetColors.Index(0), 0.0},
+			{magnetColors.Index(1), 0.05},
+			{magnetColors.Index(2), 0.5},
+			{magnetColors.Index(3), 1.0},
 		}
 	)
 

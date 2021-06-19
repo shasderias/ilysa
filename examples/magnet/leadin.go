@@ -12,10 +12,10 @@ import (
 func LeadIn(p *ilysa.Project) {
 	p.EventForBeat(4, func(ctx ilysa.TimingContext) {
 		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithValue(3),
+			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithIntValue(3),
 		)
 		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithValue(3),
+			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithIntValue(3),
 		)
 
 	})

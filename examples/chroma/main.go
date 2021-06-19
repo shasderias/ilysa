@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/shasderias/ilysa/pkg/beatsaber"
+	"github.com/shasderias/ilysa/pkg/colorful"
 	"github.com/shasderias/ilysa/pkg/ilysa"
 )
 
@@ -35,6 +37,15 @@ func do() error {
 	}
 
 	// -- your code goes here --
+	p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+		ctx.NewRGBLightingEvent(
+			ilysa.WithType(beatsaber.EventTypeBackLasers),
+			ilysa.WithValue(beatsaber.EventValueLightRedOn),
+			ilysa.WithColor(colorful.MustParseHex("#123123")),
+			ilysa.WithAlpha(0.3),
+			ilysa.WithLightID(ilysa.NewLightID(1, 2, 3)),
+		)
+	})
 
 	// save events back to Expert+ difficulty
 	return p.Save()

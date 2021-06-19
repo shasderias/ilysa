@@ -19,15 +19,15 @@ type BaseContext interface {
 }
 
 type Timing interface {
-	B() float64
-	T() float64
-	Ordinal() int
-	StartBeat() float64
-	EndBeat() float64
-	Duration() float64
-	First() bool
-	Last() bool
-	FixedRand() float64
+	B() float64         // current beat
+	T() float64         // current time in the current sequence, on a 0-1 scale
+	Ordinal() int       // ordinal number of the current iteration, starting from 0
+	StartBeat() float64 // first beat of the current sequence
+	EndBeat() float64   // last beat of the current sequence
+	Duration() float64  // duration of the current sequence, in beats
+	First() bool        // true if this is the first iteration
+	Last() bool         // true if this is the last iteration
+	FixedRand() float64 // a number from 0-1, fixed for the current sequence, but different for every sequence
 }
 
 type LightContext interface {
@@ -38,6 +38,7 @@ type LightContext interface {
 }
 
 type TimingContext interface {
+	BaseContext
 	Timing
 	Eventer
 	Lighter

@@ -12,7 +12,7 @@ type RotationEvent struct {
 }
 
 type RotationEventOpt interface {
-	applyRotationEvent(RotationEvent)
+	applyRotationEvent(*RotationEvent)
 }
 
 func (c baseContext) NewRotationEvent(opts ...RotationEventOpt) *RotationEvent {
@@ -31,7 +31,7 @@ func (e RotationEvent) CustomData() (json.RawMessage, error) { return nil, nil }
 
 func (e RotationEvent) Mod(opts ...RotationEventOpt) {
 	for _, opt := range opts {
-		opt.applyRotationEvent(e)
+		opt.applyRotationEvent(&e)
 	}
 }
 

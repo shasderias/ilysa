@@ -29,15 +29,26 @@ func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimingContext
 func BiasedColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	gradPos := SinSweepLightID(sweepSpeed, ctx.FixedRand())
 	return ctx.NewRGBLightingEvent(
-		ilysa.WithColor(grad.GetInterpolatedColorFor(gradPos(ctx))),
+		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
 	)
 }
 
-func ColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
+func ColorSweep(ctx ilysa.TimingContextWithLight, sweepSpeed float64, grad gradient.Table, opts...ColorSweepOpt) *ilysa.CompoundRGBLightingEvent {
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
-	return ctx.NewRGBLightingEvent(
-		ilysa.WithColor(grad.GetInterpolatedColorFor(gradPos(ctx))),
+
+	e :=  ctx.NewRGBLightingEvent(
+		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
 	)
+
+	for _, opt := range opts {
+		opt.applyColorSweep(ctx, e)
+	}
+
+	return e
+}
+
+type ColorSweepOpt interface {
+	applyColorSweep(light ilysa.TimingContextWithLight, event *ilysa.CompoundRGBLightingEvent)
 }
 
 func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shimmerSpeed float64) {
@@ -51,7 +62,7 @@ func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shim
 //		for i := 1; i < LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(gradient.Rainbow.GetInterpolatedColorFor(
+//			e.SetColor(gradient.Rainbow.Ierp(
 //				sin(ctx.t*sweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
 //			))
 //		}
@@ -73,7 +84,7 @@ func AlphaShimmer(ctx ilysa.TimingContextWithLight, e ilysa.EventWithAlpha, shim
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(gradient.Rainbow.GetInterpolatedColorFor(
+//			e.SetColor(gradient.Rainbow.Ierp(
 //				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
 //			))
 //			e.SetAlpha(intensity)

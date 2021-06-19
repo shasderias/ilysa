@@ -133,7 +133,7 @@ func do() error {
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(gradient.Rainbow.GetInterpolatedColorFor(
+//			e.SetColor(gradient.Rainbow.Ierp(
 //				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
 //			))
 //			e.SetAlpha(5)
@@ -172,7 +172,7 @@ func do() error {
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightBlueOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(magnetGradient.GetInterpolatedColorFor(
+//			e.SetColor(magnetGradient.Ierp(
 //				sin(ctx.t*3 + (float64(i)/float64(LightIDMax))*pi + 4),
 //			))
 //			e.SetAlpha(5)

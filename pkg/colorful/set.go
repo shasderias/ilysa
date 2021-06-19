@@ -28,7 +28,7 @@ func NewSet(colors ...Color) *Set {
 	}
 }
 
-func (s *Set) Pick(ordinal int) Color {
+func (s *Set) Index(ordinal int) Color {
 	return s.colors[ordinal%len(s.colors)]
 }
 

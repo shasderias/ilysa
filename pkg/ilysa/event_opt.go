@@ -18,9 +18,10 @@ func (w withTypeOpt) applyRGBLightingEvent(e *RGBLightingEvent) {
 	e.SetType(w.typ)
 }
 
-//func (w withTypeOpt) applyRotationEvent(e *RotationEvent) {
-//	e.SetType(w.typ)
-//}
+func (w withTypeOpt) applyRotationEvent(e *RotationEvent) {
+	e.SetType(w.typ)
+}
+
 //
 //func (w withTypeOpt) applyPreciseRotationEvent(e *PreciseRotationEvent) {
 //	e.SetType(w.typ)
@@ -78,10 +79,18 @@ func (w withValueOpt) applyPreciseZoomEvent(e *PreciseZoomEvent) {
 	e.SetValue(w.typ)
 }
 
-func (w withValueOpt) applyRotationSpeedEvent(e *RotationSpeedEvent) {
-	e.SetValue(w.typ)
+type withIntValueOpt struct {
+	val int
 }
 
-func (w withValueOpt) applyPreciseRotationSpeedEvent(e *PreciseRotationSpeedEvent) {
-	e.SetValue(w.typ)
+func WithIntValue(val int) withIntValueOpt {
+	return withIntValueOpt{val}
+}
+
+func (o withIntValueOpt) applyRotationSpeedEvent(e *RotationSpeedEvent) {
+	e.SetValue(beatsaber.EventValue(o.val))
+}
+
+func (o withIntValueOpt) applyPreciseRotationSpeedEvent(e *PreciseRotationSpeedEvent) {
+	e.SetValue(beatsaber.EventValue(o.val))
 }

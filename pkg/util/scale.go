@@ -30,4 +30,3 @@ func ScaleFromUnitInterval(tMin, tMax float64) func(m float64) float64 {
 func ScaleToUnitInterval(rMin, rMax float64) func(m float64) float64 {
 	return Scale(rMin, rMax, 0, 1)
 }
-
