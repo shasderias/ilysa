@@ -1,4 +1,4 @@
-package gen
+package fx
 
 import (
 	"github.com/shasderias/ilysa/pkg/beatsaber"

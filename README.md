@@ -1,15 +1,315 @@
 # Ilysa
 
-Ilysa is a Go library that helps you create your favorite lighting patterns with speed and ease(probably)!
+Ilysa is a Go library that helps you create your favorite lighting patterns with speed and ease (probably)!
 
 ## Sell Me
 
-Ilysa lets you generate lightshows like this:
-
-[![Ilysa Showcase](https://img.youtube.com/vi/MohFQiz8tAU/0.jpg)](https://www.youtube.com/watch?v=MohFQiz8tAU)
+Lazy lighter: I wanna place a back lasers red fade block every beat for 50 beats!
 
 <details>
-  <summary>from this</summary>
+<summary>See the Ilysa code</summary>
+
+```go
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) { // startBeat 0, beat length 1, repeat 50 times
+    ctx.NewLightingEvent(
+        ilysa.WithType(beatsaber.EventTypeBackLasers),
+        ilysa.WithValue(beatsaber.EventValueLightRedFade),
+    )
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_01.png)
+
+</details>
+
+Lazy lighter: Well, that's not as exciting as I thought. I heard Chroma lights gives downloads! I want rainbow gaming
+lights! Make every fade a different color!
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+    ctx.NewRGBLightingEvent(  // make it Chroma
+        ilysa.WithType(beatsaber.EventTypeBackLasers),
+        ilysa.WithValue(beatsaber.EventValueLightRedFade),
+        ilysa.WithColor(gradient.Rainbow.Ierp(ctx.FixedRand())), // add Rainbow power
+    )
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_02.png)
+
+</details>
+
+Lazy lighter: OIC. That's still boring. What's that lightID thing those fancy lighters are using these days? Gimme
+rainbow lightIDs!
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+// get an Ilysa light representing a base game back laser (i.e. only "1" lightID)
+backLasers := ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p) 
+
+// transform the light into a back laser light with 1 lightID for each lightID it has in the beatmap's environment
+// i.e. make it work like ChroMapper in LightID mode
+backLasersSplit := ilysa.TransformLight(backLasers,
+    ilysa.ToLightTransformer(ilysa.DivideSingle), 
+)
+
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.NewRGBLightingEvent(
+            ilysa.WithValue(beatsaber.EventValueLightRedFade),
+            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+        )
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_03.png)
+
+</details>
+
+Lazy lighter: Ah... Now we getting somewhere. All the lightIDs turning on at the same time is boring, I wanna stagger
+them!
+
+<details>
+
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        e := ctx.NewRGBLightingEvent( // save the event we created to the variable e
+            ilysa.WithValue(beatsaber.EventValueLightRedFade),
+            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+        )
+        // shift each event forward by 0.05 beats * ordinal number of the lightID
+        // i.e. 1st lightID is shifted forward by 0 beats
+        //      2nd lightID is shifted forward by 0.05 beats, etc
+        e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_04.png)
+
+</details>
+
+Lazy lighter: Maybe add an off event so it twinkles real nice?
+
+<details>
+
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        e := ctx.NewRGBLightingEvent(
+            ilysa.WithValue(beatsaber.EventValueLightRedFade),
+            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+        )
+        e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
+
+        oe := ctx.NewRGBLightingEvent( // create an off event
+            ilysa.WithValue(beatsaber.EventValueLightOff),
+        )
+        oe.ShiftBeat(float64(ctx.LightIDOrdinal())*0.05 + 0.1) // shift it forward by an additional 0.1 beat
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_05.png)
+
+</details>
+
+Lazy lighter: Wait, what happened to my fade effect? Fade effects don't work with lightIDs!?
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+    // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+            e := ctx.NewRGBLightingEvent(
+                // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
+                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            )
+            e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
+            e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
+        })
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_06.png)
+
+</details>
+
+Lazy lighter: WTF happened to my colors!
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 4, func(ctx ilysa.TimingContext) {
+    // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+            e := ctx.NewRGBLightingEvent(
+                // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
+                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            )
+            e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
+            e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
+        })
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_07.png)
+
+</details>
+
+Lazy lighter: That's... not quite what I'm looking for.
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+            // the fx package contains a suite of building blocks you can use to build more complicated effects
+            // the Gradient function generates events and colors them based on the gradient passed to it
+            e := fx.Gradient(ctx, gradient.Rainbow)
+
+            e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
+            e.SetAlpha(1 - ctx.T())
+        })
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_08.png)
+
+</details>
+
+Lazy lighter: Hm... Can we spice it up?
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+            // ColorSweep is a more advanced Gradient that shifts the gradient's position with time
+            // the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
+            e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
+
+            // we then use fx.Ripple to stagger the start time of each lightID
+            fx.Ripple(ctx, e, 0.2)
+
+            e.SetAlpha(1 - ctx.T())
+        })
+    })
+})
+```
+
+</details>
+
+<details>
+<summary>ChroMapper Preview</summary>
+
+![](doc/readme_screenshots/qq_09.png)
+
+</details>
+
+Lazy Lighter: Perfect. Now ease out the alpha fade please!
+
+<details>
+<summary>See the Ilysa code</summary>
+
+```go
+
+// light creation code omitted for brevity
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+            e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
+
+            fx.Ripple(ctx, e, 0.2)
+
+            // fx.AlphaBlend does what it says on the tin, it accepts in order:
+            // startT, endT, startAlpha, endAlpha and a ease function
+            fx.AlphaBlend(ctx, e, 0, 1, 1, 0, ease.OutCirc)
+        })
+    })
+})
+```
+
+</details>
+
+## Too Many Words, Not Convinced, Video Pls
+
+Same code for all 5 effects. Ilysa automatically adapts to the lightIDs available in the selected environment.
+Documentating the effect took more time than building it.
+
+[![Ilysa Showcase](https://img.youtube.com/vi/PUoUHLk8hiY/0.jpg)](https://www.youtube.com/watch?v=PUoUHLk8hiY)
+
+<details>
+  <summary>See the Ilysa code</summary>
 
 ```go
 package main
@@ -347,33 +647,33 @@ func do() error {
 
 ## Is Ilysa for me?
 
-Beat Saber lighting knowledge and intermediate computer skills required. Ilysa is not for you if:
+Advanced Beat Saber lighting knowledge and intermediate computer skills required. Ilysa is not for you if:
 
 - you have never placed a Chroma event in ChroMapper;
-- ```_eventType``` and ```_eventValue``` don't mean anything to you; or
+- `_eventType` and `_eventValue` don't mean anything to you; or
 - a command prompt scares you.
 
 ## Ilysa ...
 
-* may not give better results than hand lighting, it only makes actualizing complicated effects easy;
+* may not give better results than handlighting, it only makes actualizing complicated effects easy;
 * may not be easier than handlighting (the converse is probably true);
-* is not an autolighter - results directly proportionate to user's skill at lighting and technical art;
+* is not an autolighter - results directly proportionate to user's skill;
 * does not generate any other beatmap elements (for walls, you probably want
   spookyGh0st's [Beatwalls](https://github.com/spookyGh0st/beatwalls#readme])).
 
 ## Do I need to know Go? Programming?
 
-Ilysa was designed to be somewhat usable by a non-programmer (actual results may vary). You can probably get somewhere
-just by copy/pasting code and tweaking values.
+Ilysa is designed to be somewhat usable by a non-programmer (actual results may vary). You can probably achieve basic
+results by copy/pasting code and tweaking values.
 
 If you want to achieve novel effects, you'll need at least a rudimentary understanding of Go.
 
 If you can already program in another language, Go should be a snap. Take a stroll
 through [A Tour of Go](https://tour.golang.org/welcome/1) and carry on.
 
-If you have never programmed, Go is an easy language to learn.
-Completing [A Tour of Go](https://tour.golang.org/welcome/1)
-up to the section on Methods should give you enough understanding of Go.
+If you have never programmed, Go is an easy language to learn. Try
+taking [A Tour of Go](https://tour.golang.org/welcome/1). If you can make it to the section on Methods, you should be
+good to go.
 
 # Getting Started
 
@@ -381,7 +681,7 @@ up to the section on Methods should give you enough understanding of Go.
 
 * a working Go environment
 * a working Git installation
-* a code editor (these instructions are tested with Visual Studio Code and the Ilysa's author uses Goland)
+* a code editor (these instructions are tested with Visual Studio Code and Ilysa's author uses Goland)
 * a beatmap with *all* requisite BPM blocks placed
 
 ### Go Environment
@@ -413,6 +713,15 @@ command line tools when prompted to do so for code assistance support.
 
 You know what you're doing.
 
+#### Vim/Emacs
+
+Ahahahahahahahahahahahahahahahahahahahahahahahahaha. You definitely know what you're doing.
+
+#### Something Else
+
+You really want something that supports `gopls` or something similar. Code assistance will make your life a lot easier.
+If you're not sure what that means, please try starting out with Visual Studio Code.
+
 ### Beatmap
 
 Ilysa works in BPM adjusted beats, i.e. the beat numbers displayed in MMA2 or ChroMapper. If you do not place all the
@@ -426,6 +735,27 @@ Ilysa and make backups (you should be making backups regardless)!⚠️**
 
 ## Preliminaries
 
+### Alpha Testers Only
+
+Add your SSH key to GitHub.
+Instructions [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+if unsure.
+
+If you clone the repo by executing the following command, you're good to go.
+
+```
+git clone github.com/shasderias/ilysa
+```
+
+Before following the instructions below, execute:
+
+```
+go env -w GOPRIVATE=github.com/shasderias/ilysa
+git config --add --global url."git@github.com:".insteadOf https://github.com
+```
+
+### Regular Instructions Here
+
 Create a new directory to hold your Ilysa project, then in that directory, execute the following commands:
 
 Initialize the directory as the root of a Go project.
@@ -434,7 +764,7 @@ Initialize the directory as the root of a Go project.
 go mod init projectName
 ```
 
-Download Ilysa. (TODO: Include instructions for alpha testers to configure Github account.)
+Download Ilysa.
 
 ```
 go get -u github.com/shasderias/ilysa

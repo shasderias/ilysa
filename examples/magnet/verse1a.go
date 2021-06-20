@@ -5,7 +5,6 @@ import (
 	"github.com/shasderias/ilysa/pkg/chroma"
 	"github.com/shasderias/ilysa/pkg/colorful/gradient"
 	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/gen"
 	"github.com/shasderias/ilysa/pkg/ilysa"
 	"github.com/shasderias/ilysa/pkg/ilysa/fx"
 	"github.com/shasderias/ilysa/pkg/util"
@@ -28,7 +27,7 @@ func NewVerse1a(p *ilysa.Project, offset float64) Verse {
 
 func (p Verse) Play() {
 	p.EventForBeat(-0.01, func(ctx ilysa.TimingContext) {
-		gen.OffAll(ctx)
+		fx.OffAll(ctx)
 		ctx.NewPreciseRotationSpeedEvent(
 			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithSpeed(1.5))
 		ctx.NewPreciseRotationSpeedEvent(
