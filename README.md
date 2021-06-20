@@ -312,7 +312,18 @@ p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
 
 ## Is Ilysa for me?
 
-Advanced Beat Saber lighting knowledge and intermediate computer skills required. Ilysa is not for you if:
+Advanced Beat Saber lighting knowledge and intermediate computer skills required.
+
+Ilysa may be for you if:
+
+- you are experienced with lighting, can't code, but want to get started with scripting lights; starting with Ilysa is
+  probably easier than trying to cobble together code from scratch;
+- you are already scripting lights, and want a little more structure or help with dealing with the more tedious parts;
+  or
+- you are experienced with lighting, can code and want to raise the bar; the author thinks there are interesting things
+  that can be done to make doing good lighting easier - check out the `Light` interface.
+
+Ilysa is not for you if:
 
 - you have never placed a Chroma event in ChroMapper;
 - `_eventType` and `_eventValue` don't mean anything to you; or

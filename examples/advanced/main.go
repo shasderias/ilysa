@@ -69,31 +69,12 @@ func do() error {
 		colorful.MustParseHex("#ff145f"),
 	)
 
-	// grad2 := gradient.Table{
+	// grad := gradient.Table{
 	// 	{Col: colorful.MustParseHex("#fbc6d0"), Pos: 0.0},
 	// 	{Col: colorful.MustParseHex("#95bddc"), Pos: 0.2},
 	// 	{Col: colorful.MustParseHex("#0c71c9"), Pos: 0.8},
 	// 	{Col: colorful.MustParseHex("#ff145f"), Pos: 1.0},
 	// }
-
-	// grad2.Ierp(0.3)
-
-	// set := colorful.NewSet(
-	// 	colorful.MustParseHex("#fbc6d0"),
-	// 	colorful.MustParseHex("#95bddc"),
-	// )
-
-	// set.Index(0)
-
-	// // p.EventsForRange(4, 4.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-	// // 	ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
-	// // 		e := ctx.NewRGBLightingEvent(
-	// // 			ilysa.WithColor(grad.Ierp(ctx.T())),
-	// // 		)
-	// // 		fx.Ripple(ctx, e, 1)
-	// // 		fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
-	// // 	})
-	// // })
 
 	RainbowProp(p, light, grad, 4, 0.5, 1, 1)
 	RainbowProp(p, lightReverse, gradient.Rainbow, 4, 0.25, 1, 1)
