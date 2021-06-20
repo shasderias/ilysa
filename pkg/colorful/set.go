@@ -1,5 +1,7 @@
 package colorful
 
+import "math/rand"
+
 type Set struct {
 	colors []Color
 	i      int
@@ -39,4 +41,8 @@ func (s *Set) Next() Color {
 		s.i = 0
 	}
 	return c
+}
+
+func (s *Set) Rand() Color {
+	return s.colors[rand.Intn(len(s.colors))]
 }

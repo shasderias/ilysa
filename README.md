@@ -1,6 +1,6 @@
 # Ilysa
 
-Ilysa is a Go library that generates lighting events for Beat Saber beatmaps.
+Ilysa is a Go library that helps you create your favorite lighting patterns with speed and ease(probably)!
 
 ## Sell Me
 
@@ -11,11 +11,11 @@ Ilysa lets you generate lightshows like this:
 <details>
   <summary>from this</summary>
 
-```
+```go
 package main
 
 import (
-"fmt"
+	"fmt"
 
 	"github.com/shasderias/ilysa/pkg/beatsaber"
 	"github.com/shasderias/ilysa/pkg/chroma"
@@ -25,19 +25,26 @@ import (
 	"github.com/shasderias/ilysa/pkg/ilysa"
 	"github.com/shasderias/ilysa/pkg/ilysa/fx"
 	"github.com/shasderias/ilysa/pkg/util"
-
 )
 
-// set mapPath to the directory containing your beatmap const mapPath = `D:\Beat Saber Data\CustomWIPLevels\Ilysa`
+// set mapPath to the directory containing your beatmap
+const mapPath = `D:\Beat Saber Data\CustomWIPLevels\Ilysa`
 
-// please use a working copy dedicated to Ilysa (and make backups!) as Ilysa // WILL OVERWRITE ALL LIGHTING EVENTS IN
-THE SELECTED DIFFICULTY
+// please use a working copy dedicated to Ilysa (and make backups!) as Ilysa
+// WILL OVERWRITE ALL LIGHTING EVENTS IN THE SELECTED DIFFICULTY
 
-func main() { if err := do(); err != nil { fmt.Println("error:", err)
-} }
+func main() {
+	if err := do(); err != nil {
+		fmt.Println("error:", err)
+	}
+}
 
-func do() error { // open the beatmap at mapPath bsMap, err := beatsaber.Open(mapPath)
-if err != nil { return err }
+func do() error {
+	// open the beatmap at mapPath
+	bsMap, err := beatsaber.Open(mapPath)
+	if err != nil {
+		return err
+	}
 
 	// create a new Ilysa project
 	p := ilysa.New(bsMap)
@@ -340,33 +347,33 @@ if err != nil { return err }
 
 ## Is Ilysa for me?
 
-Beat Saber mapping and lighting knowledge and intermediate computer skills are required. Ilysa may not be the tool for
-you if:
+Beat Saber lighting knowledge and intermediate computer skills required. Ilysa is not for you if:
 
 - you have never placed a Chroma event in ChroMapper;
 - ```_eventType``` and ```_eventValue``` don't mean anything to you; or
 - a command prompt scares you.
 
-## Ilysa is not/does not ...
+## Ilysa ...
 
-* necessarily give results better than hand lighting, rather, it (hopefully) makes actualizing complicated effects easy;
-* necessarily easier than handlighting (the converse is probably true);
-* an autolighter - results directly proportionate to user's skill at lighting and technical art;
-* generate any other beatmap elements (for walls, you probably want
+* may not give better results than hand lighting, it only makes actualizing complicated effects easy;
+* may not be easier than handlighting (the converse is probably true);
+* is not an autolighter - results directly proportionate to user's skill at lighting and technical art;
+* does not generate any other beatmap elements (for walls, you probably want
   spookyGh0st's [Beatwalls](https://github.com/spookyGh0st/beatwalls#readme])).
 
 ## Do I need to know Go? Programming?
 
 Ilysa was designed to be somewhat usable by a non-programmer (actual results may vary). You can probably get somewhere
-just by copy/pasting code and tweaking values. However, if you want to achieve novel effects, you'll need at least a
-rudimentary understanding of Go.
+just by copy/pasting code and tweaking values.
+
+If you want to achieve novel effects, you'll need at least a rudimentary understanding of Go.
 
 If you can already program in another language, Go should be a snap. Take a stroll
 through [A Tour of Go](https://tour.golang.org/welcome/1) and carry on.
 
 If you have never programmed, Go is an easy language to learn.
 Completing [A Tour of Go](https://tour.golang.org/welcome/1)
-up to the section on Methods should give you most of the understanding you will need to use Ilysa.
+up to the section on Methods should give you enough understanding of Go.
 
 # Getting Started
 
@@ -375,7 +382,7 @@ up to the section on Methods should give you most of the understanding you will 
 * a working Go environment
 * a working Git installation
 * a code editor (these instructions are tested with Visual Studio Code and the Ilysa's author uses Goland)
-* a beatmap with *all* required BPM blocks placed
+* a beatmap with *all* requisite BPM blocks placed
 
 ### Go Environment
 
@@ -522,22 +529,21 @@ point for working with the library.
 
 There are a few methods defined on ```p``` that can be used to generate events, of which ```EventForBeat``` is the
 simplest. ```EventForBeat``` accepts two arguments, a beat number (2 in the example above) and a callback function. The
-callback function has one argument, a context value, and calling methods on this context value is how you generate
-lighting events in Ilysa.
+callback function has one argument, a context value. You call methods on this context value to generate lighting events.
 
 The signature of the callback function changes based on the method. So it is easiest to let your editor's code
-assistance do the work. For example, in Visual Studio Code you can type `p.EventForBeat(2, `, hit `Ctrl-Space`, select
-the first option and the editor will fill in the rest.
+assistance do the work. In Visual Studio Code, type `p.EventForBeat(2, `, hit `Ctrl-Space`, select the first option and
+the editor will fill in the rest.
 
 The method ```NewLightingEvent``` generates a base game lighting event. It accepts 0 or more functional arguments. In
 the example above:
 
-* passing ```ilysa.WithType(beatsaber.EventTypeBackLasers)``` to ```NewLightingEvent``` tells Ilysa we want to create an
-  event that controls the lights in the Back Lasers group; and
-* passing ```ilysa.WithValue(beatsaber.EventValueLightRedOn)``` to ```NewLightingEvent``` tells Ilysa we want an event
+* passing ```ilysa.WithType(beatsaber.EventTypeBackLasers)``` to ```NewLightingEvent``` tells Ilysa to create an event
+  that controls the lights in the Back Lasers group; and
+* passing ```ilysa.WithValue(beatsaber.EventValueLightRedOn)``` to ```NewLightingEvent``` tells Ilysa to create an event
   that changes the back laser lights to red and turns them on.
 
-```ctx``` has methods for generating the following base game's events:
+For generating base game events, ```ctx``` has the following methods:
 
 ```go
 ctx.NewRotationEvent()
@@ -562,14 +568,14 @@ See ```examples/some-basic-examples```  for a few more basic examples.
 ```EventsForBeats```:
 
 ```go
-// generate events every quarter beat (0.25), starting at beat 3, do this a total of 16 times
+// generate events every quarter beat (0.25), starting at beat 3, do this a total of 16 times ...
 // i.e. 3.00, 3.25, 3.50, 3.75, 4.00 ... 6.50, 6.75
 p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimingContext) {  
-    // each time, generate a rotation speed event
+    // ... each time, generate a rotation speed event ...
     ctx.NewRotationSpeedEvent(
-        // that controls the left laser's rotation speed
+        // ... that controls the left laser's rotation speed
         ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-        // ctx.Ordinal() returns the iteration number, starting with 0
+        // ctx.Ordinal() returns the iteration number, starting at 0
         // i.e. for beat 3.00, ctx.Ordinal is 0, for beat 3.25, ctx.Ordinal is 1
         // the following line will therefore increase the left laser's rotation speed from 0 to 15 over 3.75 beats
         ilysa.WithValue(beatsaber.EventValue(ctx.Ordinal())),
@@ -881,13 +887,34 @@ ctx.NewPreciseZoomEvent(
 
 </details>
 
+## ... generate something fancy!
 
-<details></details>
+<details>
+  <summary>Rainbow Prop?</summary>
 
+Wat dis? Light that runs down a sequence of lightIDs, changing color as it moves.
+
+*- video goes here -*
+
+```go
+func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
+	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimingContext) {
+		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+			e := ctx.NewRGBLightingEvent(
+				ilysa.WithColor(grad.Ierp(ctx.T())),
+			)
+			fx.Ripple(ctx, e, step)
+			fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
+		})
+	})
+}
+```
+
+</details>
 
 # Lights
 
-Sob
+*TODO: Sob. Somebody write this for me.*
 
 # Conventions
 
@@ -919,24 +946,119 @@ func ScaleToUnitInterval(rMin, rMax float64) func(m float64) float64
 
 ## Colors
 
+The `colorful` package (adapted from [go-colorful](https://github.com/lucasb-eyer/go-colorful)) implements a bunch of
+functions handy for working with colors.
+
+You will mostly be working with:
+
+### Defining Colors
+
+```go
+// hopefully self-explanatory
+black := colorful.MustParseHex("#000000")
+white := colorful.Color{R: 1, G: 1, B: 1, A: 1}
+```
+
+### Sets
+
+You can put colors in sets:
+
+```go
+set := colorful.NewSet(
+  colorful.MustParseHex("#fbc6d0"),
+  colorful.MustParseHex("#95bddc"),
+  colorful.MustParseHex("#3a2b1c"),
+  colorful.MustParseHex("#451234"),
+)
+```
+
+This makes it convenient to do several things.
+
+Index. Useful when combined with `ctx.Ordinal()`.
+
+```go
+set.Index(0) // returns the 1st color in the set
+set.Index(3) // returns the 4th color in the set
+set.Index(4) // returns the 1st color in the set (wraparound)
+
+// try using this in a p.EventsForSequence() to cycle through the colors in the set
+set.Index(ctx.Ordinal())
+```
+
+Iterate. Useful when `ctx.Ordinal()` doesn't have sufficient range to cycle through all the colors.
+
+```go
+
+// returns the next color in the set, starting with the 1st one
+// the set maintains internal state keeping track of the last color returned
+set.Next() 
+```
+
+Random.
+
+```go
+set.Rand() // returns a random color from the set
+```
+
 ## Gradients
+
+You can quickly define a gradient with all the colors equidistant from each other by using `gradient.New()`.
+
+```go
+grad := gradient.New(
+  colorful.MustParseHex("#fbc6d0"),
+  colorful.MustParseHex("#95bddc"),
+  colorful.MustParseHex("#0c71c9"),
+  colorful.MustParseHex("#ff145f"),
+)
+```
+
+Gradients with custom color positions are defined like so.
+
+```go
+// Pos MUST be sorted and range from 0.0 to 1.0
+grad := gradient.Table{
+  {Col: colorful.MustParseHex("#fbc6d0"), Pos: 0.0},
+  {Col: colorful.MustParseHex("#95bddc"), Pos: 0.2},
+  {Col: colorful.MustParseHex("#0c71c9"), Pos: 0.8},
+  {Col: colorful.MustParseHex("#ff145f"), Pos: 1.0},
+}
+```
+
+Once you have a gradient, get the color at position `t` by calling `Ierp()`.
+
+```go
+grad := gradient.Table{
+  {Col: colorful.MustParseHex("#fbc6d0"), Pos: 0.0},
+  {Col: colorful.MustParseHex("#95bddc"), Pos: 0.2},
+  {Col: colorful.MustParseHex("#0c71c9"), Pos: 0.8},
+  {Col: colorful.MustParseHex("#ff145f"), Pos: 1.0},
+}
+
+grad.Ierp(0.35)
+
+// most commonly used with ctx.T()
+grad.Ierp(ctx.T())
+```
 
 # Tips and Tricks
 
 ## Visual Studio Code Keyboard Shortcuts
 
-Ctrl-Shift-Space Ctrl-Space
+* Ctrl-Shift-Space - display function arguments
+* Ctrl-Space - autocomplete
 
 # Resources
 
-https://www.desmos.com/calculator
+* https://www.desmos.com/calculator
 
 # Credits
 
-* Alice (Alice#5792) for being a sounding board and the smattering of lighting techniques
+* Alice (Alice#5792) for lighting advice and being a sounding board. Check her out
+  on [Twitch](https://www.twitch.tv/alicexiv)!
 * Lucas Beyer, Bastien Dejean (@baskerville), Phil Kulak (@pkulak), Christian Muehlhaeuser (@muesli), makeworld (
   @makeworld-the-better-one) and the other contributors to the [go-colorful](https://github.com/lucasb-eyer/go-colorful)
   library, used under the MIT License.
 * Pennock Tech, LLC for the [swallowjson](https://github.com/PennockTech/swallowjson) library, used under the MIT
   License.
-* Top_Cat (Top_Cat#1961) for the Beat Saber environment definition files at https://github.com/Top-Cat/bs-env
+* Top_Cat (Top_Cat#1961) for the Beat Saber environment definition files at https://github.com/Top-Cat/bs-env.
