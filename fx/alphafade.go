@@ -1,15 +1,15 @@
 package fx
 
 import (
-	ilysa2 "github.com/shasderias/ilysa"
-	ease2 "github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/scale"
 )
 
-func RGBAlphaBlend(ctx ilysa2.TimeContext, event ilysa2.Event, startAlpha, endAlpha float64, easeFn ease2.Func) {
+func RGBAlphaBlend(ctx ilysa.TimeContext, event ilysa.Event, startAlpha, endAlpha float64, easeFn ease.Func) {
 	alphaScale := scale.FromUnitIntervalClamped(startAlpha, endAlpha)
 
-	e, ok := event.(ilysa2.EventWithAlpha)
+	e, ok := event.(ilysa.EventWithAlpha)
 	if !ok {
 		return
 	}

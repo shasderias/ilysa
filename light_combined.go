@@ -17,7 +17,7 @@ func NewCombinedLight(lights ...Light) CombinedLight {
 	}
 }
 
-func (cl CombinedLight) CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEvent {
+func (cl CombinedLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent {
 	ce := NewCompoundRGBLightingEvent()
 
 	for _, l := range cl.lights {
@@ -31,7 +31,7 @@ func (cl CombinedLight) CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEve
 			continue
 		}
 	createRGB:
-		ce.Add(*l.CreateRGBEvent(ctx)...)
+		ce.Add(*l.CreateRGBLightingEvent(ctx)...)
 	}
 
 	return ce

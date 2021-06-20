@@ -3,9 +3,9 @@ package fx
 import (
 	"math"
 
-	ilysa2 "github.com/shasderias/ilysa"
-	"github.com/shasderias/ilysa/noise"
+	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/noise"
 )
 
 var (
@@ -14,30 +14,30 @@ var (
 	sin = math.Sin
 )
 
-func SinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa2.TimeLightContext) float64 {
-	return func(ctx ilysa2.TimeLightContext) float64 {
+func SinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimeLightContext) float64 {
+	return func(ctx ilysa.TimeLightContext) float64 {
 		return sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset)
 	}
 }
 
-func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa2.TimeLightContext) float64 {
-	return func(ctx ilysa2.TimeLightContext) float64 {
+func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimeLightContext) float64 {
+	return func(ctx ilysa.TimeLightContext) float64 {
 		return abs(sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset))
 	}
 }
 
-func BiasedColorSweep(ctx ilysa2.TimeLightContext, sweepSpeed float64, grad gradient.Table) *ilysa2.CompoundRGBLightingEvent {
+func BiasedColorSweep(ctx ilysa.TimeLightContext, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	gradPos := SinSweepLightID(sweepSpeed, ctx.FixedRand())
 	return ctx.NewRGBLightingEvent(
-		ilysa2.WithColor(grad.Ierp(gradPos(ctx))),
+		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
 	)
 }
 
-func ColorSweep(ctx ilysa2.TimeLightContext, sweepSpeed float64, grad gradient.Table, opts...ColorSweepOpt) *ilysa2.CompoundRGBLightingEvent {
+func ColorSweep(ctx ilysa.TimeLightContext, sweepSpeed float64, grad gradient.Table, opts ...ColorSweepOpt) *ilysa.CompoundRGBLightingEvent {
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
 
-	e :=  ctx.NewRGBLightingEvent(
-		ilysa2.WithColor(grad.Ierp(gradPos(ctx))),
+	e := ctx.NewRGBLightingEvent(
+		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
 	)
 
 	for _, opt := range opts {
@@ -48,10 +48,10 @@ func ColorSweep(ctx ilysa2.TimeLightContext, sweepSpeed float64, grad gradient.T
 }
 
 type ColorSweepOpt interface {
-	applyColorSweep(light ilysa2.TimeLightContext, event *ilysa2.CompoundRGBLightingEvent)
+	applyColorSweep(light ilysa.TimeLightContext, event *ilysa.CompoundRGBLightingEvent)
 }
 
-func AlphaShimmer(ctx ilysa2.TimeLightContext, e ilysa2.EventWithAlpha, shimmerSpeed float64) {
+func AlphaShimmer(ctx ilysa.TimeLightContext, e ilysa.EventWithAlpha, shimmerSpeed float64) {
 	e.SetAlpha(e.GetAlpha() * noise.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT()))
 }
 

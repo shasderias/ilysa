@@ -30,7 +30,7 @@ func (c sequenceLightContext) NewLightingEvent(opts ...BasicLightingEventOpt) *C
 }
 
 func (c sequenceLightContext) NewRGBLightingEvent(opts ...CompoundRGBLightingEventOpt) *CompoundRGBLightingEvent {
-	e := c.Light.CreateRGBEvent(newLightContext(c.baseContext, c.lightTimer))
+	e := c.Light.CreateRGBLightingEvent(newLightContext(c.baseContext, c.lightTimer))
 	e.Mod(opts...)
 	return e
 }

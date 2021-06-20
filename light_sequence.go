@@ -17,10 +17,10 @@ func (sl *SequenceLight) Add(lights ...Light) {
 	sl.lights = append(sl.lights, lights...)
 }
 
-func (sl SequenceLight) CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEvent {
+func (sl SequenceLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent {
 	light := sl.Index(ctx.Ordinal())
 
-	return light.CreateRGBEvent(ctx)
+	return light.CreateRGBLightingEvent(ctx)
 }
 
 func (sl SequenceLight) EventTypeSet() beatsaber.EventTypeSet {

@@ -145,20 +145,20 @@ func do() error {
 	//})
 
 	//light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
-	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-	//		ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
-	//			// ColorSweep is a more advanced Gradient that shifts the gradient's position with time
-	//			// the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
-	//			e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
-	//
-	//			// we then use fx.Ripple to stagger the start time of each lightID
-	//			fx.Ripple(ctx, e, 0.2)
-	//
-	//			e.SetAlpha(1 - ctx.T())
-	//		})
-	//	})
-	//})
+	p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+		ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+			ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+				// ColorSweep is a more advanced Gradient that shifts the gradient's position with time
+				// the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
+				e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
+
+				// we then use fx.Ripple to stagger the start time of each lightID
+				fx.Ripple(ctx, e, 0.2)
+
+				e.SetAlpha(1 - ctx.T())
+			})
+		})
+	})
 
 	// light creation code omitted for brevity
 	p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {

@@ -17,7 +17,7 @@ func NewCompositeLight(typ beatsaber.EventType, set LightIDSet) CompositeLight {
 	}
 }
 
-func (cl CompositeLight) CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEvent {
+func (cl CompositeLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
 		ctx.NewRGBLightingEvent(
 			WithType(cl.eventType),

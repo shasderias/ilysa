@@ -5,7 +5,7 @@ import (
 )
 
 type Light interface {
-	CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEvent
+	CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent
 	EventTypeSet() beatsaber.EventTypeSet
 	LightIDLen() int
 }

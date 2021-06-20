@@ -97,6 +97,19 @@ func do() error {
 		)
 	})
 
+	// generate events on beats 0, 0.25, 0.75 and 1.25, starting from beat 4
+	// i.e. 4.00, 4.25, 4.75, 5.25
+	p.EventsForSequence(4, []float64{0, 0.25, 0.75, 1.25}, func(ctx ilysa.SequenceContext) {
+		ctx.NewLightingEvent(
+			ilysa.WithType(beatsaber.EventTypeRingLights),
+			ilysa.WithValue(beatsaber.EventValueLightBlueFade),
+		)
+	})
+
+	p.EventForBeat(24.5, func(ctx ilysa.TimeContext) {
+		// use ctx to generate events here
+	})
+
 	// save events back to Expert+ difficulty
 	return p.Save()
 }

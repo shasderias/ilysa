@@ -1,10 +1,11 @@
 package fx
 
 import (
-	ilysa2 "github.com/shasderias/ilysa"
-	"github.com/shasderias/ilysa/beatsaber")
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+)
 
-func OffAll(ctx ilysa2.TimeContext) {
+func OffAll(ctx ilysa.TimeContext) {
 	var (
 		lights = beatsaber.NewEventTypeSet(
 			beatsaber.EventTypeBackLasers,
@@ -16,6 +17,6 @@ func OffAll(ctx ilysa2.TimeContext) {
 	)
 
 	for _, l := range lights {
-		ctx.NewLightingEvent(ilysa2.WithType(l), ilysa2.WithValue(beatsaber.EventValueLightOff))
+		ctx.NewLightingEvent(ilysa.WithType(l), ilysa.WithValue(beatsaber.EventValueLightOff))
 	}
 }

@@ -26,7 +26,7 @@ func NewBasicLight(typ beatsaber.EventType, m LightIDMaxer) BasicLight {
 	}
 }
 
-func (bl BasicLight) CreateRGBEvent(ctx LightContext) *CompoundRGBLightingEvent {
+func (bl BasicLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
 		ctx.NewRGBLightingEvent().SetLight(bl.eventType),
 	)
