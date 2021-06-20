@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/fx"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -38,14 +38,14 @@ func do() error {
 		return err
 	}
 
-	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
 	//	ctx.NewLightingEvent(
 	//		ilysa.WithType(beatsaber.EventTypeBackLasers),
 	//		ilysa.WithValue(beatsaber.EventValueLightRedFade),
 	//	)
 	//})
 
-	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
 	//	ctx.NewRGBLightingEvent(
 	//		ilysa.WithType(beatsaber.EventTypeBackLasers),
 	//		ilysa.WithValue(beatsaber.EventValueLightRedFade),
@@ -62,8 +62,8 @@ func do() error {
 		ilysa.ToLightTransformer(ilysa.DivideSingle),
 	)
 
-	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-	//	ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) { // use the light we created
+	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+	//	ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) { // use the light we created
 	//		ctx.NewRGBLightingEvent(
 	//			ilysa.WithValue(beatsaber.EventValueLightRedFade),
 	//			ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -72,8 +72,8 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-	//	ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+	//	ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//		e := ctx.NewRGBLightingEvent( // save the event we created to the variable e
 	//			ilysa.WithValue(beatsaber.EventValueLightRedFade),
 	//			ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -86,8 +86,8 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-	//	ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+	//	ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//		e := ctx.NewRGBLightingEvent(
 	//			ilysa.WithValue(beatsaber.EventValueLightRedFade),
 	//			ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -102,10 +102,10 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
 	//	// for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
-	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-	//		ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+	//		ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//			e := ctx.NewRGBLightingEvent(
 	//				// ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
 	//				ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -117,10 +117,10 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
+	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
 	//		color := gradient.Rainbow.Ierp(rand.Float64())
-	//		ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//		ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//			e := ctx.NewRGBLightingEvent(
 	//				ilysa.WithColor(color),
 	//			)
@@ -131,9 +131,9 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-	//		ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+	//		ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//			// the fx package contains a suite of building blocks you can use to build more complicated effects
 	//			// the Gradient function generates events and colors them based on the gradient passed to it
 	//			e := fx.Gradient(ctx, gradient.Rainbow)
@@ -145,9 +145,9 @@ func do() error {
 	//})
 
 	//light creation code omitted for brevity
-	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-	//		ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	//p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+	//	ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+	//		ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 	//			// ColorSweep is a more advanced Gradient that shifts the gradient's position with time
 	//			// the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
 	//			e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
@@ -161,9 +161,9 @@ func do() error {
 	//})
 
 	// light creation code omitted for brevity
-	p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-		ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+		ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+			ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
 				e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
 
 				fx.Ripple(ctx, e, 0.2)

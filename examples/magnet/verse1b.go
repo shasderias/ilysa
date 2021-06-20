@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/fx"
 )
 
 type Verse1b struct {
@@ -21,7 +21,7 @@ func NewVerse1b(project *ilysa.Project, offset float64) Verse1b {
 }
 
 func (v Verse1b) Play() {
-	v.EventForBeat(0, func(ctx ilysa.TimingContext) {
+	v.EventForBeat(0, func(ctx ilysa.TimeContext) {
 		ctx.NewRotationSpeedEvent(
 			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithIntValue(5),
 		)
@@ -56,7 +56,7 @@ func (v Verse1b) Rhythm(startBeat float64) {
 			ilysa.WithDirection(chroma.CounterClockwise),
 		)
 
-		ctx.UseLight(beatLight, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(beatLight, func(ctx ilysa.SequenceLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithValue(beatsaber.EventValueLightRedFade),
 				ilysa.WithColor(color.Next()),
@@ -78,8 +78,8 @@ func (v Verse1b) Rhythm(startBeat float64) {
 		}
 	)
 
-	v.EventsForRange(rippleStart, rippleEnd, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(rippleLights, func(ctx ilysa.TimingContextWithLight) {
+	v.EventsForRange(rippleStart, rippleEnd, 30, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(rippleLights, func(ctx ilysa.TimeLightContext) {
 			events := fx.BiasedColorSweep(ctx, 3, grad)
 
 			fx.Ripple(ctx, events, rippleStep,
@@ -92,10 +92,10 @@ func (v Verse1b) Rhythm(startBeat float64) {
 			//}
 			//switch {
 			//case ctx.T() <= 0.5:
-			//	alphaScale := util.ScaleToUnitInterval(0, 0.5)
+			//	alphaScale := scale.ClampedToUnitInterval(0, 0.5)
 			//	events.Mod(ilysa.WithAlpha(events.GetAlpha() * ease.InOutQuart(alphaScale(ctx.T()))))
 			//case ctx.T() > 0.8:
-			//	alphaScale := util.ScaleToUnitInterval(0.8, 1)
+			//	alphaScale := scale.ClampedToUnitInterval(0.8, 1)
 			//	events.Mod(ilysa.WithAlpha(events.GetAlpha() * ease.InExpo(1-alphaScale(ctx.T()))))
 			//}
 		})

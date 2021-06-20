@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
 )
 
 // set mapPath to the directory containing your beatmap

@@ -3,13 +3,13 @@ package main
 import (
 	"math/rand"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/fx"
 )
 
 type Intro struct {
@@ -72,7 +72,7 @@ func (p Intro) PianoDoubles(startBeat float64) {
 			{set.Index(ctx.Ordinal() + 1), 1.0},
 		}
 
-		ctx.UseLight(cl, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(cl, func(ctx ilysa.SequenceLightContext) {
 			if !ctx.Last() {
 				e := fx.Gradient(ctx, grad)
 				e.SetValue(values[ctx.Ordinal()])
@@ -102,7 +102,7 @@ func (p Intro) LeadinDrums(startBeat float64) {
 			ilysa.WithLockPosition(false), ilysa.WithSpeed(0), ilysa.WithDirection(chroma.Clockwise),
 		)
 
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			if ctx.Ordinal() < 4 {
 				ctx.NewRGBLightingEvent(ilysa.WithColor(magnetColors.Index(ctx.Ordinal())))
 			} else {
@@ -131,26 +131,26 @@ func (p Intro) BassTwang(startBeat float64) {
 		grad       = magnetGradient
 	)
 
-	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(backLasers, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(backLasers, func(ctx ilysa.TimeLightContext) {
 			e := fx.BiasedColorSweep(ctx, sweepSpeed, grad)
 			e.Mod(ilysa.WithAlpha(intensity))
 		})
 	})
 
 	p.ModEventsInRange(startBeat, startBeat+midPoint-0.001, ilysa.FilterRGBLight(backLasers),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCubic)
 		})
 
 	p.ModEventsInRange(startBeat+midPoint, endBeat, ilysa.FilterRGBLight(backLasers),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutBounce)
 		})
 }
 
 func (p Intro) StartSplash(startBeat float64) {
-	p.EventForBeat(startBeat, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(startBeat, func(ctx ilysa.TimeContext) {
 		ctx.NewRotationSpeedEvent(
 			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithIntValue(8))
 		ctx.NewRotationSpeedEvent(
@@ -175,7 +175,7 @@ func (p Intro) Rhythm(startBeat, endBeat float64) {
 		steps = int(endBeat-startBeat) + 1
 	)
 
-	p.EventsForBeats(startBeat, 1.0, steps, func(ctx ilysa.TimingContext) {
+	p.EventsForBeats(startBeat, 1.0, steps, func(ctx ilysa.TimeContext) {
 		set := magnetColors
 
 		switch {
@@ -242,7 +242,7 @@ func (p Intro) Rhythm(startBeat, endBeat float64) {
 ////	var (
 ////		steps = int(endBeat - startBeat)
 ////	)
-////	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timing) {
+////	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timer) {
 ////		set := magnetColors
 ////
 ////		br := ctx.NewRGBLightingEvent(beatsaber.EventTypeRingLights, beatsaber.EventValueLightRedFlash)
@@ -259,7 +259,7 @@ func (p Intro) Melody1(startBeat float64) {
 	)
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			//if ctx.Ordinal()%ctx.LightIDLen() != ctx.LightIDOrdinal() {
 			//	return
 			//}
@@ -286,7 +286,7 @@ func (p Intro) Melody1(startBeat float64) {
 		})
 	})
 
-	//p.EventForBeat(startBeat+2.999, func(ctx ilysa.TimingContext) {
+	//p.EventForBeat(startBeat+2.999, func(ctx ilysa.TimeContext) {
 	//	ctx.NewRGBLightingEvent().SetType(light).SetValue(beatsaber.EventValueLightOff)
 	//})
 }
@@ -297,14 +297,14 @@ func (p Intro) Melody2(startBeat float64, reverseZoom bool) {
 		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Fan(3))
 	)
 
-	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewLightingEvent(ilysa.WithValue(beatsaber.EventValueLightOff))
 		})
 	})
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithColor(magnetPink),
 			)
@@ -335,7 +335,7 @@ func (p Intro) Melody3(startBeat float64) {
 	)
 
 	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithValue(beatsaber.EventValueLightBlueOn),
 				ilysa.WithColor(magnetPurple),
@@ -358,7 +358,7 @@ func (p Intro) Chorus(startBeat float64) {
 		colorGrad = allColorsGradient
 	)
 
-	p.EventForBeat(startBeat, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(startBeat, func(ctx ilysa.TimeContext) {
 		ctx.NewRGBLightingEvent(
 			ilysa.WithType(beatsaber.EventTypeLeftRotatingLasers), ilysa.WithValue(beatsaber.EventValueLightOff))
 
@@ -407,13 +407,13 @@ func (p Intro) Chorus(startBeat float64) {
 			grad[i].Col, grad[j].Col = grad[j].Col, grad[i].Col
 		})
 
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			e := fx.Gradient(ctx, grad)
 			e.ShiftBeat(1.0 * float64(ctx.Ordinal()) / 32)
 		})
 
 		//for i := 1; i <= LightIDMax; i++ {
-		//	gradientPos := util.Scale(1, float64(LightIDMax), 0, 1)
+		//	gradientPos := scale.Clamped(1, float64(LightIDMax), 0, 1)
 		//	color := grad.Ierp(gradientPos(float64(i)))
 		//
 		//	e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
@@ -429,8 +429,8 @@ func (p Intro) PianoRoll(startBeat float64, count int) {
 		light = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Divide(count))
 	)
 
-	p.EventsForBeats(startBeat, 0.25, count, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForBeats(startBeat, 0.25, count, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewRGBLightingEvent().SetValue(beatsaber.EventValueLightOff)
 		})
 	})
@@ -445,8 +445,8 @@ func (p Intro) Trill(startBeat float64) {
 		//lightCount = int(ratio * float64(LightIDMax))
 	)
 
-	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(backLasers, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(backLasers, func(ctx ilysa.TimeLightContext) {
 			if rand.Float64() > ratio {
 				return
 			}
@@ -472,19 +472,19 @@ func (p Intro) Trill(startBeat float64) {
 		//
 		//}
 	})
-	p.EventsForRange(startBeat+0.5, startBeat+0.5+1.2, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(ringLasers, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForRange(startBeat+0.5, startBeat+0.5+1.2, 30, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(ringLasers, func(ctx ilysa.TimeLightContext) {
 			fx.ColorSweep(ctx, 0.4, gradient.Rainbow)
 		})
 	})
 
 	p.ModEventsInRange(startBeat+0.5, startBeat+0.5+0.6-0.001, ilysa.FilterRGBLight(ringLasers),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCubic)
 		})
 
 	p.ModEventsInRange(startBeat+0.5+0.6, startBeat+0.5+1.2, ilysa.FilterRGBLight(ringLasers),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
 		})
 }
@@ -509,7 +509,7 @@ func (p Intro) Climb(startBeat float64) {
 		}
 	)
 
-	p.EventForBeat(startBeat, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(startBeat, func(ctx ilysa.TimeContext) {
 		ctx.NewPreciseRotationEvent(
 			ilysa.WithRotation(360),
 			ilysa.WithStep(15),
@@ -520,8 +520,8 @@ func (p Intro) Climb(startBeat float64) {
 		ctx.NewZoomEvent()
 	})
 
-	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithColor(backGrad.Ierp(ctx.T())),
 			)
@@ -617,8 +617,8 @@ func (p Intro) Fall(startBeat float64) {
 		)
 	)
 
-	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForBeats(startBeat, step, count, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithValue(values.Pick(ctx.Ordinal())),
 				ilysa.WithColor(colorSet.Next()),
@@ -628,7 +628,7 @@ func (p Intro) Fall(startBeat float64) {
 }
 
 func (p Intro) Bridge(startBeat float64) {
-	p.EventForBeat(startBeat, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(startBeat, func(ctx ilysa.TimeContext) {
 		ctx.NewPreciseRotationEvent(
 			ilysa.WithRotation(180),
 			ilysa.WithStep(12.5),
@@ -639,7 +639,7 @@ func (p Intro) Bridge(startBeat float64) {
 		)
 	})
 
-	p.EventsForRange(startBeat, startBeat+1, 30, ease.OutCubic, func(ctx ilysa.TimingContext) {
+	p.EventsForRange(startBeat, startBeat+1, 30, ease.OutCubic, func(ctx ilysa.TimeContext) {
 		if !ctx.Last() {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithType(beatsaber.EventTypeBackLasers),
@@ -664,8 +664,8 @@ func (p Intro) Outro(startBeat float64) {
 		light    = p.NewBasicLight(beatsaber.EventTypeBackLasers).TransformToSequence(ilysa.Fan(len(sequence)))
 	)
 
-	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventForBeat(startBeat-0.01, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewRGBLightingEvent(
 				ilysa.WithColor(allColorsGradient.Ierp(ctx.LightIDT())),
 			)
@@ -673,13 +673,13 @@ func (p Intro) Outro(startBeat float64) {
 	})
 
 	p.EventsForSequence(startBeat, sequence[:len(sequence)-1], func(ctx ilysa.SequenceContext) {
-		ctx.UseLight(light, func(ctx ilysa.SequenceContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
 			ctx.NewRGBLightingEvent(ilysa.WithValue(beatsaber.EventValueLightOff))
 		})
 	})
 
-	p.EventForBeat(startBeat+sequence[len(sequence)-1], func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventForBeat(startBeat+sequence[len(sequence)-1], func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			ctx.NewLightingEvent(ilysa.WithValue(beatsaber.EventValueLightOff))
 		})
 	})
@@ -696,20 +696,20 @@ func (p Intro) OutroSplash(startBeat float64) {
 		backLaser  = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
 	)
 
-	p.EventsForRange(startBeat, startBeat+2, 60, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(backLaser, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForRange(startBeat, startBeat+2, 60, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(backLaser, func(ctx ilysa.TimeLightContext) {
 			e := fx.BiasedColorSweep(ctx, sweepSpeed, grad)
 			e.Mod(ilysa.WithAlpha(intensity))
 		})
 	})
 
 	p.ModEventsInRange(startBeat, startBeat+1, ilysa.FilterRGBLight(backLaser),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCubic)
 		})
 
 	p.ModEventsInRange(startBeat+1, startBeat+2, ilysa.FilterRGBLight(backLaser),
-		func(ctx ilysa.TimingContext, event ilysa.Event) {
+		func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
 		})
 
@@ -722,18 +722,18 @@ func (p Intro) OutroSplash(startBeat float64) {
 		rand.Shuffle(len(g), func(i, j int) {
 			g[i].Col, g[j].Col = g[j].Col, g[i].Col
 		})
-		p.EventsForRange(ctx.B(), ctx.B()+splashDuration, 15, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(leftLaser, func(ctx ilysa.TimingContextWithLight) {
+		p.EventsForRange(ctx.B(), ctx.B()+splashDuration, 15, ease.Linear, func(ctx ilysa.TimeContext) {
+			ctx.WithLight(leftLaser, func(ctx ilysa.TimeLightContext) {
 				e := fx.Gradient(ctx, g)
 				e.Mod(ilysa.WithAlpha(float64(ctx.Ordinal()) * 0.5))
 			})
-			ctx.UseLight(rightLaser, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(rightLaser, func(ctx ilysa.TimeLightContext) {
 				e := fx.Gradient(ctx, g)
 				e.Mod(ilysa.WithAlpha(float64(ctx.Ordinal()) * 0.5))
 			})
 		})
 
-		p.ModEventsInRange(ctx.B(), ctx.B()+splashDuration, ilysa.FilterRGBLights(), func(ctx ilysa.TimingContext, event ilysa.Event) {
+		p.ModEventsInRange(ctx.B(), ctx.B()+splashDuration, ilysa.FilterRGBLights(), func(ctx ilysa.TimeContext, event ilysa.Event) {
 			fx.RGBAlphaBlend(ctx, event, 1, 0, ease.InCirc)
 		})
 	})

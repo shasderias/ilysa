@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
 )
 
 const mapPath = `D:\Beat Saber Data\CustomWIPLevels\MagnetLights`
@@ -129,7 +129,7 @@ func do() error {
 //	colorSweepSpeed *= duration
 //	shimmerSweepSpeed *= duration
 //
-//	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timing) {
+//	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timer) {
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
@@ -142,17 +142,17 @@ func do() error {
 //
 //	//p.ModEventsInRange(startBeat, endBeat,
 //	//	ilysa.FilterLightingEvents(light),
-//	//	func(ctx ilysa.Timing, event ilysa.Event) {
+//	//	func(ctx ilysa.Timer, event ilysa.Event) {
 //	//		e := event.(*ilysa.RGBLightingEvent)
 //	//		lightID := float64(e.FirstLightID())
 //	//		e.SetAlpha(e.GetAlpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(LightIDMax)*pi+offset))
 //	//	})
 //
-//	//fadeScale := util.Scale(startBeat, endBeat, 0, 1)
+//	//fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
 //	//
 //	//modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.2), 0, 1, ease.InCubic)
 //	//modfx.RGBAlphaFade(p, light, fadeScale(0.9), endBeat, 1, 0, ease.OutCubic)
-//	fadeScale := util.Scale(startBeat, endBeat, 0, 1)
+//	fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
 //	modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.5), 0, 1, ease.InCubic)
 //	modfx.RGBAlphaFade(p, light, fadeScale(0.501), endBeat, 1, 0, ease.OutCubic)
 //}
@@ -168,7 +168,7 @@ func do() error {
 //		pi         = math.Pi
 //	)
 //
-//	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timing) {
+//	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timer) {
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightBlueOn)
 //			e.SetSingleLightID(i)
@@ -179,7 +179,7 @@ func do() error {
 //		}
 //	})
 //
-//	fadeScale := util.Scale(startBeat, endBeat, 0, 1)
+//	fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
 //	modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.5), 0, 1, ease.InCubic)
 //	modfx.RGBAlphaFade(p, light, fadeScale(0.501), endBeat, 1, 0, ease.OutBounce)
 //}

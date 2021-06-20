@@ -27,8 +27,8 @@ p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) { // startBeat 0, beat 
 
 </details>
 
-Lazy lighter: Well, that's not as exciting as I thought. I heard Chroma lights gives downloads! I want rainbow gaming
-lights! Make every fade a different color!
+Lazy lighter: Well, that's not as exciting as I thought. I heard Chroma lights gives upvotes! I want gamer lights! Make
+every fade a different color!
 
 <details>
 <summary>See the Ilysa code</summary>
@@ -69,7 +69,7 @@ backLasersSplit := ilysa.TransformLight(backLasers,
 )
 
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
         ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
             ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -97,7 +97,7 @@ them!
 ```go
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
         e := ctx.NewRGBLightingEvent( // save the event we created to the variable e
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
             ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -128,7 +128,7 @@ Lazy lighter: Maybe add an off event so it twinkles real nice?
 ```go
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
         e := ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
             ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -162,7 +162,7 @@ Lazy lighter: Wait, what happened to my fade effect? Fade effects don't work wit
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
                 ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -193,7 +193,7 @@ Lazy lighter: WTF happened to my colors!
 p.EventsForBeats(0, 1, 4, func(ctx ilysa.TimingContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
                 ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
@@ -223,7 +223,7 @@ Lazy lighter: That's... not quite what I'm looking for.
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
             // the fx package contains a suite of building blocks you can use to build more complicated effects
             // the Gradient function generates events and colors them based on the gradient passed to it
             e := fx.Gradient(ctx, gradient.Rainbow)
@@ -253,7 +253,7 @@ Lazy lighter: Hm... Can we spice it up?
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
             // ColorSweep is a more advanced Gradient that shifts the gradient's position with time
             // the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
@@ -286,7 +286,7 @@ Lazy Lighter: Perfect. Now ease out the alpha fade please!
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
 
             fx.Ripple(ctx, e, 0.2)
@@ -317,14 +317,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
-	"github.com/shasderias/ilysa/pkg/util"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/ilysa"
+	"github.com/shasderias/ilysa/ilysa/fx"
+	"github.com/shasderias/ilysa/util"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -405,10 +405,10 @@ func do() error {
 
 		// alphaEase is a function that will scale a number from the unit interval ([0,1]) to the interval [0.5,6]
 		// we use this later to blend the alpha of the generated events from 0.5 to 6
-		alphaEase := util.ScaleFromUnitInterval(0.5, 6)
+		alphaEase := scale.ClampedFromUnitInterval(0.5, 6)
 
 		// ... use the light we created earlier ...
-		ctx.UseLight(leftRightSequence, func(ctx ilysa.TimingContextWithLight) {
+		ctx.WithLight(leftRightSequence, func(ctx ilysa.TimingContextWithLight) {
 			// ... to create a Chroma RGB event
 			// UseLight automatically sets _eventType for us to alternate between left and right rotating lights
 			ctx.NewRGBLightingEvent(
@@ -470,7 +470,7 @@ func do() error {
 	ctx.EventsForSequence(0, rhythmSeq, func(ctx ilysa.SequenceContext) {
 		// create a function that scales a number from the unit interval ([0,1] to [0.5,6])
 		// we use this to set the propagation speed of the ring spins
-		propScale := util.ScaleFromUnitInterval(0.5, 5)
+		propScale := scale.ClampedFromUnitInterval(0.5, 5)
 
 		// create a Chroma precise rotation event
 		re := ctx.NewPreciseRotationEvent(
@@ -500,7 +500,7 @@ func do() error {
 		// - ending flickerDuration later (ctx.B() + flickerDuration - 0.05).
 		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx ilysa.TimingContext) {
 			// use the light we picked out
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(light, func(ctx ilysa.TimingContextWithLight) {
 				// generate a gradient from the color set we selected
 				// i.e. on the 1st iteration, lime green to sky blue
 				//      on the 2nd iteration, sky blue to orange
@@ -546,7 +546,7 @@ func do() error {
 	ctx.EventsForBeats(0, 4, 3, func(ctx ilysa.TimingContext) {
 		ctx.NewZoomEvent() // base game zoom event
 		ctx.EventsForRange(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(combinedLights, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(combinedLights, func(ctx ilysa.TimingContextWithLight) {
 				// ColorSweep is an effect that comes with Ilysa that animates a gradient moving over a set of
 				// lightIDs. The "speed" of the animation is controllable using the 2nd argument (1.4 in this case).
 				fx.ColorSweep(ctx, 1.4, gradient.Rainbow,
@@ -593,7 +593,7 @@ func do() error {
 
 	// over the length of the drop
 	ctx.EventsForRange(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(bigRingsWhole, func(ctx ilysa.TimingContextWithLight) {
+		ctx.WithLight(bigRingsWhole, func(ctx ilysa.TimingContextWithLight) {
 			// animate a gradient moving over the ring lasers
 			e := fx.ColorSweep(ctx, 0.6, gradient.Rainbow)
 			// add a shimmer effect by setting the alpha values of each lightID based on 1d-noise generated
@@ -628,7 +628,7 @@ func do() error {
 				dropColors.Index(seqCtx.Ordinal()),
 				dropColors.Index(seqCtx.Ordinal()+2),
 			)
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(light, func(ctx ilysa.TimingContextWithLight) {
 				e := fx.Gradient(ctx, grad)
 				fx.Ripple(ctx, e, 1.2,
 					fx.WithAlphaBlend(0, 0.3, 0, 1, ease.InSine),
@@ -671,7 +671,7 @@ If you want to achieve novel effects, you'll need at least a rudimentary underst
 If you can already program in another language, Go should be a snap. Take a stroll
 through [A Tour of Go](https://tour.golang.org/welcome/1) and carry on.
 
-If you have never programmed, Go is an easy language to learn. Try
+If you have no programming experience, Go is an easy language to learn. Try
 taking [A Tour of Go](https://tour.golang.org/welcome/1). If you can make it to the section on Methods, you should be
 good to go.
 
@@ -719,8 +719,8 @@ Ahahahahahahahahahahahahahahahahahahahahahahahahaha. You definitely know what yo
 
 #### Something Else
 
-You really want something that supports `gopls` or something similar. Code assistance will make your life a lot easier.
-If you're not sure what that means, please try starting out with Visual Studio Code.
+You really want something that provides code assistance via `gopls` or something similar. If you are unsure, please try
+starting out with Visual Studio Code.
 
 ### Beatmap
 
@@ -737,11 +737,11 @@ Ilysa and make backups (you should be making backups regardless)!⚠️**
 
 ### Alpha Testers Only
 
-Add your SSH key to GitHub.
-Instructions [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
-if unsure.
+Add your SSH key to GitHub. Instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+.
 
-If you clone the repo by executing the following command, you're good to go.
+If you can clone the repo with the following command, your SSH key configuration is correct.
 
 ```
 git clone github.com/shasderias/ilysa
@@ -752,6 +752,18 @@ Before following the instructions below, execute:
 ```
 go env -w GOPRIVATE=github.com/shasderias/ilysa
 git config --add --global url."git@github.com:".insteadOf https://github.com
+```
+
+After the alpha is over, execute `go env`, make sure the `set GOPRIVATE` line looks like so:
+
+```
+set GOPRIVATE=github.com/shasderias/ilysa
+```
+
+then reset your configuration back to the default state by executing:
+
+```
+go env -w GOPRIVATE=
 ```
 
 ### Regular Instructions Here
@@ -785,8 +797,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"	"github.com/shasderias/ilysa/ilysa"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -1229,7 +1240,7 @@ Wat dis? Light that runs down a sequence of lightIDs, changing color as it moves
 ```go
 func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
 	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+		ctx.WithLight(light, func(ctx ilysa.TimingContextWithLight) {
 			e := ctx.NewRGBLightingEvent(
 				ilysa.WithColor(grad.Ierp(ctx.T())),
 			)
@@ -1255,23 +1266,23 @@ By convention:
 * LightID or lightID - is always 1-indexed
 * Ordinal - is always 0-indexed
 
-# Utility Packages
+# Helper Packages
 
 ## Ease
 
-The `ease` package implements all the easing functions at https://easings.net/.
+The `ease` package implements Robert Penner's easing functions. Visualize them at https://easings.net/.
 
-## Util
+## Scale
 
-The `util` package implements a few functions handy for scaling numbers:
+The `scale` package implements a few functions handy for scaling numbers:
 
 ```go
 // returns a function that scales a number from [rMin,rMax] to [tMin,tMax]
-func Scale(rMin, rMax, tMin, tMax float64) func(m float64) float64
+func Clamped(rMin, rMax, tMin, tMax float64) func(m float64) float64
 // returns a function that scales a number from [0,1] to [tMin,tMax]
-func ScaleFromUnitInterval(tMin, tMax float64) func(m float64) float64 
+func ToUnitIntervalClamped(tMin, tMax float64) func(m float64) float64 
 // returns a function that scales a number from [rMin,rMax] to [0,1]
-func ScaleToUnitInterval(rMin, rMax float64) func(m float64) float64 
+func FromUnitIntervalClammped(rMin, rMax float64) func(m float64) float64 
 ```
 
 ## Colors
@@ -1386,9 +1397,14 @@ grad.Ierp(ctx.T())
 
 * Alice (Alice#5792) for lighting advice and being a sounding board. Check her out
   on [Twitch](https://www.twitch.tv/alicexiv)!
+* Andrey Sitnik and Ivan Solovev for the excellent visualizations of Robert Penner's easing equations
+  at https://easings.net/.
+* George McGinley Smith for the implementation of Robert Penner's easing equations in
+  the [jquery.easing](https://github.com/gdsmith/jquery.easing) library.
 * Lucas Beyer, Bastien Dejean (@baskerville), Phil Kulak (@pkulak), Christian Muehlhaeuser (@muesli), makeworld (
   @makeworld-the-better-one) and the other contributors to the [go-colorful](https://github.com/lucasb-eyer/go-colorful)
   library, used under the MIT License.
 * Pennock Tech, LLC for the [swallowjson](https://github.com/PennockTech/swallowjson) library, used under the MIT
   License.
+* Robert Penner for the original easing functions. Find out more [here](http://robertpenner.com/easing/).
 * Top_Cat (Top_Cat#1961) for the Beat Saber environment definition files at https://github.com/Top-Cat/bs-env.

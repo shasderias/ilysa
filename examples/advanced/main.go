@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/fx"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -85,8 +85,8 @@ func do() error {
 
 	// set.Index(0)
 
-	// // p.EventsForRange(4, 4.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-	// // 	ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	// // p.EventsForRange(4, 4.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+	// // 	ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 	// // 		e := ctx.NewRGBLightingEvent(
 	// // 			ilysa.WithColor(grad.Ierp(ctx.T())),
 	// // 		)
@@ -105,8 +105,8 @@ func do() error {
 }
 
 func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
-	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 			e := ctx.NewRGBLightingEvent(
 				ilysa.WithColor(grad.Ierp(ctx.T())),
 			)

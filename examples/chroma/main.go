@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -37,7 +37,7 @@ func do() error {
 	}
 
 	// -- your code goes here --
-	p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(2, func(ctx ilysa.TimeContext) {
 		ctx.NewRGBLightingEvent(
 			ilysa.WithType(beatsaber.EventTypeBackLasers),
 			ilysa.WithValue(beatsaber.EventValueLightRedOn),

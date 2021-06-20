@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
-	"github.com/shasderias/ilysa/pkg/util"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/fx"
+	"github.com/shasderias/ilysa/scale"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -72,7 +72,7 @@ func do() error {
 	)
 
 	// generate events every half (0.5) beat, starting at beat (0), repeat a total of 24 times ...
-	ctx.EventsForBeats(0, 0.5, 24, func(ctx ilysa.TimingContext) {
+	ctx.EventsForBeats(0, 0.5, 24, func(ctx ilysa.TimeContext) {
 		// ... generate Chroma precise rotation speed events for the left and right lasers,
 		// setting speed to the iteration count with locked positions
 		// i.e. beat = 0.0, speed = 0
@@ -91,12 +91,12 @@ func do() error {
 
 		// alphaEase is a function that will scale a number from the unit interval ([0,1]) to the interval [0.5,6]
 		// we use this later to blend the alpha of the generated events from 0.5 to 6
-		alphaEase := util.ScaleFromUnitInterval(0.5, 6)
+		alphaEase := scale.FromUnitIntervalClamped(0.5, 6)
 
 		// ... use the light we created earlier ...
-		ctx.UseLight(leftRightSequence, func(ctx ilysa.TimingContextWithLight) {
+		ctx.WithLight(leftRightSequence, func(ctx ilysa.TimeLightContext) {
 			// ... to create a Chroma RGB event
-			// UseLight automatically sets _eventType for us to alternate between left and right rotating lights
+			// WithLight automatically sets _eventType for us to alternate between left and right rotating lights
 			ctx.NewRGBLightingEvent(
 				// use the gradient we created earlier to set the color
 				ilysa.WithColor(grad.Ierp(ctx.T())),
@@ -156,7 +156,7 @@ func do() error {
 	ctx.EventsForSequence(0, rhythmSeq, func(ctx ilysa.SequenceContext) {
 		// create a function that scales a number from the unit interval ([0,1] to [0.5,6])
 		// we use this to set the propagation speed of the ring spins
-		propScale := util.ScaleFromUnitInterval(0.5, 5)
+		propScale := scale.FromUnitIntervalClamped(0.5, 5)
 
 		// create a Chroma precise rotation event
 		re := ctx.NewPreciseRotationEvent(
@@ -184,9 +184,9 @@ func do() error {
 		// - 30 evenly spaced events (ease.Linear);
 		// - starting from the current beat in rhythmSeq - 0.05 beats (ctx.B() - 0.05)); and (we start a little to make the lights feel more responsive)
 		// - ending flickerDuration later (ctx.B() + flickerDuration - 0.05).
-		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx ilysa.TimingContext) {
+		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx ilysa.TimeContext) {
 			// use the light we picked out
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 				// generate a gradient from the color set we selected
 				// i.e. on the 1st iteration, lime green to sky blue
 				//      on the 2nd iteration, sky blue to orange
@@ -229,10 +229,10 @@ func do() error {
 	)
 
 	// this is similar to the pattern we used for the previous effect, see above for commentary
-	ctx.EventsForBeats(0, 4, 3, func(ctx ilysa.TimingContext) {
+	ctx.EventsForBeats(0, 4, 3, func(ctx ilysa.TimeContext) {
 		ctx.NewZoomEvent() // base game zoom event
-		ctx.EventsForRange(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(combinedLights, func(ctx ilysa.TimingContextWithLight) {
+		ctx.EventsForRange(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx ilysa.TimeContext) {
+			ctx.WithLight(combinedLights, func(ctx ilysa.TimeLightContext) {
 				// ColorSweep is an effect that comes with Ilysa that animates a gradient moving over a set of
 				// lightIDs. The "speed" of the animation is controllable using the 2nd argument (1.4 in this case).
 				fx.ColorSweep(ctx, 1.4, gradient.Rainbow,
@@ -249,7 +249,7 @@ func do() error {
 	)
 
 	// once the drop lands
-	ctx.EventForBeat(dropOffset, func(ctx ilysa.TimingContext) {
+	ctx.EventForBeat(dropOffset, func(ctx ilysa.TimeContext) {
 		ctx.NewPreciseRotationEvent( // do a precision rotation event
 			ilysa.WithRotation(720),
 			ilysa.WithStep(17),
@@ -278,8 +278,8 @@ func do() error {
 	)
 
 	// over the length of the drop
-	ctx.EventsForRange(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(bigRingsWhole, func(ctx ilysa.TimingContextWithLight) {
+	ctx.EventsForRange(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.WithLight(bigRingsWhole, func(ctx ilysa.TimeLightContext) {
 			// animate a gradient moving over the ring lasers
 			e := fx.ColorSweep(ctx, 0.6, gradient.Rainbow)
 			// add a shimmer effect by setting the alpha values of each lightID based on 1d-noise generated
@@ -306,15 +306,15 @@ func do() error {
 		)
 	)
 
-	ctx.EventsForBeats(dropOffset, 1, 8, func(ctx ilysa.TimingContext) {
+	ctx.EventsForBeats(dropOffset, 1, 8, func(ctx ilysa.TimeContext) {
 		light := leftRightSequenceSplit.Index(ctx.Ordinal())
 		seqCtx := ctx
-		ctx.EventsForRange(ctx.B(), ctx.B()+0.75, 30, ease.Linear, func(ctx ilysa.TimingContext) {
+		ctx.EventsForRange(ctx.B(), ctx.B()+0.75, 30, ease.Linear, func(ctx ilysa.TimeContext) {
 			grad := gradient.New(
 				dropColors.Index(seqCtx.Ordinal()),
 				dropColors.Index(seqCtx.Ordinal()+2),
 			)
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+			ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
 				e := fx.Gradient(ctx, grad)
 				fx.Ripple(ctx, e, 1.2,
 					fx.WithAlphaBlend(0, 0.3, 0, 1, ease.InSine),

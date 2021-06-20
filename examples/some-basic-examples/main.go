@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -37,7 +37,7 @@ func do() error {
 		return err
 	}
 
-	p.EventForBeat(2, func(ctx ilysa.TimingContext) { // generate events for beat 2:
+	p.EventForBeat(2, func(ctx ilysa.TimeContext) { // generate events for beat 2:
 		ctx.NewLightingEvent( // generate a new base game (non-Chroma) lighting event
 			ilysa.WithType(beatsaber.EventTypeBackLasers),   // back lasers
 			ilysa.WithValue(beatsaber.EventValueLightRedOn), // red on
@@ -49,7 +49,7 @@ func do() error {
 		)
 	})
 
-	p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+	p.EventForBeat(2, func(ctx ilysa.TimeContext) {
 		ctx.NewLightingEvent(
 			ilysa.WithType(beatsaber.EventTypeBackLasers),
 			ilysa.WithValue(beatsaber.EventValueLightBlueFlash),

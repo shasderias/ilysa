@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/ilysa"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -37,7 +37,7 @@ func do() error {
 
 	// generate events every quarter beat (0.25), starting at beat 3, do this a total of 16 times
 	// i.e. 3.00, 3.25, 3.50, 3.75, 4.00 ... 6.50, 6.75
-	p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimingContext) {
+	p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimeContext) {
 		// each time, generate a rotation speed event
 		ctx.NewRotationSpeedEvent(
 			// that controls the left laser's rotation speed
