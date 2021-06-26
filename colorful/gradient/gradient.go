@@ -1,6 +1,9 @@
 package gradient
 
-import "github.com/shasderias/ilysa/colorful"
+import (
+	"github.com/mitchellh/copystructure"
+	"github.com/shasderias/ilysa/colorful"
+)
 
 func New(colors ...colorful.Color) Table {
 	if len(colors) < 2 {
@@ -64,9 +67,13 @@ func FromSet(s colorful.Set) Table {
 }
 
 func (gt Table) Reverse() Table {
-	for i := len(gt)/2 - 1; i >= 0; i-- {
-		opp := len(gt) - 1 - i
-		gt[i].Pos, gt[opp].Pos = gt[opp].Pos, gt[i].Pos
+	reverseTable := copystructure.Must(copystructure.Copy(gt))
+	rt := reverseTable.(Table)
+
+	for i := len(rt)/2 - 1; i >= 0; i-- {
+		opp := len(rt) - 1 - i
+		rt[i].Col, rt[opp].Col = rt[opp].Col, rt[i].Col
 	}
-	return gt
+
+	return rt
 }

@@ -1,6 +1,8 @@
 package ilysa
 
 import (
+	"math/rand"
+
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/calc"
 )
@@ -52,6 +54,15 @@ func (sl SequenceLight) Len() int {
 
 func (sl SequenceLight) Slice(i, j int) SequenceLight {
 	return SequenceLight{lights: sl.lights[i:j]}
+}
+
+func (sl SequenceLight) Shuffle() SequenceLight {
+	rand.Shuffle(len(sl.lights), func(i, j int) {
+		sl.lights[i], sl.lights[j] = sl.lights[j], sl.lights[i]
+	})
+	return SequenceLight{
+		lights: sl.lights,
+	}
 }
 
 func (sl SequenceLight) LightIDTransform(tfer LightIDTransformer) Light {

@@ -25,6 +25,30 @@ func Fan(groupCount int) LightIDTransformer {
 	}
 }
 
+func Even(lightID LightID) LightIDSet {
+	evenIDs := NewLightID()
+
+	for _, id := range lightID {
+		if id%2 == 0 {
+			evenIDs = append(evenIDs, id)
+		}
+	}
+
+	return NewLightIDSet(evenIDs)
+}
+
+func Odd(lightID LightID) LightIDSet {
+	evenIDs := NewLightID()
+
+	for _, id := range lightID {
+		if id%2 == 1 {
+			evenIDs = append(evenIDs, id)
+		}
+	}
+
+	return NewLightIDSet(evenIDs)
+}
+
 func ToLightIDSetTransformer(tfer LightIDTransformer) LightIDSetTransformer {
 	return func(set LightIDSet) LightIDSet {
 		newSet := NewLightIDSet()
