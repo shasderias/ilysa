@@ -58,3 +58,15 @@ var Rainbow = Table{
 	{colorful.MustParseHex("#3288bd"), 0.9},
 	{colorful.MustParseHex("#5e4fa2"), 1.0},
 }
+
+func FromSet(s colorful.Set) Table {
+	return New(s.Colors()...)
+}
+
+func (gt Table) Reverse() Table {
+	for i := len(gt)/2 - 1; i >= 0; i-- {
+		opp := len(gt) - 1 - i
+		gt[i].Pos, gt[opp].Pos = gt[opp].Pos, gt[i].Pos
+	}
+	return gt
+}

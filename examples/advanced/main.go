@@ -54,7 +54,7 @@ func do() error {
 		ilysa.NewBasicLight(beatsaber.EventTypeRingLights, p),
 		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
 		ilysa.ToLightTransformer(ilysa.DivideSingle),
-		ilysa.LightIDSetTransformerToLightTransformer(ilysa.Reverse),
+		ilysa.LightIDSetTransformerToLightTransformer(ilysa.ReverseSet),
 	).(ilysa.SequenceLight)
 
 	lightReverse := ilysa.NewCombinedLight(

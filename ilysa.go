@@ -23,7 +23,7 @@ func New(bsMap *beatsaber.Map) *Project {
 
 func (p *Project) WithBeatOffset(offset float64) BaseContext {
 	ctx := newBaseContext(p)
-	return ctx.WithBeatOffset(offset)
+	return ctx.withBeatOffset(offset)
 }
 
 func (p *Project) EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(TimeContext)) {

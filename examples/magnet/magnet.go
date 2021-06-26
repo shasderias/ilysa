@@ -31,8 +31,8 @@ var (
 	allColors = colorful.NewSet(
 		shirayukiGold,
 		shirayukiPurple,
-		sukoyaPink,
 		sukoyaWhite,
+		sukoyaPink,
 		magnetPurple,
 		magnetPink,
 		magnetWhite,
@@ -40,8 +40,8 @@ var (
 
 	magnetColors = colorful.NewSet(
 		magnetPink,
-		magnetWhite,
 		magnetPurple,
+		magnetWhite,
 	)
 
 	shirayukiColors = colorful.NewSet(
@@ -57,16 +57,17 @@ var (
 	crossickColors = colorful.NewSet(
 		shirayukiGold,
 		shirayukiPurple,
-		sukoyaPink,
 		sukoyaWhite,
+		sukoyaPink,
 	)
 )
 
 var (
 	magnetGradient = gradient.Table{
 		{magnetPurple, 0.0},
-		{magnetWhite, 0.5},
-		{magnetPink, 1.0},
+		{magnetPink, 0.25},
+		{magnetWhite, 0.50},
+		{magnetPurple, 1.00},
 	}
 
 	allColorsGradient = gradient.Table{
@@ -93,18 +94,21 @@ func do() error {
 		return err
 	}
 
-	LeadIn(p)
+	//LeadIn(p)
+	//
+	//Intro{
+	//	Project:   p,
+	//	startBeat: 0,
+	//}.Play()
+	//
+	//verse1 := NewVerse1a(p, 52)
+	//verse1.Play()
+	//
+	//verse2 := NewVerse1b(p, 84)
+	//verse2.Play()
 
-	Intro{
-		Project:   p,
-		startBeat: 0,
-	}.Play()
-
-	verse1 := NewVerse1a(p, 52)
-	verse1.Play()
-
-	verse2 := NewVerse1b(p, 84)
-	verse2.Play()
+	chorus := NewChorus(p, 114)
+	chorus.Play()
 
 	//v := Verse{Project: p}
 	//v.Play(52)

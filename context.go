@@ -17,6 +17,7 @@ type BaseContext interface {
 	ModEventsInRange(startBeat, endBeat float64, filter EventFilter, eventModder func(ctx TimeContext, event Event))
 	NewBasicLight(eventType beatsaber.EventType) BasicLight
 	LightIDMax(beatsaber.EventType) int
+	WithBeatOffset(o float64) BaseContext
 }
 
 type Timer interface {
@@ -51,7 +52,7 @@ type TimeContext interface {
 	Timer
 	Eventer
 	Lighter
-	WithLight(Light, func(TimeLightContext))
+	WithLight(Light, func(ctx TimeLightContext))
 }
 
 type TimeLightContext interface {
@@ -66,7 +67,7 @@ type SequenceContext interface {
 	SequenceTimer
 	Lighter
 	Eventer
-	WithLight(Light, func(SequenceLightContext))
+	WithLight(Light, func(ctx SequenceLightContext))
 }
 
 type SequenceLightContext interface {
@@ -74,6 +75,7 @@ type SequenceLightContext interface {
 	LightTimer
 	SequenceTimer
 	CompoundLighter
+	DeleteEvents(startBeat float64, filter EventFilter)
 }
 
 type Lighter interface {

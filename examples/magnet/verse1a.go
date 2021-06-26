@@ -203,7 +203,7 @@ func (p Verse) RinPun(startBeat float64) {
 	sl = ilysa.NewSequenceLight(
 		sl.Index(0),
 		ilysa.TransformLight(sl.Index(1),
-			ilysa.LightIDSetTransformerToLightTransformer(ilysa.Reverse),
+			ilysa.LightIDSetTransformerToLightTransformer(ilysa.ReverseSet),
 		))
 
 	p.EventForBeat(startBeat, func(ctx ilysa.TimeContext) {

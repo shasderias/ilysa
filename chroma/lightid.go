@@ -26,3 +26,12 @@ func (l LightID) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal([]int(l))
 }
+
+func (l LightID) Has(t int) bool {
+	for _, id := range l {
+		if id == t {
+			return true
+		}
+	}
+	return false
+}

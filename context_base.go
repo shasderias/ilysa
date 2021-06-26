@@ -43,12 +43,23 @@ func (c baseContext) withTimer(beat, startBeat, endBeat float64, ordinal int) ba
 	}
 }
 
-func (c baseContext) WithBeatOffset(o float64) baseContext {
+func (c baseContext) withBeatOffset(o float64) baseContext {
 	return baseContext{
 		Project: c.Project,
 		timer:   c.timer,
 
 		beatOffset: o,
+		fixedRand:  c.fixedRand,
+		modifiers:  c.modifiers,
+	}
+}
+
+func (c baseContext) WithBeatOffset(o float64) BaseContext {
+	return baseContext{
+		Project: c.Project,
+		timer:   c.timer,
+
+		beatOffset: c.beatOffset + o,
 		fixedRand:  c.fixedRand,
 		modifiers:  c.modifiers,
 	}
@@ -88,7 +99,7 @@ func (c baseContext) applyModifiers(e Event) {
 
 func (c baseContext) EventForBeat(beat float64, callback func(TimeContext)) {
 	beat += c.beatOffset
-	callback(c.withTimer(beat, beat, beat, 0).WithBeatOffset(0))
+	callback(c.withTimer(beat, beat, beat, 0).withBeatOffset(0))
 }
 
 func (c baseContext) EventsForBeats(startBeat, duration float64, count int, callback func(TimeContext)) {
@@ -97,7 +108,7 @@ func (c baseContext) EventsForBeats(startBeat, duration float64, count int, call
 	endBeat := startBeat + (duration * float64(count-1))
 
 	for i := 0; i < count; i++ {
-		callback(c.withTimer(startBeat+duration*float64(i), startBeat, endBeat, i).WithBeatOffset(0))
+		callback(c.withTimer(startBeat+duration*float64(i), startBeat, endBeat, i).withBeatOffset(0))
 	}
 }
 
@@ -109,7 +120,7 @@ func (c baseContext) EventsForRange(startBeat, endBeat float64, steps int, easeF
 
 	for i := 0; i < steps; i++ {
 		beat := Ierp(startBeat, endBeat, tScaler(float64(i)), easeFunc)
-		callback(c.withTimer(beat, startBeat, endBeat, i).WithBeatOffset(0))
+		callback(c.withTimer(beat, startBeat, endBeat, i).withBeatOffset(0))
 	}
 }
 
@@ -127,7 +138,7 @@ func (c baseContext) EventsForSequence(startBeat float64, sequence []float64, ca
 		callback(newSequenceContext(
 			c.
 				withTimer(beat, startBeat, endBeat, i).
-				WithBeatOffset(0),
+				withBeatOffset(0),
 			sequence,
 		))
 	}
@@ -165,6 +176,35 @@ startFound:
 		if !filter(events[i]) {
 			continue
 		}
-		modder(c.withTimer(events[i].Base().Beat, startBeat, endBeat, i).WithBeatOffset(0), events[i])
+		modder(c.withTimer(events[i].Base().Beat, startBeat, endBeat, i).withBeatOffset(0), events[i])
 	}
+}
+
+func (c baseContext) DeleteEvents(startBeat float64, filter EventFilter) {
+	p := c.Project
+	p.sortEvents()
+
+	startBeat += c.beatOffset
+
+	startIdx := 0
+
+	for i := 0; i < len(p.events); i++ {
+		if p.events[i].Base().Beat >= startBeat {
+			startIdx = i
+			goto startFound
+		}
+	}
+	// past last event
+	return
+startFound:
+
+	events := p.events[:startIdx]
+
+	for _, e := range p.events[startIdx:] {
+		if filter(e) {
+			events = append(events, e)
+		}
+	}
+
+	p.events = events
 }
