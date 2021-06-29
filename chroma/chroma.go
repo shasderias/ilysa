@@ -13,3 +13,13 @@ func (d SpinDirection) Reverse() SpinDirection {
 	}
 	return CounterClockwise
 }
+
+func (d SpinDirection) ReverseIf(b bool) SpinDirection {
+	if !b {
+		return d
+	}
+	if d == CounterClockwise {
+		return Clockwise
+	}
+	return CounterClockwise
+}

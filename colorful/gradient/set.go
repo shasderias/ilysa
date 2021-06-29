@@ -4,13 +4,14 @@ import "math/rand"
 
 type Set struct {
 	gradients []Table
-	i         int
+	i         *int
 }
 
 func NewSet(gradients ...Table) Set {
+	i := 0
 	return Set{
 		gradients: append([]Table{}, gradients...),
-		i:         0,
+		i:         &i,
 	}
 }
 
@@ -19,10 +20,10 @@ func (s Set) Index(ordinal int) Table {
 }
 
 func (s *Set) Next() Table {
-	t := s.Index(s.i)
-	s.i++
-	if s.i == len(s.gradients) {
-		s.i = 0
+	t := s.Index(*s.i)
+	*s.i++
+	if *s.i == len(s.gradients) {
+		*s.i = 0
 	}
 	return t
 }

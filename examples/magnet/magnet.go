@@ -18,13 +18,42 @@ func main() {
 }
 
 var (
-	shirayukiGold   = colorful.MustParseHex("#CFB96A")
-	shirayukiPurple = colorful.MustParseHex("#6F37E3")
-	sukoyaPink      = colorful.MustParseHex("#E92EB1")
-	sukoyaWhite     = colorful.MustParseHex("#FFFFFF")
-	magnetPurple    = colorful.MustParseHex("#7F7BEB")
-	magnetPink      = colorful.MustParseHex("#B63A8C")
-	magnetWhite     = colorful.MustParseHex("#FFFFFF")
+	magnetRainbowPale = gradient.New(
+		colorful.MustParseHex("#F48DB4"),
+		colorful.MustParseHex("#BCA2D8"),
+		colorful.MustParseHex("#70B5D8"),
+		colorful.MustParseHex("#44BFB4"),
+		colorful.MustParseHex("#6DBE81"),
+		colorful.MustParseHex("#A5B559"),
+		colorful.MustParseHex("#D6A454"),
+		colorful.MustParseHex("#F49472"),
+	)
+
+	magnetRainbow = gradient.New(
+		colorful.MustParseHex("#FF0000"),
+		colorful.MustParseHex("#FF8000"),
+		colorful.MustParseHex("#FFFF00"),
+		colorful.MustParseHex("#00FF00"),
+		colorful.MustParseHex("#00FFFF"),
+		colorful.MustParseHex("#0000FF"),
+		colorful.MustParseHex("#8000FF"),
+		colorful.MustParseHex("#FF00FF"),
+	)
+)
+
+var (
+	shirayukiGold   = colorful.MustParseHex("#F5CA1C")
+	shirayukiPurple = colorful.MustParseHex("#711FCF")
+	sukoyaPink      = colorful.MustParseHex("#F521CF")
+	sukoyaWhite     = colorful.MustParseHex("#FFFCFF")
+)
+
+var (
+	magnetRed       = colorful.MustParseHex("#600F45")
+	magnetPurpleRed = colorful.MustParseHex("#8A317C")
+	magnetPurple    = colorful.MustParseHex("#B241BA")
+	magnetPink      = colorful.MustParseHex("#C856D9")
+	magnetWhite     = colorful.MustParseHex("#FFBEFF")
 )
 
 var (
@@ -39,8 +68,10 @@ var (
 	)
 
 	magnetColors = colorful.NewSet(
-		magnetPink,
+		magnetRed,
+		magnetPurpleRed,
 		magnetPurple,
+		magnetPink,
 		magnetWhite,
 	)
 
@@ -64,10 +95,11 @@ var (
 
 var (
 	magnetGradient = gradient.Table{
-		{magnetPurple, 0.0},
-		{magnetPink, 0.25},
-		{magnetWhite, 0.50},
-		{magnetPurple, 1.00},
+		{magnetRed, 0.0},
+		{magnetPurpleRed, 0.25},
+		{magnetPurple, 0.50},
+		{magnetPink, 0.75},
+		{magnetWhite, 1.00},
 	}
 
 	allColorsGradient = gradient.Table{
@@ -79,6 +111,48 @@ var (
 		{magnetPink, 0.167 * 5},
 		{magnetWhite, 1.0},
 	}
+
+	//shirayukiGradient = gradient.Table{
+	//	{shirayukiPurple, 0},
+	//	{shirayukiGold, 0.33},
+	//	{shirayukiPurple, 0.5},
+	//	{shirayukiGold, 0.66},
+	//	{shirayukiPurple, 1},
+	//}
+
+	shirayukiGradient = gradient.New(
+		shirayukiPurple,
+		shirayukiGold,
+		shirayukiGold,
+		shirayukiPurple,
+	)
+
+	shirayukiSingleGradient = gradient.New(
+		shirayukiPurple,
+		shirayukiGold,
+	)
+
+	sukoyaGradient = gradient.New(
+		sukoyaPink,
+		sukoyaWhite,
+		sukoyaWhite,
+		sukoyaPink,
+	)
+
+	shirayukiWhiteGradient = gradient.New(
+		shirayukiPurple,
+		magnetWhite,
+	)
+
+	sukoyaSingleGradient = gradient.New(
+		sukoyaPink,
+		sukoyaWhite,
+	)
+
+	sukoyaWhiteGradient = gradient.New(
+		sukoyaPink,
+		magnetWhite,
+	)
 )
 
 func do() error {
@@ -94,29 +168,32 @@ func do() error {
 		return err
 	}
 
-	//LeadIn(p)
-	//
-	//Intro{
-	//	Project:   p,
-	//	startBeat: 0,
-	//}.Play()
-	//
-	//verse1 := NewVerse1a(p, 52)
-	//verse1.Play()
-	//
-	//verse2 := NewVerse1b(p, 84)
-	//verse2.Play()
+	leadIn1 := NewLeadIn(p, 4)
+	leadIn1.Play()
+
+	intro1 := NewIntro(p, 16)
+	intro1.Play()
+
+	verse1 := NewVerse1a(p, 52)
+	verse1.Play()
+
+	verse2 := NewVerse1b(p, 84)
+	verse2.Play()
 
 	chorus := NewChorus(p, 114)
 	chorus.Play()
 
-	//v := Verse{Project: p}
-	//v.Play(52)
+	breakdown := NewBreakdown(p, 149)
+	breakdown.Play()
 
-	//
-	//BassTwang(p, 18.5)
-	//
-	//
+	verse3 := NewVerse1a(p, 164)
+	verse3.Play()
+
+	verse4 := NewVerse1b(p, 196)
+	verse4.Play()
+
+	chorus2 := NewChorus(p, 226)
+	chorus2.Play()
 
 	return p.Save()
 }
@@ -137,7 +214,7 @@ func do() error {
 //		for i := 1; i <= LightIDMax; i++ {
 //			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(gradient.Rainbow.Ierp(
+//			e.SetColor(magnetRainbow.Ierp(
 //				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
 //			))
 //			e.SetAlpha(5)

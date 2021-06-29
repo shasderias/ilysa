@@ -23,7 +23,7 @@ func (c sequenceContext) OrdinalOffset(offset int) float64 {
 }
 
 func (c sequenceContext) NextB() float64 {
-	return c.OrdinalOffset(1)
+	return c.B() + c.NextBOffset()
 }
 
 func (c sequenceContext) NextBOffset() float64 {
@@ -31,7 +31,7 @@ func (c sequenceContext) NextBOffset() float64 {
 }
 
 func (c sequenceContext) PrevB() float64 {
-	return c.OrdinalOffset(-1)
+	return c.B() + c.PrevBOffset()
 }
 
 func (c sequenceContext) PrevBOffset() float64 {

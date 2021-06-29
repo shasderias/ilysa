@@ -60,7 +60,7 @@ func (c baseContext) WithBeatOffset(o float64) BaseContext {
 		timer:   c.timer,
 
 		beatOffset: c.beatOffset + o,
-		fixedRand:  c.fixedRand,
+		fixedRand:  rand.Float64(),
 		modifiers:  c.modifiers,
 	}
 }

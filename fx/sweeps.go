@@ -6,6 +6,7 @@ import (
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/colorful/gradient"
 	"github.com/shasderias/ilysa/noise"
+	"github.com/shasderias/ilysa/scale"
 )
 
 var (
@@ -16,13 +17,16 @@ var (
 
 func SinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimeLightContext) float64 {
 	return func(ctx ilysa.TimeLightContext) float64 {
-		return sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset)
+		a := sin(ctx.T()*sweepSpeed/ctx.Duration() + ctx.LightIDT()*pi + offset)
+		return a
 	}
 }
 
 func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimeLightContext) float64 {
+	s := scale.ToUnitIntervalClamped(-1, 1)
 	return func(ctx ilysa.TimeLightContext) float64 {
-		return abs(sin(ctx.T()*ctx.Duration()*sweepSpeed + ctx.LightIDT()*pi + offset))
+		a := s(sin(ctx.T()*sweepSpeed*ctx.Duration() + ctx.LightIDT()*pi + offset*sweepSpeed*pi))
+		return a
 	}
 }
 

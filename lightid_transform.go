@@ -2,6 +2,7 @@ package ilysa
 
 import (
 	"math"
+	"math/rand"
 
 	"github.com/shasderias/ilysa/beatsaber"
 )
@@ -23,6 +24,10 @@ func Fan(groupCount int) LightIDTransformer {
 
 		return set
 	}
+}
+
+func Identity(lightID LightID) LightIDSet {
+	return NewLightIDSet(lightID)
 }
 
 func Even(lightID LightID) LightIDSet {
@@ -67,6 +72,13 @@ func DivideSingle(id LightID) LightIDSet {
 		set.Add(LightID{lightID})
 	}
 	return set
+}
+
+func Shuffle(id LightID) LightIDSet {
+	rand.Shuffle(len(id), func(i, j int) {
+		id[i], id[j] = id[j], id[i]
+	})
+	return NewLightIDSet(id)
 }
 
 // Divide returns a LightIDTransformer that divides a light ID into groupSize equal
@@ -122,7 +134,6 @@ func Reverse(id LightID) LightIDSet {
 
 	return NewLightIDSet(id)
 }
-
 func ReverseSet(set LightIDSet) LightIDSet {
 	for i := len(set)/2 - 1; i >= 0; i-- {
 		opp := len(set) - 1 - i

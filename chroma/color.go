@@ -3,11 +3,16 @@ package chroma
 import (
 	"encoding/json"
 	"image/color"
+
+	"github.com/shasderias/ilysa/colorful"
 )
 
 type Color []float64
 
 func ColorFromColor(c color.Color) Color {
+	if cf, ok := c.(colorful.Color); ok {
+		return Color{cf.R, cf.G, cf.B, cf.A}
+	}
 	r, g, b, a := c.RGBA()
 	return Color{float64(r) / 0xffff, float64(g) / 0xffff, float64(b) / 0xffff, float64(a) / 0xffff}
 }

@@ -1,6 +1,8 @@
 package gradient
 
 import (
+	"math/rand"
+
 	"github.com/mitchellh/copystructure"
 	"github.com/shasderias/ilysa/colorful"
 )
@@ -67,8 +69,8 @@ func FromSet(s colorful.Set) Table {
 }
 
 func (gt Table) Reverse() Table {
-	reverseTable := copystructure.Must(copystructure.Copy(gt))
-	rt := reverseTable.(Table)
+	reversedTable := copystructure.Must(copystructure.Copy(gt))
+	rt := reversedTable.(Table)
 
 	for i := len(rt)/2 - 1; i >= 0; i-- {
 		opp := len(rt) - 1 - i
@@ -76,4 +78,25 @@ func (gt Table) Reverse() Table {
 	}
 
 	return rt
+}
+
+func (gt Table) Rotate(n int) Table {
+	rotatedTable := copystructure.Must(copystructure.Copy(gt))
+	rt := rotatedTable.(Table)
+
+	n %= len(gt)
+
+	rt = append(rt, rt[0:n]...)
+	rt = rt[n:]
+
+	for i := range rt {
+		rt[i].Pos = gt[i].Pos
+	}
+
+	return rt
+}
+
+func (gt Table) RotateRand() Table {
+	n := rand.Intn(len(gt))
+	return gt.Rotate(n)
 }
