@@ -69,6 +69,7 @@ func (b Breakdown) BrokenChord(startBeat float64) {
 				)
 			})
 		})
+
 	})
 }
 

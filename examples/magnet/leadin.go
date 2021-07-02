@@ -100,7 +100,7 @@ func (l LeadIn) BrokenChord(startBeat float64) {
 			ilysa.ToLightTransformer(ilysa.DivideSingle),
 		)
 		colorSweepSpeed   = 2.2
-		shimmerSweepSpeed = 0.8
+		//shimmerSweepSpeed = 0.8
 		intensity         = 0.8
 		grad              = magnetRainbowPale
 	)
@@ -109,8 +109,8 @@ func (l LeadIn) BrokenChord(startBeat float64) {
 		ctx.WithLight(backLasers, func(ctx ilysa.TimeLightContext) {
 			e := fx.ColorSweep(ctx, colorSweepSpeed, grad)
 			fx.AlphaBlend(ctx, e, 0, 0.3, 0, intensity, ease.InCubic)
-			fx.AlphaBlend(ctx, e, 0.4, 1, intensity, 0, ease.OutCirc)
-			fx.AlphaShimmer(ctx, e, shimmerSweepSpeed)
+			fx.AlphaBlend(ctx, e, 0.4, 1, intensity, 0, ease.InCirc)
+			//fx.AlphaShimmer(ctx, e, shimmerSweepSpeed)
 		})
 	})
 }

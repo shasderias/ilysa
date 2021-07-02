@@ -24,7 +24,7 @@ func NewVerse1a(p *ilysa.Project, offset float64) Verse {
 	}
 }
 
-func (p Verse) Play() {
+func (p Verse) Play1() {
 	p.EventForBeat(0, func(ctx ilysa.TimeContext) {
 		fx.OffAll(ctx)
 		ctx.NewPreciseRotationSpeedEvent(
@@ -44,6 +44,31 @@ func (p Verse) Play() {
 
 	p.PianoBackstep(7)
 	p.PianoBackstep(15)
+	p.PianoBackstep(23)
+	p.RinPun(27)
+}
+
+func (p Verse) Play2() {
+	p.EventForBeat(0, func(ctx ilysa.TimeContext) {
+		fx.OffAll(ctx)
+		ctx.NewPreciseRotationSpeedEvent(
+			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithSpeed(3.5))
+		ctx.NewPreciseRotationSpeedEvent(
+			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithSpeed(3.5))
+	})
+
+	p.Rhythm(0, true)
+	p.Rhythm(4, false)
+	p.Rhythm(8, false)
+	p.Rhythm(12, false)
+	p.Rhythm(16, false)
+	p.Rhythm(20, false)
+	p.Rhythm(24, false)
+	p.Rhythm(28, true)
+
+	p.PianoBackstep(7)
+	//p.PianoBackstep(15)
+	p.SnareDrums(14, []float64{0.25, 0.50, 1.00, 1.25, 1.75, 2.00})
 	p.PianoBackstep(23)
 	p.RinPun(27)
 }
@@ -162,6 +187,49 @@ func (p Verse) PianoBackstep(startBeat float64) {
 
 			})
 		})
+	})
+}
+func (p Verse) SnareDrums(startBeat float64, sequence []float64) {
+	light := ilysa.TransformLight(
+		ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p),
+		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
+		ilysa.ToLightTransformer(ilysa.DivideSingle),
+	)
+
+	gradSet := gradient.NewSet(magnetGradient, shirayukiGradient)
+
+	p.EventsForSequence(startBeat, sequence, func(ctx ilysa.SequenceContext) {
+		grad := gradSet.Next()
+
+		if ctx.Ordinal()%2 == 0 {
+			ctx.NewPreciseRotationEvent(
+				ilysa.WithRotation(15),
+				ilysa.WithStep(15),
+				ilysa.WithProp(20),
+				ilysa.WithSpeed(8),
+				ilysa.WithDirection(chroma.CounterClockwise),
+			)
+			ctx.WithLight(light, func(ctx ilysa.SequenceLightContext) {
+				e := fx.Gradient(ctx, grad)
+				e.SetAlpha(2)
+				oe := ctx.NewRGBLightingEvent(ilysa.WithValue(beatsaber.EventValueLightOff))
+				oe.ShiftBeat(0.15)
+			})
+		} else {
+			ctx.NewPreciseRotationEvent(
+				ilysa.WithRotation(30),
+				ilysa.WithStep(15),
+				ilysa.WithProp(1.2),
+				ilysa.WithSpeed(8),
+				ilysa.WithDirection(chroma.CounterClockwise),
+			)
+			ctx.EventsForBeats(ctx.B(), ctx.B()+0.5, 8, func(ctx ilysa.TimeContext) {
+				ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
+					e := fx.Gradient(ctx, grad)
+					fx.AlphaBlend(ctx, e, 0, 1, 2, 0, ease.InCubic)
+				})
+			})
+		}
 	})
 }
 

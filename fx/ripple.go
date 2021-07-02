@@ -60,5 +60,5 @@ func AlphaBlend(ctx ilysa.TimeLightContext, events *ilysa.CompoundRGBLightingEve
 	}
 	tScale := scale.ToUnitIntervalClamped(startT, endT)
 	alphaScale := scale.FromUnitIntervalClamped(startAlpha, endAlpha)
-	events.Mod(ilysa.WithAlpha(alphaScale(tScale(ctx.T()))))
+	events.Mod(ilysa.WithAlpha(alphaScale(tScale(easeFn(ctx.T())))))
 }

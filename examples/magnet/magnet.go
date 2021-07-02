@@ -175,7 +175,7 @@ func do() error {
 	intro1.Play()
 
 	verse1 := NewVerse1a(p, 52)
-	verse1.Play()
+	verse1.Play1()
 
 	verse2 := NewVerse1b(p, 84)
 	verse2.Play()
@@ -187,13 +187,16 @@ func do() error {
 	breakdown.Play()
 
 	verse3 := NewVerse1a(p, 164)
-	verse3.Play()
+	verse3.Play2()
 
 	verse4 := NewVerse1b(p, 196)
 	verse4.Play()
 
 	chorus2 := NewChorus(p, 226)
 	chorus2.Play()
+
+	guitarSolo := NewGuitarSolo(p, 260)
+	guitarSolo.Play()
 
 	return p.Save()
 }
