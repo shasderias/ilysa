@@ -17,9 +17,9 @@ type RotationEventOpt interface {
 
 func (c baseContext) NewRotationEvent(opts ...RotationEventOpt) *RotationEvent {
 	e := &RotationEvent{BaseEvent: BaseEvent{
-		Beat:  c.B(),
-		Type:  beatsaber.EventTypeRingSpin,
-		Value: 0,
+		beat: c.B(),
+		typ:  beatsaber.EventTypeRingSpin,
+		val:  0,
 	}}
 
 	e.Mod(opts...)
@@ -47,9 +47,9 @@ type PreciseRotationEventOpt interface {
 func (c baseContext) NewPreciseRotationEvent(opts ...PreciseRotationEventOpt) *PreciseRotationEvent {
 	e := &PreciseRotationEvent{
 		BaseEvent: BaseEvent{
-			Beat:  c.B(),
-			Type:  beatsaber.EventTypeRingSpin,
-			Value: 0,
+			beat: c.B(),
+			typ:  beatsaber.EventTypeRingSpin,
+			val:  0,
 		},
 	}
 

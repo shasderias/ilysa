@@ -154,7 +154,7 @@ func (c baseContext) ModEventsInRange(startBeat, endBeat float64, filter EventFi
 	startIdx, endIdx := 0, len(p.events)
 
 	for i := 0; i < len(p.events); i++ {
-		if p.events[i].Base().Beat >= startBeat {
+		if p.events[i].Beat() >= startBeat {
 			startIdx = i
 			goto startFound
 		}
@@ -164,7 +164,7 @@ func (c baseContext) ModEventsInRange(startBeat, endBeat float64, filter EventFi
 startFound:
 
 	for i := len(p.events) - 1; i >= startIdx; i-- {
-		if p.events[i].Base().Beat <= endBeat {
+		if p.events[i].Beat() <= endBeat {
 			endIdx = i
 			break
 		}
@@ -176,7 +176,7 @@ startFound:
 		if !filter(events[i]) {
 			continue
 		}
-		modder(c.withTimer(events[i].Base().Beat, startBeat, endBeat, i).withBeatOffset(0), events[i])
+		modder(c.withTimer(events[i].Beat(), startBeat, endBeat, i).withBeatOffset(0), events[i])
 	}
 }
 
@@ -189,7 +189,7 @@ func (c baseContext) DeleteEvents(startBeat float64, filter EventFilter) {
 	startIdx := 0
 
 	for i := 0; i < len(p.events); i++ {
-		if p.events[i].Base().Beat >= startBeat {
+		if p.events[i].Beat() >= startBeat {
 			startIdx = i
 			goto startFound
 		}

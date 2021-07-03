@@ -21,8 +21,8 @@ type RGBLightingEventOpt interface {
 func (c baseContext) NewRGBLightingEvent(opts ...RGBLightingEventOpt) *RGBLightingEvent {
 	e := &RGBLightingEvent{
 		BaseEvent: BaseEvent{
-			Beat:  c.B(),
-			Value: beatsaber.EventValueLightRedOn,
+			beat: c.B(),
+			val:  beatsaber.EventValueLightRedOn,
 		},
 	}
 	for _, opt := range opts {
@@ -36,7 +36,7 @@ func (e *RGBLightingEvent) SetLight(typ beatsaber.EventTyper) *RGBLightingEvent 
 	if !beatsaber.IsLightingEvent(typ.EventType()) {
 		panic(fmt.Sprintf("context.NewRGBLightingEvent: %v is not c lighting event", typ))
 	}
-	e.Type = typ.EventType()
+	e.typ = typ.EventType()
 	return e
 }
 

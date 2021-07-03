@@ -61,11 +61,10 @@ func (p *Project) Save() error {
 	p.sortEvents()
 
 	for _, e := range p.events {
-		be := e.Base()
 		event := beatsaber.Event{
-			Time:  p.Map.UnscaleTime(be.Beat),
-			Type:  be.Type,
-			Value: be.Value,
+			Time:  p.Map.UnscaleTime(e.Beat()),
+			Type:  e.Type(),
+			Value: e.Value(),
 		}
 
 		cd, err := e.CustomData()
@@ -84,6 +83,6 @@ func (p *Project) Save() error {
 
 func (p *Project) sortEvents() {
 	sort.Slice(p.events, func(i, j int) bool {
-		return p.events[i].Base().Beat < p.events[j].Base().Beat
+		return p.events[i].Beat() < p.events[j].Beat()
 	})
 }

@@ -146,9 +146,9 @@ func TestDecode(t *testing.T) {
 		ok bool
 	)
 	if err := json.Unmarshal(f3a.Rest["baz"], &f3aTime); err != nil {
-		t.Errorf("foo3/a baz Beat decode of %q failed: %s", f3a.Rest["baz"], err)
+		t.Errorf("foo3/a baz beat decode of %q failed: %s", f3a.Rest["baz"], err)
 	} else {
-		t.Logf("foo3/a baz Beat: %+v", f3aTime)
+		t.Logf("foo3/a baz beat: %+v", f3aTime)
 	}
 	if n, ok = f1a.Rest["num"].(float64); !ok {
 		t.Errorf("foo1/a num not stored as a float")

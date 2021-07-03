@@ -23,7 +23,7 @@ func (e *CompoundRGBLightingEvent) Add(events ...*RGBLightingEvent) {
 
 func (e *CompoundRGBLightingEvent) ShiftBeat(offset float64) {
 	for i := range *e {
-		(*e)[i].Beat += offset
+		(*e)[i].beat += offset
 	}
 }
 

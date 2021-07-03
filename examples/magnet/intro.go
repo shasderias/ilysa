@@ -427,7 +427,7 @@ func (p Intro) Chorus(startBeat float64) {
 		//	e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
 		//	e.SetSingleLightID(i)
 		//	e.SetColor(color)
-		//	e.Beat += 1.0 / 64.0
+		//	e.beat += 1.0 / 64.0
 		//}
 	})
 }
@@ -487,7 +487,7 @@ func (p Intro) Trill(startBeat float64) {
 	//	//	e.SetColor(allColorsGradient.Ierp(rand.Float64()))
 	//	//
 	//	//	oe := ctx.NewRGBLightingEvent(backLasers, beatsaber.EventValueLightOff)
-	//	//	oe.Beat += step / 2
+	//	//	oe.beat += step / 2
 	//	//
 	//	//	if !ctx.Last {
 	//	//		continue

@@ -2,6 +2,10 @@ package ilysa
 
 import "github.com/shasderias/ilysa/beatsaber"
 
+type Opt interface {
+	Apply(e Event)
+}
+
 type withTypeOpt struct {
 	typ beatsaber.EventType
 }

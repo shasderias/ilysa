@@ -15,7 +15,13 @@ const (
 )
 
 type Event interface {
-	Base() *BaseEvent
+	Beat() float64
+	SetBeat(b float64)
+	Type() beatsaber.EventType
+	SetType(t beatsaber.EventType)
+	Value() beatsaber.EventValue
+	SetValue(v beatsaber.EventValue)
+
 	CustomData() (json.RawMessage, error)
 }
 
@@ -68,27 +74,39 @@ func (o withDirectionOpt) applyPreciseRotationSpeedEvent(e *PreciseRotationSpeed
 }
 
 type BaseEvent struct {
-	Beat  float64
-	Type  beatsaber.EventType
-	Value beatsaber.EventValue
+	beat float64
+	typ  beatsaber.EventType
+	val  beatsaber.EventValue
 }
 
 func (e *BaseEvent) ScaleBeat(scaler func(float64) float64) {
-	e.Beat = scaler(e.Beat)
+	e.beat = scaler(e.beat)
 }
 
 func (e *BaseEvent) ShiftBeat(offset float64) {
-	e.Beat += offset
+	e.beat += offset
 }
 
-func (e *BaseEvent) Base() *BaseEvent {
-	return e
+func (e BaseEvent) Beat() float64 {
+	return e.beat
+}
+
+func (e *BaseEvent) SetBeat(b float64) {
+	e.beat = b
+}
+
+func (e BaseEvent) Type() beatsaber.EventType {
+	return e.typ
+}
+
+func (e *BaseEvent) SetType(t beatsaber.EventType) {
+	e.typ = t
+}
+
+func (e BaseEvent) Value() beatsaber.EventValue {
+	return e.val
 }
 
 func (e *BaseEvent) SetValue(v beatsaber.EventValue) {
-	e.Value = v
-}
-
-func (e *BaseEvent) SetType(typ beatsaber.EventType) {
-	e.Type = typ
+	e.val = v
 }

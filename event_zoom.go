@@ -18,9 +18,9 @@ type ZoomEvent struct {
 func (c baseContext) NewZoomEvent(opts ...ZoomEventOpt) *ZoomEvent {
 	e := &ZoomEvent{
 		BaseEvent{
-			Beat:  c.B(),
-			Type:  beatsaber.EventTypeRingZoom,
-			Value: 0,
+			beat: c.B(),
+			typ:  beatsaber.EventTypeRingZoom,
+			val:  0,
 		},
 	}
 	e.Mod(opts...)
@@ -48,9 +48,9 @@ type PreciseZoomEvent struct {
 func (c baseContext) NewPreciseZoomEvent(opts ...PreciseZoomEventOpt) *PreciseZoomEvent {
 	e := &PreciseZoomEvent{
 		BaseEvent: BaseEvent{
-			Beat:  c.B(),
-			Type:  beatsaber.EventTypeRingZoom,
-			Value: 0,
+			beat: c.B(),
+			typ:  beatsaber.EventTypeRingZoom,
+			val:  0,
 		},
 	}
 	e.Mod(opts...)

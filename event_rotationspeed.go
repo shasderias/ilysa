@@ -19,9 +19,9 @@ type RotationSpeedEventOpt interface {
 func (c baseContext) NewRotationSpeedEvent(opts ...RotationSpeedEventOpt) *RotationSpeedEvent {
 	e := &RotationSpeedEvent{
 		BaseEvent{
-			Beat:  c.B(),
-			Type:  beatsaber.EventTypeLeftRotatingLasersRotationSpeed,
-			Value: 0,
+			beat: c.B(),
+			typ:  beatsaber.EventTypeLeftRotatingLasersRotationSpeed,
+			val:  0,
 		},
 	}
 	e.Mod(opts...)
@@ -49,7 +49,7 @@ type PreciseRotationSpeedEventOpt interface {
 func (c baseContext) NewPreciseRotationSpeedEvent(opts ...PreciseRotationSpeedEventOpt) *PreciseRotationSpeedEvent {
 	e := &PreciseRotationSpeedEvent{
 		BaseEvent: BaseEvent{
-			Beat: c.B(),
+			beat: c.B(),
 		},
 	}
 	for _, opt := range opts {

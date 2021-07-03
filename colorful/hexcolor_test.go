@@ -25,7 +25,7 @@ func TestHexColor(t *testing.T) {
 			t.Errorf("_.Scan(%q) wrote %v, want %v", tc.s, gotHC, tc.hc)
 		}
 		if gotValue, err := tc.hc.Value(); err != nil || !reflect.DeepEqual(gotValue, tc.s) {
-			t.Errorf("%v.Value() == %v, %v, want %v, <nil>", tc.hc, gotValue, err, tc.s)
+			t.Errorf("%v.val() == %v, %v, want %v, <nil>", tc.hc, gotValue, err, tc.s)
 		}
 	}
 }

@@ -19,7 +19,7 @@ func FilterLightingEvents(targetType beatsaber.EventType) EventFilter {
 			return false
 		}
 
-		return e.Base().Type == targetType
+		return e.Type() == targetType
 	}
 }
 
@@ -37,6 +37,6 @@ func FilterRGBLight(light Light) EventFilter {
 			return false
 		}
 
-		return light.EventTypeSet().Has(event.Base().Type)
+		return light.EventTypeSet().Has(event.Type())
 	}
 }

@@ -16,9 +16,9 @@ type BasicLightingEventOpt interface {
 func (c baseContext) NewLightingEvent(opts ...BasicLightingEventOpt) *BasicLightingEvent {
 	e := &BasicLightingEvent{
 		BaseEvent: BaseEvent{
-			Beat:  c.B(),
-			Type:  beatsaber.EventTypeBackLasers,
-			Value: 0,
+			beat: c.B(),
+			typ:  beatsaber.EventTypeBackLasers,
+			val:  0,
 		},
 	}
 	for _, opt := range opts {
