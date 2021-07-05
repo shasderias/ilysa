@@ -3,6 +3,7 @@ package fx
 import (
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/scale"
 )
 
@@ -43,7 +44,7 @@ func (o withFadeInOpt) apply(ctx ilysa.TimeLightContext, events *ilysa.CompoundR
 		return
 	}
 	alphaScale := scale.Clamped(o.startT, o.endT, o.startAlpha, o.endAlpha)
-	events.Mod(ilysa.WithAlpha(events.GetAlpha() * o.easeFn(alphaScale(ctx.T()))))
+	events.Mod(evt.WithAlpha(events.Alpha() * o.easeFn(alphaScale(ctx.T()))))
 }
 
 func (o withFadeInOpt) applyRipple(ctx ilysa.TimeLightContext, events *ilysa.CompoundRGBLightingEvent) {
@@ -60,5 +61,5 @@ func AlphaBlend(ctx ilysa.TimeLightContext, events *ilysa.CompoundRGBLightingEve
 	}
 	tScale := scale.ToUnitIntervalClamped(startT, endT)
 	alphaScale := scale.FromUnitIntervalClamped(startAlpha, endAlpha)
-	events.Mod(ilysa.WithAlpha(alphaScale(tScale(easeFn(ctx.T())))))
+	events.Mod(evt.WithAlpha(alphaScale(tScale(easeFn(ctx.T())))))
 }

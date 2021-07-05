@@ -1,6 +1,6 @@
 package ilysa
 
-type EventWithAlpha interface {
-	GetAlpha() float64
-	SetAlpha(float64)
-}
+//type EventWithAlpha interface {
+//	Alpha() float64
+//	SetAlpha(float64)
+//}

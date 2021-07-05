@@ -6,7 +6,9 @@ import (
 	"github.com/shasderias/ilysa/chroma"
 	"github.com/shasderias/ilysa/colorful/gradient"
 	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/fx"
+	"github.com/shasderias/ilysa/light2"
 )
 
 type GuitarSolo struct {
@@ -22,14 +24,14 @@ func NewGuitarSolo(p *ilysa.Project, startBeat float64) GuitarSolo {
 }
 
 func (g GuitarSolo) Play() {
-	g.EventForBeat(0, func(ctx ilysa.TimeContext) {
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithIntValue(3), ilysa.WithSpeed(4.5),
+	g.EventForBeat(0, func(ctx ilysa.RangeContext) {
+		ctx.NewPreciseLaser(
+			evt.WithDirectionalLaser(ilysa.LeftLaser),
+			ilysa.WithIntValue(3), evt.WithPreciseLaserSpeed(4.5),
 		)
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithIntValue(3), ilysa.WithSpeed(4.5),
+		ctx.NewPreciseLaser(
+			evt.WithDirectionalLaser(ilysa.RightLaser),
+			ilysa.WithIntValue(3), evt.WithPreciseLaserSpeed(4.5),
 		)
 	})
 
@@ -53,8 +55,8 @@ func (g GuitarSolo) Play() {
 func (g GuitarSolo) Beat(startBeat float64) {
 	ctx := g.WithBeatOffset(startBeat)
 
-	bl := ilysa.TransformLight(
-		ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, g),
+	bl := light2.TransformLight(
+		light2.NewBasicLight(beatsaber.EventTypeBackLasers, g),
 		ilysa.ToLightTransformer(ilysa.DivideSingle),
 	)
 
@@ -65,13 +67,13 @@ func (g GuitarSolo) Beat(startBeat float64) {
 		sukoyaSingleGradient,
 	)
 
-	ctx.EventsForBeats(0, 2, 4, func(ctx ilysa.TimeContext) {
-		ctx.NewPreciseRotationEvent(
-			ilysa.WithRotation(15),
-			ilysa.WithStep(15),
-			ilysa.WithProp(2),
-			ilysa.WithSpeed(8),
-			ilysa.WithDirection(chroma.CounterClockwise),
+	ctx.EventsForBeats(0, 2, 4, func(ctx ilysa.RangeContext) {
+		ctx.NewPreciseRotation(
+			evt.WithRotation(15),
+			evt.WithRotationStep(15),
+			evt.WithProp(2),
+			evt.WithPreciseLaserSpeed(8),
+			evt.WithLaserDirection(chroma.CounterClockwise),
 		)
 
 		step := -0.5
@@ -79,11 +81,11 @@ func (g GuitarSolo) Beat(startBeat float64) {
 			step = 0.5
 		}
 
-		ctx.NewPreciseZoomEvent(ilysa.WithStep(step))
+		ctx.NewPreciseZoom(evt.WithRotationStep(step))
 
 		grad := gradSet.Next()
 
-		ctx.EventsForRange(ctx.B(), ctx.B()+0.50, 12, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.Range(ctx.B(), ctx.B()+0.50, 12, ease.Linear, func(ctx ilysa.RangeContext) {
 			ctx.WithLight(bl, func(ctx ilysa.TimeLightContext) {
 				e := fx.ColorSweep(ctx, 2.4, grad)
 				fx.AlphaBlend(ctx, e, 0, 1, 1.5, 0, ease.InBounce)
@@ -109,32 +111,32 @@ func (g GuitarSolo) Solo(startBeat float64, sequence []float64, reverse bool) {
 		rlReverse = ilysa.Reverse
 	}
 
-	ll := ilysa.TransformLight(
-		ilysa.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers, g),
+	ll := light2.TransformLight(
+		light2.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers, g),
 		ilysa.ToLightTransformer(llReverse),
 		ilysa.ToSequenceLightTransformer(ilysa.DivideSingle),
-	).(ilysa.SequenceLight)
-	rl := ilysa.TransformLight(
-		ilysa.NewBasicLight(beatsaber.EventTypeRightRotatingLasers, g),
+	).(light2.SequenceLight)
+	rl := light2.TransformLight(
+		light2.NewBasicLight(beatsaber.EventTypeRightRotatingLasers, g),
 		ilysa.ToLightTransformer(rlReverse),
 		ilysa.ToSequenceLightTransformer(ilysa.DivideSingle),
-	).(ilysa.SequenceLight)
-	light := ilysa.NewSequenceLight()
+	).(light2.SequenceLight)
+	light := light2.NewSequenceLight()
 
 	for i := 0; i < ll.Len(); i++ {
-		light.Add(ilysa.NewCombinedLight(ll.Index(i), rl.Index(i)))
+		light.Add(light2.NewCombinedLight(ll.Index(i), rl.Index(i)))
 	}
 
-	ctx.EventForBeat(0, func(ctx ilysa.TimeContext) {
-		//ctx.NewPreciseRotationSpeedEvent(
+	ctx.EventForBeat(0, func(ctx ilysa.RangeContext) {
+		//ctx.NewPreciseLaser(
 		//	ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-		//	ilysa.WithSpeed(0),
-		//	ilysa.WithIntValue(6),
+		//	ilysa.WithPreciseLaserSpeed(0),
+		//	ilysa.WithLaserSpeed(6),
 		//)
-		//ctx.NewPreciseRotationSpeedEvent(
+		//ctx.NewPreciseLaser(
 		//	ilysa.WithDirectionalLaser(ilysa.RightLaser),
-		//	ilysa.WithSpeed(0),
-		//	ilysa.WithIntValue(6),
+		//	ilysa.WithPreciseLaserSpeed(0),
+		//	ilysa.WithLaserSpeed(6),
 		//)
 
 	})
@@ -154,23 +156,23 @@ func (g GuitarSolo) Solo(startBeat float64, sequence []float64, reverse bool) {
 			//llAlpha, rlAlpha = 1.0, 3.0
 		}
 
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithLockPosition(llLock),
-			ilysa.WithSpeed(llSpeed),
+		ctx.NewPreciseLaser(
+			evt.WithDirectionalLaser(ilysa.LeftLaser),
+			evt.WithLockPosition(llLock),
+			evt.WithPreciseLaserSpeed(llSpeed),
 			ilysa.WithIntValue(llIntValue),
 		)
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithLockPosition(rlLock),
-			ilysa.WithSpeed(rlSpeed),
+		ctx.NewPreciseLaser(
+			evt.WithDirectionalLaser(ilysa.RightLaser),
+			evt.WithLockPosition(rlLock),
+			evt.WithPreciseLaserSpeed(rlSpeed),
 			ilysa.WithIntValue(rlIntValue),
 		)
 
-		ctx.EventsForRange(ctx.B(), ctx.B()+1.25, 30, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.EventsForRange(ctx.B(), ctx.B()+1.25, 30, ease.Linear, func(ctx ilysa.RangeContext) {
 			ctx.WithLight(light.Index(seqCtx.Ordinal()), func(ctx ilysa.TimeLightContext) {
 				e := fx.ColorSweep(ctx, 1.9, magnetRainbowPale)
-				//e := ctx.NewRGBLightingEvent(ilysa.WithColor(color))
+				//e := ctx.NewRGBLighting(ilysa.WithColor(color))
 				fx.AlphaBlend(ctx, e, 0, 1, 3, 0, ease.InCubic)
 			})
 		})

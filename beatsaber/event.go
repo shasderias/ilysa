@@ -32,6 +32,7 @@ type CustomData interface {
 type EventValue float64
 
 const (
+	EventValueInvalid        EventValue = -1
 	EventValueLightOff       EventValue = 0
 	EventValueLightBlueOn    EventValue = 1
 	EventValueLightBlueFlash EventValue = 2

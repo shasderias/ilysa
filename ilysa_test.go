@@ -37,7 +37,7 @@ package ilysa
 //		t.Run(tt.name, func(t *testing.T) {
 //			p := &Project{}
 //			callbackCount := 0
-//			p.EventsForRange(tt.args.startBeat, tt.args.endBeat, tt.args.steps, tt.args.easeFunc, func(ctx Timer) {
+//			p.rangeTimer(tt.args.startBeat, tt.args.endBeat, tt.args.steps, tt.args.easeFunc, func(ctx Range) {
 //				if ctx.B != tt.callbackOnBeat[callbackCount] {
 //					t.Fatalf("got %dth callback on beat %f; want callback on beat %f instead",
 //						callbackCount, ctx.B, tt.callbackOnBeat[callbackCount],
@@ -83,7 +83,7 @@ package ilysa
 //		t.Run(tt.name, func(t *testing.T) {
 //			p := &Project{}
 //			callbackCount := 0
-//			p.EventsForBeats(tt.args.startBeat, tt.args.duration, tt.args.count, func(ctx Timer) {
+//			p.EventsForBeats(tt.args.startBeat, tt.args.duration, tt.args.count, func(ctx Range) {
 //				if ctx.B != tt.callbackOnBeat[callbackCount] {
 //					t.Fatalf("got %dth callback on beat %f; want callback on beat %f instead",
 //						callbackCount, ctx.B, tt.callbackOnBeat[callbackCount],

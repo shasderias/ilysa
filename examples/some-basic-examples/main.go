@@ -7,6 +7,7 @@ import (
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/chroma"
 	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/evt"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -37,82 +38,82 @@ func do() error {
 		return err
 	}
 
-	p.EventForBeat(2, func(ctx ilysa.TimeContext) { // generate events for beat 2:
-		ctx.NewLightingEvent( // generate a new base game (non-Chroma) lighting event
+	p.EventForBeat(2, func(ctx ilysa.RangeContext) { // generate events for beat 2:
+		ctx.NewLighting( // generate a new base game (non-Chroma) lighting event
 			ilysa.WithType(beatsaber.EventTypeBackLasers),   // back lasers
 			ilysa.WithValue(beatsaber.EventValueLightRedOn), // red on
 		)
 
-		ctx.NewLightingEvent( // generate a new base game (non-Chroma) lighting event
+		ctx.NewLighting( // generate a new base game (non-Chroma) lighting event
 			ilysa.WithType(beatsaber.EventTypeLeftRotatingLasers), // left lasers
 			ilysa.WithValue(beatsaber.EventValueLightBlueFade),    // blue fade
 		)
 	})
 
-	p.EventForBeat(4, func(ctx ilysa.TimeContext) {
+	p.EventForBeat(4, func(ctx ilysa.RangeContext) {
 		// beat 4, back lasers, blue flash
-		ctx.NewLightingEvent(
+		ctx.NewLighting(
 			ilysa.WithType(beatsaber.EventTypeBackLasers),
 			ilysa.WithValue(beatsaber.EventValueLightBlueFlash),
 		)
 
 		// beat 4, raise hydrualics, all cars
-		ctx.NewRotationEvent(
+		ctx.NewRotation(
 			ilysa.WithType(beatsaber.EventTypeInterscopeRaiseHydraulics),
 			ilysa.WithValue(1),
 		)
 
 		// beat 4, zoom event
-		ctx.NewZoomEvent()
+		ctx.NewZoom()
 
 		// beat 4, left laser, speed 3
-		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser),
+		ctx.NewLaser(
+			evt.WithDirectionalLaser(ilysa.LeftLaser),
 			ilysa.WithIntValue(3),
 		)
 	})
 
-	p.EventsForBeats(6, 2, 5, func(ctx ilysa.TimeContext) {
+	p.EventsForBeats(6, 2, 5, func(ctx ilysa.RangeContext) {
 		// beats 6, 8, 10, 12, 14 ...
 
 		// ... back lasers, red on event with Chroma, color #123123, alpha 0.3, lightIDs 1, 2, 3
-		ctx.NewRGBLightingEvent(
+		ctx.NewRGBLighting(
 			ilysa.WithType(beatsaber.EventTypeBackLasers),
 			ilysa.WithValue(beatsaber.EventValueLightRedOn),
-			ilysa.WithColor(colorful.MustParseHex("#123123")),
-			ilysa.WithAlpha(0.3),
-			ilysa.WithLightID(ilysa.NewLightID(1, 2, 3)),
+			evt.WithColor(colorful.MustParseHex("#123123")),
+			evt.WithAlpha(0.3),
+			evt.WithLightID(ilysa.NewLightID(1, 2, 3)),
 		)
 
 		// ... Chroma precision rotation speed event, lock positions, value 3, precise speed 0, clockwise direction
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithLockPosition(true),
+		ctx.NewPreciseLaser(
+			evt.WithLockPosition(true),
 			ilysa.WithIntValue(1),
-			ilysa.WithSpeed(0),
-			ilysa.WithDirection(chroma.Clockwise),
+			evt.WithPreciseLaserSpeed(0),
+			evt.WithLaserDirection(chroma.Clockwise),
 		)
 
 		// ... Chroma precise rotation event ...
-		ctx.NewPreciseRotationEvent(
-			ilysa.WithNameFilter("BigTrackLaneRings"), // ... nameFilter "BigTrackLaneRings"
-			ilysa.WithReset(false),                    // no reset
-			ilysa.WithRotation(45),                    // rotation 45
-			ilysa.WithStep(15.0),                      // step 15
-			ilysa.WithProp(0.5),                       // prop 0.5
-			ilysa.WithSpeed(3),                        // speed 3
-			ilysa.WithDirection(chroma.Clockwise),     // clockwise spin
-			ilysa.WithCounterSpin(true),               // inner rings counter spin
+		ctx.NewPreciseRotation(
+			evt.WithNameFilter("BigTrackLaneRings"),  // ... nameFilter "BigTrackLaneRings"
+			evt.WithReset(false),                     // no reset
+			evt.WithRotation(45),                     // rotation 45
+			evt.WithRotationStep(15.0),               // step 15
+			evt.WithProp(0.5),                        // prop 0.5
+			evt.WithPreciseLaserSpeed(3),             // speed 3
+			evt.WithLaserDirection(chroma.Clockwise), // clockwise spin
+			evt.WithCounterSpin(true),                // inner rings counter spin
 		)
 		// ... Chroma precise zoom event, step 4
-		ctx.NewPreciseZoomEvent(
-			ilysa.WithStep(4),
+		ctx.NewPreciseZoom(
+			evt.WithRotationStep(4),
 		)
 	})
 
 	// generate events on beats 0, 0.25, 0.75 and 1.25, starting from beat 4
 	// i.e. 4.00, 4.25, 4.75, 5.25
-	p.EventsForSequence(4, []float64{0, 0.25, 0.75, 1.25}, func(ctx ilysa.SequenceContext) {
-		ctx.NewLightingEvent(
+	p.Sequence(4, []float64{0, 0.25, 0.75, 1.25}, func(ctx ilysa.SequenceContext) {
+		ctx.NewLighting(
 			ilysa.WithType(beatsaber.EventTypeRingLights),
 			ilysa.WithValue(beatsaber.EventValueLightBlueFade),
 		)

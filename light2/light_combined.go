@@ -1,4 +1,4 @@
-package ilysa
+package light2
 
 import (
 	"math"

@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/light"
 )
 
 type LightIDTransformer func(id LightID) LightIDSet
@@ -167,11 +168,11 @@ type SingleLight interface {
 }
 
 type LightIDTransformable interface {
-	LightIDTransform(LightIDTransformer) Light
+	LightIDTransform(LightIDTransformer) light.Light
 }
 
-func ToLightTransformer(tfer LightIDTransformer) LightTransformer {
-	return func(l Light) Light {
+func ToLightTransformer(tfer LightIDTransformer) light.LightTransformer {
+	return func(l light.Light) light.Light {
 		tfl, ok := l.(LightIDTransformable)
 		if !ok {
 			return l
@@ -181,11 +182,11 @@ func ToLightTransformer(tfer LightIDTransformer) LightTransformer {
 }
 
 type LightIDSequenceTransformable interface {
-	LightIDSequenceTransform(LightIDTransformer) Light
+	LightIDSequenceTransform(LightIDTransformer) light.Light
 }
 
-func ToSequenceLightTransformer(tfer LightIDTransformer) LightTransformer {
-	return func(l Light) Light {
+func ToSequenceLightTransformer(tfer LightIDTransformer) light.LightTransformer {
+	return func(l light.Light) light.Light {
 		tfl, ok := l.(LightIDSequenceTransformable)
 		if !ok {
 			return l
@@ -195,11 +196,11 @@ func ToSequenceLightTransformer(tfer LightIDTransformer) LightTransformer {
 }
 
 type LightIDSetTransformable interface {
-	LightIDSetTransform(LightIDSetTransformer) Light
+	LightIDSetTransform(LightIDSetTransformer) light.Light
 }
 
-func LightIDSetTransformerToLightTransformer(tfer LightIDSetTransformer) LightTransformer {
-	return func(l Light) Light {
+func LightIDSetTransformerToLightTransformer(tfer LightIDSetTransformer) light.LightTransformer {
+	return func(l light.Light) light.Light {
 		tfl, ok := l.(LightIDSetTransformable)
 		if !ok {
 			return l

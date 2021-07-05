@@ -3,6 +3,7 @@ package beatsaber
 type EventType int
 
 const (
+	EventTypeInvalid                          EventType = -1
 	EventTypeBackLasers                       EventType = 0
 	EventTypeRingLights                       EventType = 1
 	EventTypeLeftRotatingLasers               EventType = 2

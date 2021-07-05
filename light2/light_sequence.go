@@ -1,8 +1,9 @@
-package ilysa
+package light2
 
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/calc"
 )
@@ -65,10 +66,10 @@ func (sl SequenceLight) Shuffle() SequenceLight {
 	}
 }
 
-func (sl SequenceLight) LightIDTransform(tfer LightIDTransformer) Light {
+func (sl SequenceLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
 	tfedLights := []Light{}
 	for _, l := range sl.lights {
-		tfl, ok := l.(LightIDTransformable)
+		tfl, ok := l.(ilysa.LightIDTransformable)
 		if !ok {
 			tfedLights = append(tfedLights, l)
 			continue
@@ -78,10 +79,10 @@ func (sl SequenceLight) LightIDTransform(tfer LightIDTransformer) Light {
 	return NewSequenceLight(tfedLights...)
 }
 
-func (sl SequenceLight) LightIDSetTransform(tfer LightIDSetTransformer) Light {
+func (sl SequenceLight) LightIDSetTransform(tfer ilysa.LightIDSetTransformer) Light {
 	tfedLights := []Light{}
 	for _, l := range sl.lights {
-		tfl, ok := l.(LightIDSetTransformable)
+		tfl, ok := l.(ilysa.LightIDSetTransformable)
 		if !ok {
 			tfedLights = append(tfedLights, l)
 			continue

@@ -1,6 +1,7 @@
-package ilysa
+package light2
 
 import (
+	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
 )
 
@@ -11,7 +12,7 @@ type BasicLight struct {
 	maxLightID int
 }
 
-func (p *Project) NewBasicLight(typ beatsaber.EventType) BasicLight {
+func (p *ilysa.Project) NewBasicLight(typ beatsaber.EventType) BasicLight {
 	return BasicLight{
 		eventType:  typ,
 		maxLightID: p.ActiveDifficultyProfile().LightIDMax(typ),
@@ -28,7 +29,7 @@ func NewBasicLight(typ beatsaber.EventType, m LightIDMaxer) BasicLight {
 
 func (bl BasicLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLightingEvent {
 	return NewCompoundRGBLightingEvent(
-		ctx.NewRGBLightingEvent().SetLight(bl.eventType),
+		ctx.NewRGBLighting().SetLight(bl.eventType),
 	)
 }
 
@@ -44,69 +45,69 @@ func (bl BasicLight) LightIDLen() int {
 	return 1
 }
 
-func (bl BasicLight) LightIDSet() LightIDSet {
-	return NewLightIDSet(
-		NewLightIDFromInterval(1, bl.maxLightID),
+func (bl BasicLight) LightIDSet() ilysa.LightIDSet {
+	return ilysa.NewLightIDSet(
+		ilysa.NewLightIDFromInterval(1, bl.maxLightID),
 	)
 }
 
-func (bl BasicLight) LightIDTransform(tfer LightIDTransformer) Light {
+func (bl BasicLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
 	return CompositeLight{
 		eventType: bl.eventType,
-		set:       tfer(NewLightIDFromInterval(1, bl.maxLightID)),
+		set:       tfer(ilysa.NewLightIDFromInterval(1, bl.maxLightID)),
 	}
 }
 
-func (bl BasicLight) LightIDSequenceTransform(tfer LightIDTransformer) Light {
+func (bl BasicLight) LightIDSequenceTransform(tfer ilysa.LightIDTransformer) Light {
 	sl := NewSequenceLight()
-	set := tfer(NewLightIDFromInterval(1, bl.maxLightID))
+	set := tfer(ilysa.NewLightIDFromInterval(1, bl.maxLightID))
 
 	for _, lightID := range set {
 		sl.Add(CompositeLight{
 			eventType: bl.eventType,
-			set:       LightIDSet{lightID},
+			set:       ilysa.LightIDSet{lightID},
 		})
 
 	}
 	return sl
 }
 
-func (bl BasicLight) LightIDSetTransform(tfer LightIDSetTransformer) Light {
+func (bl BasicLight) LightIDSetTransform(tfer ilysa.LightIDSetTransformer) Light {
 	return CompositeLight{
 		eventType: bl.eventType,
 		set:       tfer(bl.LightIDSet()),
 	}
 }
 
-func (bl BasicLight) LightIDSetSequenceTransform(tfer LightIDSetTransformer) Light {
+func (bl BasicLight) LightIDSetSequenceTransform(tfer ilysa.LightIDSetTransformer) Light {
 	sl := NewSequenceLight()
 	set := tfer(bl.LightIDSet())
 
 	for _, lightID := range set {
 		sl.Add(CompositeLight{
 			eventType: bl.eventType,
-			set:       LightIDSet{lightID},
+			set:       ilysa.LightIDSet{lightID},
 		})
 
 	}
 	return sl
 }
 
-func (bl BasicLight) Transform(tfer LightIDTransformer) CompositeLight {
+func (bl BasicLight) Transform(tfer ilysa.LightIDTransformer) CompositeLight {
 	return CompositeLight{
 		eventType: bl.eventType,
-		set:       tfer(NewLightIDFromInterval(1, bl.maxLightID)),
+		set:       tfer(ilysa.NewLightIDFromInterval(1, bl.maxLightID)),
 	}
 }
 
-func (bl BasicLight) TransformToSequence(tfer LightIDTransformer) SequenceLight {
+func (bl BasicLight) TransformToSequence(tfer ilysa.LightIDTransformer) SequenceLight {
 	sl := NewSequenceLight()
-	set := tfer(NewLightIDFromInterval(1, bl.maxLightID))
+	set := tfer(ilysa.NewLightIDFromInterval(1, bl.maxLightID))
 
 	for _, lightID := range set {
 		sl.Add(CompositeLight{
 			eventType: bl.eventType,
-			set:       LightIDSet{lightID},
+			set:       ilysa.LightIDSet{lightID},
 		})
 
 	}

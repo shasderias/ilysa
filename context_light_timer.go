@@ -1,11 +1,15 @@
 package ilysa
 
+import (
+	"github.com/shasderias/ilysa/light"
+)
+
 type lightTimer struct {
-	Light
+	light.Light
 	lightIDOrdinal int
 }
 
-func newLightTimer(l Light, lightIDOrdinal int) lightTimer {
+func newLightTimer(l light.Light, lightIDOrdinal int) lightTimer {
 	return lightTimer{
 		Light:          l,
 		lightIDOrdinal: lightIDOrdinal,
@@ -21,5 +25,5 @@ func (c lightTimer) LightIDCur() int {
 }
 
 func (c lightTimer) LightIDT() float64 {
-	return float64(c.LightIDOrdinal()) / float64(c.LightIDLen())
+	return float64(c.LightIDOrdinal()) / 1 // float64(c.LightIDLen())
 }

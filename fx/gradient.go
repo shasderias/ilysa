@@ -3,10 +3,11 @@ package fx
 import (
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/evt"
 )
 
 func Gradient(ctx ilysa.TimeLightContext, table gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	return ctx.NewRGBLightingEvent(
-		ilysa.WithColor(table.Ierp(ctx.LightIDT())),
+		evt.WithColor(table.Ierp(ctx.LightIDT())),
 	)
 }

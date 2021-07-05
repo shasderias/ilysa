@@ -5,6 +5,7 @@ import (
 
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/noise"
 	"github.com/shasderias/ilysa/scale"
 )
@@ -33,7 +34,7 @@ func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx ilysa.TimeLightCont
 func BiasedColorSweep(ctx ilysa.TimeLightContext, sweepSpeed float64, grad gradient.Table) *ilysa.CompoundRGBLightingEvent {
 	gradPos := SinSweepLightID(sweepSpeed, ctx.FixedRand())
 	return ctx.NewRGBLightingEvent(
-		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
+		evt.WithColor(grad.Ierp(gradPos(ctx))),
 	)
 }
 
@@ -41,7 +42,7 @@ func ColorSweep(ctx ilysa.TimeLightContext, sweepSpeed float64, grad gradient.Ta
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
 
 	e := ctx.NewRGBLightingEvent(
-		ilysa.WithColor(grad.Ierp(gradPos(ctx))),
+		evt.WithColor(grad.Ierp(gradPos(ctx))),
 	)
 
 	for _, opt := range opts {
@@ -56,15 +57,15 @@ type ColorSweepOpt interface {
 }
 
 func AlphaShimmer(ctx ilysa.TimeLightContext, e ilysa.EventWithAlpha, shimmerSpeed float64) {
-	e.SetAlpha(e.GetAlpha() * noise.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT()))
+	e.SetAlpha(e.Alpha() * noise.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT()))
 }
 
-//func SweepLightID(light beatsaber.EventTypeSet, lightIDPicker lightid.Picker) func(ctx ilysa.Timer) {
-//	return func(ctx ilysa.Timer) {
+//func SweepLightID(light beatsaber.EventTypeSet, lightIDPicker lightid.Picker) func(ctx ilysa.Range) {
+//	return func(ctx ilysa.Range) {
 //		lidSet := lightIDPicker(ctx, light)
 //
 //		for i := 1; i < LightIDMax; i++ {
-//			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
+//			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
 //			e.SetColor(gradient.Rainbow.Ierp(
 //				sin(ctx.t*sweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
@@ -84,9 +85,9 @@ func AlphaShimmer(ctx ilysa.TimeLightContext, e ilysa.EventWithAlpha, shimmerSpe
 //
 //	colorSweepSpeed *= duration
 //
-//	p.EventsForRange(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Timer) {
+//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Range) {
 //		for i := 1; i <= LightIDMax; i++ {
-//			e := ctx.NewRGBLightingEvent(light, beatsaber.EventValueLightRedOn)
+//			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
 //			e.SetColor(gradient.Rainbow.Ierp(
 //				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
@@ -97,10 +98,10 @@ func AlphaShimmer(ctx ilysa.TimeLightContext, e ilysa.EventWithAlpha, shimmerSpe
 //
 //	//p.ModEventsInRange(startBeat, endBeat,
 //	//	ilysa.FilterLightingEvents(light),
-//	//	func(ctx ilysa.Timer, event ilysa.Event) {
+//	//	func(ctx ilysa.Range, event ilysa.Event) {
 //	//		e := event.(*ilysa.RGBLightingEvent)
 //	//		lightID := float64(e.FirstLightID())
-//	//		e.SetAlpha(e.GetAlpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(LightIDMax)*pi+offset))
+//	//		e.SetAlpha(e.Alpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(LightIDMax)*pi+offset))
 //	//	})
 //
 //	//fadeScale := util.Clamped(startBeat, endBeat, 0, 1)

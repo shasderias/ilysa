@@ -1,5 +1,7 @@
 package scale
 
+type Fn func(m float64) float64
+
 // Clamped returns a function that scales a number from the interval [rMin,rMax]
 // to the interval [tMin,tMax]
 // https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
