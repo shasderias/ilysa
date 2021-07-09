@@ -6,7 +6,7 @@ import (
 	"sort"
 
 	"github.com/shasderias/ilysa/beatsaber"
-	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -24,28 +24,24 @@ func New(bsMap *beatsaber.Map) *Project {
 	}
 }
 
-func (p *Project) WithBeatOffset(offset float64) BaseContext {
-	ctx := newBaseContext(p)
-	return ctx.withBeatOffset(offset)
+func (p *Project) Offset(offset float64) context.Context {
+	return context.Base(p).Offset(offset)
 }
 
-func (p *Project) Range(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(RangeContext)) {
-	ctx := newBaseContext(p)
-	ctx.Range(startBeat, endBeat, steps, easeFunc, callback)
+func (p *Project) Range(r timer.Ranger, callback func(context.Context)) {
+	context.Base(p).Range(r, callback)
 }
 
-func (p *Project) Sequence(sequence timer.Sequencer, callback func(ctx SequenceContext)) {
-	ctx := newBaseContext(p)
-	ctx.Sequence(sequence, callback)
+func (p *Project) Sequence(s timer.Sequencer, callback func(ctx context.Context)) {
+	context.Base(p).Sequence(s, callback)
 }
 
-//func (p *Project) ModEventsInRange(startBeat, endBeat float64, filter EventFilter, modder func(ctx RangeContext, event Event)) {
-//	ctx := newBaseContext(p)
-//	ctx.ModEventsInRange(startBeat, endBeat, filter, modder)
-//}
+func (p *Project) MaxLightID(t evt.LightType) int {
+	return p.Map.ActiveDifficultyProfile().MaxLightID(beatsaber.EventType(t))
+}
 
-func (p *Project) LightIDMax(typ beatsaber.EventType) int {
-	return p.Map.ActiveDifficultyProfile().LightIDMax(typ)
+func (p *Project) AddEvents(events ...evt.Event) {
+	p.events = append(p.events, events...)
 }
 
 func (p *Project) sortEvents() {

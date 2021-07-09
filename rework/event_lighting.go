@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 //type EventWithAlpha interface {
 //	Alpha() float64

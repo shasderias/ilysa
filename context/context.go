@@ -6,32 +6,56 @@ import (
 )
 
 type Context interface {
-	Timer
+	timer.Sequence
+	timer.Range
+	FixedRand() float64
+
 	Eventer
-	Offset() float64
+	MaxLightID(t evt.LightType) int
+
+	Offset(float64) Context
+	Sequence(s timer.Sequencer, callback func(ctx Context))
+	Range(r timer.Ranger, callback func(ctx Context))
+	Light(l Light, callback func(ctx LightContext))
 
 	addEvents(events ...evt.Event)
 	baseTimer() bool
-}
-
-type Timer interface {
-	timer.Sequence
-	timer.Range
+	offset() float64
 }
 
 type LightContext interface {
-	Timer
-	LightTimer
-}
+	timer.Sequence
+	timer.Range
+	timer.Light
+	FixedRand() float64
 
-type LightTimer interface {
-	LightIDT() float64 // current time in light ID sequence, 0-1
-	LightIDOrdinal() int
-	LightIDLen() int
-	LightIDCur() int
+	LightEventer
 }
 
 type Eventer interface {
 	NewLighting(opts ...evt.LightingOpt) *evt.Lighting
 	NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting
+	NewLaser(opts ...evt.LaserOpt) *evt.Laser
+	NewPreciseLaser(opts ...evt.PreciseLaserOpt) *evt.PreciseLaser
+	NewRotation(opts ...evt.RotationOpt) *evt.Rotation
+	NewPreciseRotation(opts ...evt.PreciseRotationOpt) *evt.PreciseRotation
+	NewZoom(opts ...evt.ZoomOpt) *evt.Zoom
+	NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom
+}
+
+type LightEventer interface {
+	NewRGBLighting(opts ...evt.RGBLightingOpt) evt.RGBLightingEvents
+}
+
+type LightRGBLightingContext interface {
+	timer.Sequence
+	timer.Range
+	timer.Light
+	FixedRand() float64
+	NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting
+}
+
+type Light interface {
+	NewRGBLighting(ctx LightRGBLightingContext) evt.RGBLightingEvents
+	LightIDLen() int
 }

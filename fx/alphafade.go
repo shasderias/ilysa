@@ -1,17 +1,30 @@
 package fx
 
 import (
-	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/scale"
 )
 
-func RGBAlphaBlend(ctx ilysa.RangeContext, event ilysa.Event, startAlpha, endAlpha float64, easeFn ease.Func) {
-	alphaScale := scale.FromUnitIntervalClamped(startAlpha, endAlpha)
+func AlphaFade(ctx context.LightContext, events evt.RGBLightingEvents, startAlpha, endAlpha float64, easeFn ease.Func) {
+	alpha := scale.FromUnitClamp(startAlpha, endAlpha)(easeFn(ctx.T()))
 
-	e, ok := event.(ilysa.EventWithAlpha)
-	if !ok {
+	events.Apply(evt.WithAlpha(alpha))
+}
+
+func AlphaFadeEx(ctx context.LightContext, events evt.RGBLightingEvents, startT, endT, startAlpha, endAlpha float64, easeFn ease.Func) {
+	if ctx.T() < startT || ctx.T() > endT {
 		return
 	}
-	e.SetAlpha(e.Alpha() * alphaScale(easeFn(ctx.T())))
+
+	tScale := scale.ToUnitClamp(startT, endT)
+	alphaScale := scale.FromUnitClamp(startAlpha, endAlpha)
+	events.Apply(evt.WithAlpha(alphaScale(tScale(easeFn(ctx.T())))))
+}
+
+func NewAlphaFader(startT, endT, startAlpha, endAlpha float64, fn ease.Func) func(context.LightContext, evt.RGBLightingEvents) {
+	return func(ctx context.LightContext, e evt.RGBLightingEvents) {
+		AlphaFadeEx(ctx, e, startT, endT, startAlpha, endAlpha, fn)
+	}
 }

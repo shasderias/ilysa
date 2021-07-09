@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 import (
 	"testing"

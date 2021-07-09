@@ -185,18 +185,18 @@ func do() error {
 
 	breakdown := NewBreakdown(p, 149)
 	breakdown.Play()
-
-	verse3 := NewVerse1a(p, 164)
-	verse3.Play2()
-
-	verse4 := NewVerse1b(p, 196)
-	verse4.Play()
-
-	chorus2 := NewChorus(p, 226)
-	chorus2.Play()
-
-	guitarSolo := NewGuitarSolo(p, 260)
-	guitarSolo.Play()
+	//
+	//verse3 := NewVerse1a(p, 164)
+	//verse3.Play2()
+	//
+	//verse4 := NewVerse1b(p, 196)
+	//verse4.Play()
+	//
+	//chorus2 := NewChorus(p, 226)
+	//chorus2.Play()
+	//
+	//guitarSolo := NewGuitarSolo(p, 260)
+	//guitarSolo.Play()
 
 	return p.Save()
 }
@@ -205,7 +205,7 @@ func do() error {
 //	var (
 //		duration   = endBeat - startBeat
 //		offset     = rand.Float64() * math.Pi * 2
-//		LightIDMax = p.ActiveDifficultyProfile().LightIDMax(light)
+//		MaxLightID = p.ActiveDifficultyProfile().MaxLightID(light)
 //		sin        = math.Sin
 //		pi         = math.Pi
 //	)
@@ -213,12 +213,12 @@ func do() error {
 //	colorSweepSpeed *= duration
 //	shimmerSweepSpeed *= duration
 //
-//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Range) {
-//		for i := 1; i <= LightIDMax; i++ {
+//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.rng) {
+//		for i := 1; i <= MaxLightID; i++ {
 //			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightRedOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(magnetRainbow.Ierp(
-//				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(LightIDMax))*pi + offset),
+//			e.SetColor(magnetRainbow.Lerp(
+//				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(MaxLightID))*pi + offset),
 //			))
 //			e.SetAlpha(5)
 //		}
@@ -226,10 +226,10 @@ func do() error {
 //
 //	//p.ModEventsInRange(startBeat, endBeat,
 //	//	ilysa.FilterLightingEvents(light),
-//	//	func(ctx ilysa.Range, event ilysa.Event) {
+//	//	func(ctx ilysa.rng, event ilysa.Event) {
 //	//		e := event.(*ilysa.RGBLightingEvent)
 //	//		lightID := float64(e.FirstLightID())
-//	//		e.SetAlpha(e.Alpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(LightIDMax)*pi+offset))
+//	//		e.SetAlpha(e.Alpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(MaxLightID)*pi+offset))
 //	//	})
 //
 //	//fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
@@ -248,16 +248,16 @@ func do() error {
 //	var (
 //		sin        = math.Sin
 //		light      = beatsaber.EventTypeBackLasers
-//		LightIDMax = p.ActiveDifficultyProfile().LightIDMax(light)
+//		MaxLightID = p.ActiveDifficultyProfile().MaxLightID(light)
 //		pi         = math.Pi
 //	)
 //
-//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.Range) {
-//		for i := 1; i <= LightIDMax; i++ {
+//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.rng) {
+//		for i := 1; i <= MaxLightID; i++ {
 //			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightBlueOn)
 //			e.SetSingleLightID(i)
-//			e.SetColor(magnetGradient.Ierp(
-//				sin(ctx.t*3 + (float64(i)/float64(LightIDMax))*pi + 4),
+//			e.SetColor(magnetGradient.Lerp(
+//				sin(ctx.t*3 + (float64(i)/float64(MaxLightID))*pi + 4),
 //			))
 //			e.SetAlpha(5)
 //		}

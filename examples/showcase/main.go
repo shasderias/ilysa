@@ -12,6 +12,7 @@ import (
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/fx"
 	"github.com/shasderias/ilysa/light2"
+	"github.com/shasderias/ilysa/rework"
 	"github.com/shasderias/ilysa/scale"
 )
 
@@ -48,7 +49,7 @@ func do() error {
 
 	// create a new context that offsets all subsequent beat numbers, this is
 	// useful when creating reusable lights
-	ctx := p.WithBeatOffset(showcaseStart)
+	ctx := p.Offset(showcaseStart)
 
 	// Beats 116-128 - Left/Right Lasers
 	// Starting off with a relatively simple effect, here we will:
@@ -56,8 +57,8 @@ func do() error {
 	// (2) smoothly change the lasers' colors through a gradient;
 	// (3) increase the rotation speed of the lasers as the music approaches the drop.
 	var (
-		leftLaser  = light2.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers, p)  // base game left laser
-		rightLaser = light2.NewBasicLight(beatsaber.EventTypeRightRotatingLasers, p) // base game right laser
+		leftLaser  = light.NewBasic(beatsaber.EventTypeLeftRotatingLasers, p)  // base game left laser
+		rightLaser = light.NewBasic(beatsaber.EventTypeRightRotatingLasers, p) // base game right laser
 
 		// this creates a new Ilysa light that alternates between the left light and right lasers
 		leftRightSequence = light2.NewSequenceLight(leftLaser, rightLaser)
@@ -74,34 +75,34 @@ func do() error {
 	)
 
 	// generate events every half (0.5) beat, starting at beat (0), repeat a total of 24 times ...
-	ctx.EventsForBeats(0, 0.5, 24, func(ctx ilysa.RangeContext) {
+	ctx.EventsForBeats(0, 0.5, 24, func(ctx context.Context) {
 		// ... generate Chroma precise rotation speed events for the left and right lasers,
 		// setting speed to the iteration count with locked positions
 		// i.e. beat = 0.0, speed = 0
 		//      beat = 0.5, speed = 1
 		//      beat = 1.0, speed = 2, etc
 		ctx.NewPreciseLaser(
-			evt.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithIntValue(ctx.Ordinal()), evt.WithPreciseLaserSpeed(float64(ctx.Ordinal())),
+			evt.WithDirectionalLaser(evt.LeftLaser),
+			evt.WithIntValue(ctx.Ordinal()), evt.WithPreciseLaserSpeed(float64(ctx.Ordinal())),
 			evt.WithLockPosition(true),
 		)
 		ctx.NewPreciseLaser(
-			evt.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithIntValue(ctx.Ordinal()), evt.WithPreciseLaserSpeed(float64(ctx.Ordinal())),
+			evt.WithDirectionalLaser(evt.RightLaser),
+			evt.WithIntValue(ctx.Ordinal()), evt.WithPreciseLaserSpeed(float64(ctx.Ordinal())),
 			evt.WithLockPosition(true),
 		)
 
 		// alphaEase is a function that will scale a number from the unit interval ([0,1]) to the interval [0.5,6]
 		// we use this later to blend the alpha of the generated events from 0.5 to 6
-		alphaEase := scale.FromUnitIntervalClamped(0.5, 6)
+		alphaEase := scale.FromUnitClamp(0.5, 6)
 
 		// ... use the light we created earlier ...
-		ctx.WithLight(leftRightSequence, func(ctx ilysa.TimeLightContext) {
+		ctx.Light(leftRightSequence, func(ctx context.LightContext) {
 			// ... to create a Chroma RGB event
 			// WithLight automatically sets _eventType for us to alternate between left and right rotating lights
 			ctx.NewRGBLightingEvent(
 				// use the gradient we created earlier to set the color
-				evt.WithColor(grad.Ierp(ctx.T())),
+				evt.WithColor(grad.Lerp(ctx.T())),
 				// use the alphaEase function we made above here, with an in-out quadratic ease
 				evt.WithAlpha(alphaEase(ease.InOutQuad(ctx.T()))),
 			)
@@ -135,15 +136,15 @@ func do() error {
 			10.0, 10.5, // 126
 			11.0, 11.5, // 127
 		}
-		bigRings = light2.NewBasicLight(beatsaber.EventTypeRingLights, p)
+		bigRings = light.NewBasic(beatsaber.EventTypeRingLights, p)
 		// take base game's ring lights
-		bigRingsSplit = light2.TransformLight(bigRings,
+		bigRingsSplit = transform.Light(bigRings,
 			// and split it into 3 lights, each with 1/3 the lightIDs of the base game's ring lights
 			// i.e. [1:13], [14:26], [27:40] in the Nice environment
-			ilysa.ToSequenceLightTransformer(ilysa.Divide(3)),
+			rework.ToSequenceLightTransformer(rework.Divide(3)),
 			// within each group, divide the lightIDs into single lightIDs so that we can light them in a gradient
 			// i.e. group1: [1], [2] ... [13], group2: [14], [15] ... [26], group3: [27], [28] ... [40]
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
+			rework.ToLightTransformer(rework.DivideSingle),
 		).(light2.SequenceLight)
 		// colors we will be using to light the ring lights
 		bigRingColors = colorful.NewSet(
@@ -155,10 +156,10 @@ func do() error {
 	)
 
 	// generate events starting at beat 0, with the rhythmSeq's offsets
-	ctx.Sequence(0, rhythmSeq, func(ctx ilysa.SequenceContext) {
+	ctx.Sequence(0, rhythmSeq, func(ctx rework.SequenceContext) {
 		// create a function that scales a number from the unit interval ([0,1] to [0.5,6])
 		// we use this to set the propagation speed of the ring spins
-		propScale := scale.FromUnitIntervalClamped(0.5, 5)
+		propScale := scale.FromUnitClamp(0.5, 5)
 
 		// create a Chroma precise rotation event
 		re := ctx.NewPreciseRotation(
@@ -176,7 +177,7 @@ func do() error {
 		}
 
 		seqCtx := ctx
-		// get the nth light, Index() wraparounds, so this will give us ...
+		// get the nth light, Idx() wraparounds, so this will give us ...
 		// ... on the 1st iteration, big ring lights with lightIDs [1:13]
 		// ... on the 2nd iteration, big ring lights with lightIDs [14:26]
 		// etc el
@@ -186,16 +187,16 @@ func do() error {
 		// - 30 evenly spaced events (ease.Linear);
 		// - starting from the current beat in rhythmSeq - 0.05 beats (ctx.B() - 0.05)); and (we start a little to make the lights feel more responsive)
 		// - ending flickerDuration later (ctx.B() + flickerDuration - 0.05).
-		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx ilysa.RangeContext) {
+		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx context.Context) {
 			// use the light we picked out
-			ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
+			ctx.Light(light, func(ctx context.LightContext) {
 				// generate a gradient from the color set we selected
 				// i.e. on the 1st iteration, lime green to sky blue
 				//      on the 2nd iteration, sky blue to orange
 				// etc el
 				grad := gradient.New(
-					bigRingColors.Index(seqCtx.Ordinal()),
-					bigRingColors.Index(seqCtx.Ordinal()+1),
+					bigRingColors.Idx(seqCtx.Ordinal()),
+					bigRingColors.Idx(seqCtx.Ordinal()+1),
 				)
 
 				// apply the gradient, fx.Gradient will generate the requisite events based on the light we are using and the gradient passed to it
@@ -219,22 +220,22 @@ func do() error {
 	// as Ilysa takes into account the number of lightIDs available in the selected environment when generating
 	// events, and this lets gets us a whole new lightshow just by changing the environment.
 	var (
-		centerLights = light2.TransformLight(
-			light2.NewBasicLight(beatsaber.EventTypeCenterLights, p), // take the base game's center lights
-			ilysa.ToLightTransformer(ilysa.DivideSingle),             // divide into single lightIDs
+		centerLights = transform.Light(
+			light.NewBasic(beatsaber.EventTypeCenterLights, p), // take the base game's center lights
+			rework.ToLightTransformer(rework.DivideSingle),     // divide into single lightIDs
 		)
-		backLights = light2.TransformLight(
-			light2.NewBasicLight(beatsaber.EventTypeBackLasers, p), // repeat for back lasers
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
+		backLights = transform.Light(
+			light.NewBasic(beatsaber.EventTypeBackLasers, p), // repeat for back lasers
+			rework.ToLightTransformer(rework.DivideSingle),
 		)
 		combinedLights = light2.NewCombinedLight(centerLights, backLights) // combine them
 	)
 
 	// this is similar to the pattern we used for the previous effect, see above for commentary
-	ctx.EventsForBeats(0, 4, 3, func(ctx ilysa.RangeContext) {
+	ctx.EventsForBeats(0, 4, 3, func(ctx context.Context) {
 		ctx.NewZoom() // base game zoom event
-		ctx.Range(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx ilysa.RangeContext) {
-			ctx.WithLight(combinedLights, func(ctx ilysa.TimeLightContext) {
+		ctx.Range(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx context.Context) {
+			ctx.Light(combinedLights, func(ctx context.LightContext) {
 				// ColorSweep is an effect that comes with Ilysa that animates a gradient moving over a set of
 				// lightIDs. The "speed" of the animation is controllable using the 2nd argument (1.4 in this case).
 				fx.ColorSweep(ctx, 1.4, gradient.Rainbow,
@@ -251,7 +252,7 @@ func do() error {
 	)
 
 	// once the drop lands
-	ctx.EventForBeat(dropOffset, func(ctx ilysa.RangeContext) {
+	ctx.Sequence(timer.Beat(dropOffset, func(ctx context.Context) {
 		ctx.NewPreciseRotation( // do a precision rotation event
 			evt.WithRotation(720),
 			evt.WithRotationStep(17),
@@ -260,12 +261,12 @@ func do() error {
 			evt.WithPreciseLaserSpeed(3),
 		)
 		ctx.NewLaser( // slow down the left and right lasers
-			evt.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithIntValue(1),
+			evt.WithDirectionalLaser(evt.LeftLaser),
+			evt.WithIntValue(1),
 		)
 		ctx.NewLaser(
-			evt.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithIntValue(1),
+			evt.WithDirectionalLaser(evt.RightLaser),
+			evt.WithIntValue(1),
 		)
 	})
 
@@ -273,22 +274,22 @@ func do() error {
 	// This takes the ColorSweep effect introduced earlier, applies it to the whole big ring and adds a
 	// shimmery effect to it.
 	var (
-		bigRingsWhole = light2.TransformLight( // here we take the ring lights as a whole ...
+		bigRingsWhole = transform.Light( // here we take the ring lights as a whole ...
 			bigRings,
-			ilysa.ToLightTransformer(ilysa.DivideSingle), // .. and divide the lightIDs into individual units
+			rework.ToLightTransformer(rework.DivideSingle), // .. and divide the lightIDs into individual units
 		)
 	)
 
 	// over the length of the drop
-	ctx.Range(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx ilysa.RangeContext) {
-		ctx.WithLight(bigRingsWhole, func(ctx ilysa.TimeLightContext) {
+	ctx.Range(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx context.Context) {
+		ctx.Light(bigRingsWhole, func(ctx context.LightContext) {
 			// animate a gradient moving over the ring lasers
 			e := fx.ColorSweep(ctx, 0.6, gradient.Rainbow)
 			// add a shimmer effect by setting the alpha values of each lightID based on 1d-noise generated
 			// with a bunch of sine functions
 			fx.AlphaShimmer(ctx, e, 3)
 			// fade to black
-			fx.AlphaBlend(ctx, e, 0.6, 1, 1, 0, ease.OutSine)
+			fx.AlphaFadeEx(ctx, e, 0.6, 1, 1, 0, ease.OutSin)
 		})
 	})
 
@@ -297,9 +298,9 @@ func do() error {
 	// laser being it in a gradient with a ripple effect. The higher step value for the ripple changes the feel of
 	// the effect to be less like a ripple and more like the lasers lighting up in random order.
 	var (
-		leftRightSequenceSplit = light2.TransformLight(
+		leftRightSequenceSplit = transform.Light(
 			leftRightSequence,
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
+			rework.ToLightTransformer(rework.DivideSingle),
 		).(light2.SequenceLight)
 		dropColors = colorful.NewSet(
 			colorful.MustParseHex("#3775bd"), // shades of blue
@@ -308,19 +309,19 @@ func do() error {
 		)
 	)
 
-	ctx.EventsForBeats(dropOffset, 1, 8, func(ctx ilysa.RangeContext) {
+	ctx.EventsForBeats(dropOffset, 1, 8, func(ctx context.Context) {
 		light := leftRightSequenceSplit.Index(ctx.Ordinal())
 		seqCtx := ctx
-		ctx.Range(ctx.B(), ctx.B()+0.75, 30, ease.Linear, func(ctx ilysa.RangeContext) {
+		ctx.Range(ctx.B(), ctx.B()+0.75, 30, ease.Linear, func(ctx context.Context) {
 			grad := gradient.New(
-				dropColors.Index(seqCtx.Ordinal()),
-				dropColors.Index(seqCtx.Ordinal()+2),
+				dropColors.Idx(seqCtx.Ordinal()),
+				dropColors.Idx(seqCtx.Ordinal()+2),
 			)
-			ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
+			ctx.Light(light, func(ctx context.LightContext) {
 				e := fx.Gradient(ctx, grad)
 				fx.Ripple(ctx, e, 1.2,
-					fx.WithAlphaBlend(0, 0.3, 0, 1, ease.InSine),
-					fx.WithAlphaBlend(0.3, 1, 1, 0, ease.OutSine),
+					fx.WithAlphaBlend(0, 0.3, 0, 1, ease.InSin),
+					fx.WithAlphaBlend(0.3, 1, 1, 0, ease.OutSin),
 				)
 			})
 		})

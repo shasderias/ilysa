@@ -12,6 +12,14 @@ type withNameFilterOpt struct {
 	nameFilter string
 }
 
+func (o withNameFilterOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
+}
+
 func (o withNameFilterOpt) applyPreciseRotation(e *PreciseRotation) {
 	e.NameFilter = o.nameFilter
 }
@@ -23,6 +31,14 @@ func WithReset(r bool) withResetOpt {
 
 type withResetOpt struct {
 	reset bool
+}
+
+func (o withResetOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
 }
 
 func (o withResetOpt) applyPreciseRotation(e *PreciseRotation) {
@@ -38,20 +54,36 @@ type withRotationOpt struct {
 	rotation float64
 }
 
+func (o withRotationOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
+}
+
 func (o withRotationOpt) applyPreciseRotation(e *PreciseRotation) {
 	e.Rotation = o.rotation
 }
 
 // WithRotationStep dictates how much rotation is added between each ring
-func WithRotationStep(s float64) withRotationStep {
-	return withRotationStep{s}
+func WithRotationStep(s float64) withRotationStepOpt {
+	return withRotationStepOpt{s}
 }
 
-type withRotationStep struct {
+type withRotationStepOpt struct {
 	step float64
 }
 
-func (o withRotationStep) applyPreciseRotation(e *PreciseRotation) {
+func (o withRotationStepOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
+}
+
+func (o withRotationStepOpt) applyPreciseRotation(e *PreciseRotation) {
 	e.Step = o.step
 }
 
@@ -64,6 +96,14 @@ func WithProp(p float64) withPropOpt {
 
 type withPropOpt struct {
 	prop float64
+}
+
+func (o withPropOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
 }
 
 func (o withPropOpt) applyPreciseRotation(e *PreciseRotation) {
@@ -79,6 +119,14 @@ type withRotationSpeedOpt struct {
 	s float64
 }
 
+func (o withRotationSpeedOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
+}
+
 func (o withRotationSpeedOpt) applyPreciseRotation(e *PreciseRotation) {
 	e.Speed = o.s
 }
@@ -92,6 +140,14 @@ type withRotationDirectionOpt struct {
 	d chroma.SpinDirection
 }
 
+func (o withRotationDirectionOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
+}
+
 func (o withRotationDirectionOpt) applyPreciseRotation(e *PreciseRotation) {
 	e.Direction = o.d
 }
@@ -103,6 +159,14 @@ func WithCounterSpin(c bool) withCounterSpinOpt {
 
 type withCounterSpinOpt struct {
 	counterSpin bool
+}
+
+func (o withCounterSpinOpt) apply(e Event) {
+	pr, ok := e.(*PreciseRotation)
+	if !ok {
+		return
+	}
+	o.applyPreciseRotation(pr)
 }
 
 func (o withCounterSpinOpt) applyPreciseRotation(e *PreciseRotation) {

@@ -11,6 +11,7 @@ import (
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/fx"
 	"github.com/shasderias/ilysa/light2"
+	"github.com/shasderias/ilysa/rework"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -41,10 +42,10 @@ func do() error {
 		return err
 	}
 
-	ringLights := light2.TransformLight(
-		light2.NewBasicLight(beatsaber.EventTypeRingLights, p),
-		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
-		ilysa.ToLightTransformer(ilysa.DivideSingle),
+	ringLights := transform.Light(
+		light.NewBasic(beatsaber.EventTypeRingLights, p),
+		rework.ToSequenceLightTransformer(rework.Fan(2)),
+		rework.ToLightTransformer(rework.DivideSingle),
 	).(light2.SequenceLight)
 
 	light := light2.NewCombinedLight(
@@ -52,11 +53,11 @@ func do() error {
 		ringLights.Index(1),
 	)
 
-	ringLightsReverse := light2.TransformLight(
-		light2.NewBasicLight(beatsaber.EventTypeRingLights, p),
-		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
-		ilysa.ToLightTransformer(ilysa.DivideSingle),
-		ilysa.LightIDSetTransformerToLightTransformer(ilysa.ReverseSet),
+	ringLightsReverse := transform.Light(
+		light.NewBasic(beatsaber.EventTypeRingLights, p),
+		rework.ToSequenceLightTransformer(rework.Fan(2)),
+		rework.ToLightTransformer(rework.DivideSingle),
+		rework.LightIDSetTransformerToLightTransformer(rework.ReverseSet),
 	).(light2.SequenceLight)
 
 	lightReverse := light2.NewCombinedLight(
@@ -87,14 +88,14 @@ func do() error {
 	return p.Save()
 }
 
-func RainbowProp(p ilysa.BaseContext, light light2.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
-	p.Range(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.RangeContext) {
-		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
+func RainbowProp(p rework.BaseContext, light light2.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
+	p.Range(startBeat, startBeat+duration, frames, ease.Linear, func(ctx context.Context) {
+		ctx.Light(light, func(ctx context.LightContext) {
 			e := ctx.NewRGBLightingEvent(
-				evt.WithColor(grad.Ierp(ctx.T())),
+				evt.WithColor(grad.Lerp(ctx.T())),
 			)
 			fx.Ripple(ctx, e, step)
-			fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
+			fx.AlphaFadeEx(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
 		})
 	})
 }

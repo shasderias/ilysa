@@ -1,18 +1,18 @@
 package light2
 
 import (
-	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/rework"
 )
 
 // CompositeLight represents a single base game light and a set of LightIDs.
 type CompositeLight struct {
 	eventType beatsaber.EventType
-	set       ilysa.LightIDSet
+	set       rework.LightIDSet
 }
 
-func NewCompositeLight(typ beatsaber.EventType, set ilysa.LightIDSet) CompositeLight {
+func NewCompositeLight(typ beatsaber.EventType, set rework.LightIDSet) CompositeLight {
 	return CompositeLight{
 		eventType: typ,
 		set:       set,
@@ -36,12 +36,12 @@ func (cl CompositeLight) LightIDLen() int {
 	return cl.set.Len()
 }
 
-func (cl CompositeLight) LightIDSet() ilysa.LightIDSet {
+func (cl CompositeLight) LightIDSet() rework.LightIDSet {
 	return cl.set
 }
 
-func (cl CompositeLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
-	newSet := ilysa.LightIDSet{}
+func (cl CompositeLight) LightIDTransform(tfer rework.LightIDTransformer) Light {
+	newSet := rework.LightIDSet{}
 
 	for _, lid := range cl.set {
 		newSet.Add(tfer(lid)...)
@@ -53,7 +53,7 @@ func (cl CompositeLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
 	}
 }
 
-func (cl CompositeLight) LightIDSequenceTransform(tfer ilysa.LightIDTransformer) Light {
+func (cl CompositeLight) LightIDSequenceTransform(tfer rework.LightIDTransformer) Light {
 	max := 0
 	for _, lid := range cl.set {
 		set := tfer(lid)
@@ -65,7 +65,7 @@ func (cl CompositeLight) LightIDSequenceTransform(tfer ilysa.LightIDTransformer)
 	compositeLights := make([]CompositeLight, max)
 
 	for i := 0; i < max; i++ {
-		compositeLights[i] = NewCompositeLight(cl.eventType, ilysa.NewLightIDSet())
+		compositeLights[i] = NewCompositeLight(cl.eventType, rework.NewLightIDSet())
 	}
 
 	for _, lid := range cl.set {
@@ -83,20 +83,20 @@ func (cl CompositeLight) LightIDSequenceTransform(tfer ilysa.LightIDTransformer)
 	return seqLight
 }
 
-func (cl CompositeLight) LightIDSetTransform(tfer ilysa.LightIDSetTransformer) Light {
+func (cl CompositeLight) LightIDSetTransform(tfer rework.LightIDSetTransformer) Light {
 	return CompositeLight{
 		eventType: cl.eventType,
 		set:       tfer(cl.set),
 	}
 }
 
-func (cl CompositeLight) LightIDSetSequenceTransform(tfer ilysa.LightIDSetTransformer) Light {
+func (cl CompositeLight) LightIDSetSequenceTransform(tfer rework.LightIDSetTransformer) Light {
 	newSet := tfer(cl.set)
 
 	seqLight := NewSequenceLight()
 
 	for _, lightID := range newSet {
-		seqLight.Add(NewCompositeLight(cl.eventType, ilysa.NewLightIDSet(lightID)))
+		seqLight.Add(NewCompositeLight(cl.eventType, rework.NewLightIDSet(lightID)))
 	}
 
 	return seqLight

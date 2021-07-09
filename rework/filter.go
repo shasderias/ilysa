@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 //var FilterAllLightingEvents EventFilter = func(event Event) bool {
 //	switch event.(type) {

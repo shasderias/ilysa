@@ -181,7 +181,7 @@ func (m *Map) UnscaleTime(beat float64) Time {
 		}
 	}
 
-	panic("unreachable code")
+	panic(fmt.Sprintf("UnscaleTime(): unreachable code, beat: %f", beat))
 }
 
 func (m *Map) loadEnvironmentProfile() {

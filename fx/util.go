@@ -1,22 +1,23 @@
 package fx
 
 import (
-	"github.com/shasderias/ilysa"
-	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/context"
+	"github.com/shasderias/ilysa/evt"
 )
 
-func OffAll(ctx ilysa.RangeContext) {
+// OffAll generates events to turn all lights/lasers off.
+func OffAll(ctx context.Context) {
 	var (
-		lights = beatsaber.NewEventTypeSet(
-			beatsaber.EventTypeBackLasers,
-			beatsaber.EventTypeRingLights,
-			beatsaber.EventTypeLeftRotatingLasers,
-			beatsaber.EventTypeRightRotatingLasers,
-			beatsaber.EventTypeCenterLights,
-		)
+		lights = []evt.LightType{
+			evt.BackLasers,
+			evt.RingLights,
+			evt.LeftRotatingLasers,
+			evt.RightRotatingLasers,
+			evt.CenterLights,
+		}
 	)
 
 	for _, l := range lights {
-		ctx.NewLighting(ilysa.WithType(l), ilysa.WithValue(beatsaber.EventValueLightOff))
+		ctx.NewLighting(evt.WithLight(l), evt.WithLightValue(evt.LightOff))
 	}
 }

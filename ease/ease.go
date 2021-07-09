@@ -80,9 +80,9 @@ func InOutQuint(x float64) float64 {
 		return 1 - pow(-2*x+2, 5)/2
 	}
 }
-func InSine(x float64) float64    { return 1 - cos((x*pi)/2) }
-func OutSine(x float64) float64   { return sin((x * pi) / 2) }
-func InOutSine(x float64) float64 { return -(cos(pi*x) - 1) / 2 }
+func InSin(x float64) float64    { return 1 - cos((x*pi)/2) }
+func OutSin(x float64) float64   { return sin((x * pi) / 2) }
+func InOutSin(x float64) float64 { return -(cos(pi*x) - 1) / 2 }
 
 func InExpo(x float64) float64 {
 	if x == 0 {
@@ -157,10 +157,10 @@ func InOutElastic(x float64) float64 {
 		return 0
 	case x == 1:
 		return 1
-	case x < -0.5:
+	case x < 0.5:
 		return -(pow(2, 20*x-10) * sin((20*x-11.125)*c5)) / 2
 	default:
-		return (pow(2, -20*x+10)*sin((20*x-11.125)*c5))/2 + 1
+		return pow(2, -20*x+10)*sin((20*x-11.125)*c5)/2 + 1
 	}
 }
 

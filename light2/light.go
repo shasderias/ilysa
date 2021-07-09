@@ -1,8 +1,8 @@
 package light2
 
 import (
-	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/rework"
 	"github.com/shasderias/ilysa/timer"
 )
 
@@ -14,10 +14,10 @@ type Light interface {
 
 type LightContext interface {
 	timer.Range
-	ilysa.Lighter
-	ilysa.LightTimer
+	rework.Lighter
+	rework.LightTimer
 }
 
 type LightIDMaxer interface {
-	LightIDMax(beatsaber.EventType) int
+	MaxLightID(beatsaber.EventType) int
 }

@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 type LightIDSet []LightID
 

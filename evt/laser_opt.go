@@ -23,6 +23,14 @@ type withLockPositionOpt struct {
 	b bool
 }
 
+func (o withLockPositionOpt) apply(e Event) {
+	plse, ok := e.(*PreciseLaser)
+	if !ok {
+		return
+	}
+	plse.LockPosition = o.b
+}
+
 func (o withLockPositionOpt) applyPreciseLaser(e *PreciseLaser) {
 	e.LockPosition = o.b
 }
@@ -33,6 +41,15 @@ func WithLaserSpeed(v int) withLaserSpeedOpt {
 
 type withLaserSpeedOpt struct {
 	v int
+}
+
+func (o withLaserSpeedOpt) apply(e Event) {
+	switch lse := e.(type) {
+	case *Laser:
+		lse.SetValue(beatsaber.EventValue(o.v))
+	case *PreciseLaser:
+		lse.SetValue(beatsaber.EventValue(o.v))
+	}
 }
 
 func (o withLaserSpeedOpt) applyLaser(e *Laser) {
@@ -53,6 +70,14 @@ func WithPreciseLaserSpeed(s float64) withPreciseLaserSpeedOpt {
 
 type withPreciseLaserSpeedOpt struct {
 	s float64
+}
+
+func (o withPreciseLaserSpeedOpt) apply(e Event) {
+	lse, ok := e.(*PreciseLaser)
+	if !ok {
+		return
+	}
+	lse.Speed = o.s
 }
 
 func (o withPreciseLaserSpeedOpt) applyPreciseLaser(e *PreciseLaser) {

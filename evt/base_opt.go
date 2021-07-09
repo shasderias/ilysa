@@ -120,6 +120,24 @@ func (o withValueOpt) applyBase(e *Base) {
 	e.SetValue(o.t)
 }
 
+type withIntValueOpt struct{ v int }
+
+func WithIntValue(v int) withIntValueOpt {
+	return withIntValueOpt{v}
+}
+
+func (o withIntValueOpt) applyBase(e *Base) {
+	e.SetValue(beatsaber.EventValue(o.v))
+}
+
+func (o withIntValueOpt) applyLaser(e *Laser) {
+	e.SetValue(beatsaber.EventValue(o.v))
+}
+
+func (o withIntValueOpt) applyPreciseLaser(e *PreciseLaser) {
+	e.SetValue(beatsaber.EventValue(o.v))
+}
+
 type withInvalidBaseOpt struct{}
 
 func WithInvalidDefaults() BaseOpt {

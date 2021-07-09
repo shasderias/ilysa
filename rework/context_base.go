@@ -1,8 +1,9 @@
-package ilysa
+package rework
 
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
@@ -10,7 +11,7 @@ import (
 )
 
 type baseContext struct {
-	*Project
+	*ilysa.Project
 
 	beatOffset float64
 	fixedRand  float64
@@ -18,7 +19,7 @@ type baseContext struct {
 	defaultOpts []evt.Opt
 }
 
-func newBaseContext(p *Project) baseContext {
+func newBaseContext(p *ilysa.Project) baseContext {
 	return baseContext{
 		Project:     p,
 		beatOffset:  0,
@@ -31,8 +32,8 @@ func (c baseContext) FixedRand() float64 {
 	return c.fixedRand
 }
 
-func (c baseContext) LightIDMax(typ beatsaber.EventType) int {
-	return c.Project.ActiveDifficultyProfile().LightIDMax(typ)
+func (c baseContext) MaxLightID(typ beatsaber.EventType) int {
+	return c.Project.ActiveDifficultyProfile().MaxLightID(typ)
 }
 
 func (c baseContext) withBeatOffset(o float64) baseContext {
@@ -74,7 +75,7 @@ func (c baseContext) addEvent(e evt.Event) {
 //	tScaler := scale.ToUnitIntervalClamped(0, float64(steps-1))
 //
 //	for i := 0; i < steps; i++ {
-//		beat := Ierp(startBeat, endBeat, tScaler(float64(i)), easeFunc)
+//		beat := Lerp(startBeat, endBeat, tScaler(float64(i)), easeFunc)
 //		callback(c.withTimer(beat, startBeat, endBeat, i).withBeatOffset(0))
 //	}
 //}

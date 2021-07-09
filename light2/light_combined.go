@@ -22,7 +22,7 @@ func (cl CombinedLight) CreateRGBLightingEvent(ctx LightContext) *CompoundRGBLig
 
 	for _, l := range cl.lights {
 		if l.LightIDLen() < cl.LightIDLen() {
-			lightIDScale := scale.Clamped(1, float64(l.LightIDLen()), 1, float64(cl.LightIDLen()))
+			lightIDScale := scale.Clamp(1, float64(l.LightIDLen()), 1, float64(cl.LightIDLen()))
 			for i := 1; i <= l.LightIDLen(); i++ {
 				if int(math.Round(lightIDScale(float64(i)))) == ctx.LightIDCur() {
 					goto createRGB

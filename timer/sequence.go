@@ -62,36 +62,30 @@ func SequencerFromSlice(seq []float64) Sequencer {
 	}
 }
 
-func (s Sequencer) Offset(o float64) Sequencer {
-	newSeq := make([]float64, s.Len())
+//func (s Sequencer) offset(o float64) Sequencer {
+//	newSeq := make([]float64, s.Len())
+//
+//	copy(newSeq, s.s)
+//
+//	for i := 0; i < len(newSeq); i++ {
+//		newSeq[i] += o
+//	}
+//
+//	return Sequencer{
+//		s: newSeq,
+//		g: s.g + o,
+//	}
+//}
 
-	copy(newSeq, s.s)
+func (s Sequencer) Idx(i int) float64 { return s.s[calc.WraparoundIdx(s.Len(), i)] }
+func (s Sequencer) Len() int          { return len(s.s) }
 
-	for i := 0; i < len(newSeq); i++ {
-		newSeq[i] += o
-	}
-
-	return Sequencer{
-		s: newSeq,
-		g: s.g + o,
-	}
-}
-
-func (s Sequencer) Idx(i int) float64 {
-	return s.s[calc.WraparoundIdx(s.Len(), i)]
-}
-
-func (s Sequencer) Len() int {
-	return len(s.s)
-}
-
-func (s Sequencer) Iterate(offset float64) Sequence {
-	return &SequenceIterator{s, offset, -1}
+func (s Sequencer) Iterate() Sequence {
+	return &SequenceIterator{s, -1}
 }
 
 type SequenceIterator struct {
 	Sequencer
-	offset  float64
 	ordinal int
 }
 
@@ -103,85 +97,28 @@ func (i *SequenceIterator) Next() bool {
 	return true
 }
 
-func (i *SequenceIterator) SeqT() float64 {
-	return float64(i.ordinal) / float64(i.Len()-1)
-}
-
-func (i *SequenceIterator) SeqOrdinal() int {
-	return i.ordinal
-}
-
-func (i *SequenceIterator) SeqLen() int {
-	return i.Len()
-}
-
-func (i *SequenceIterator) SeqNextB() float64 {
-	return i.offset + i.Idx(i.ordinal+1)
-}
-
+func (i *SequenceIterator) SeqT() float64     { return float64(i.ordinal) / float64(i.Len()-1) }
+func (i *SequenceIterator) SeqOrdinal() int   { return i.ordinal }
+func (i *SequenceIterator) SeqLen() int       { return i.Len() }
+func (i *SequenceIterator) SeqNextB() float64 { return i.Idx(i.ordinal + 1) }
 func (i *SequenceIterator) SeqNextBOffset() float64 {
 	if i.SeqLast() {
 		return i.g - i.Idx(i.ordinal)
 	}
 	return i.Idx(i.ordinal+1) - i.Idx(i.ordinal)
 }
+func (i *SequenceIterator) SeqPrevB() float64       { return i.Idx(i.ordinal - 1) }
+func (i *SequenceIterator) SeqPrevBOffset() float64 { return i.Idx(i.ordinal) - i.Idx(i.ordinal-1) }
+func (i *SequenceIterator) SeqFirst() bool          { return i.ordinal == 0 }
+func (i *SequenceIterator) SeqLast() bool           { return i.ordinal == i.Len()-1 }
 
-func (i *SequenceIterator) SeqPrevB() float64 {
-	return i.offset + i.Idx(i.ordinal-1)
-}
-
-func (i *SequenceIterator) SeqPrevBOffset() float64 {
-	return i.Idx(i.ordinal) - i.Idx(i.ordinal-1)
-}
-
-func (i *SequenceIterator) SeqFirst() bool {
-	return i.ordinal == 0
-}
-
-func (i *SequenceIterator) SeqLast() bool {
-	return i.ordinal == i.Len()-1
-}
-
-func (i *SequenceIterator) B() float64 {
-	return i.offset + i.Idx(i.ordinal)
-}
-
-func (i *SequenceIterator) NoOffsetB() float64 {
-	return i.Idx(i.ordinal)
-}
-
-func (i *SequenceIterator) T() float64 {
-	return i.SeqT()
-}
-
-func (i *SequenceIterator) Ordinal() int {
-	return i.ordinal
-}
-
-func (i *SequenceIterator) StartB() float64 {
-	return i.offset + i.Idx(0)
-}
-
-func (i *SequenceIterator) EndB() float64 {
-	return i.offset + i.Idx(i.Len()-1)
-}
-
-func (i *SequenceIterator) Duration() float64 {
-	return i.EndB() - i.StartB()
-}
-
-func (i *SequenceIterator) First() bool {
-	return i.SeqFirst()
-}
-
-func (i *SequenceIterator) Last() bool {
-	return i.SeqLast()
-}
-
-func (i *SequenceIterator) ToRange() Range {
-	return i
-}
-
-func (i *SequenceIterator) ToSequence() Sequence {
-	return i
-}
+func (i *SequenceIterator) B() float64           { return i.Idx(i.ordinal) }
+func (i *SequenceIterator) T() float64           { return i.SeqT() }
+func (i *SequenceIterator) Ordinal() int         { return i.ordinal }
+func (i *SequenceIterator) StartB() float64      { return i.Idx(0) }
+func (i *SequenceIterator) EndB() float64        { return i.Idx(i.Len() - 1) }
+func (i *SequenceIterator) Duration() float64    { return i.EndB() - i.StartB() }
+func (i *SequenceIterator) First() bool          { return i.SeqFirst() }
+func (i *SequenceIterator) Last() bool           { return i.SeqLast() }
+func (i *SequenceIterator) ToRange() Range       { return i }
+func (i *SequenceIterator) ToSequence() Sequence { return i }

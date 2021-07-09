@@ -33,9 +33,9 @@ type Point struct {
 	Pos float64
 }
 
-// Ierp returns interpolated color at t. The interpolation is done in the Oklab
+// Lerp returns interpolated color at t. The interpolation is done in the Oklab
 // colorspace
-func (gt Table) Ierp(t float64) colorful.Color {
+func (gt Table) Lerp(t float64) colorful.Color {
 	for i := 0; i < len(gt)-1; i++ {
 		c1 := gt[i]
 		c2 := gt[i+1]

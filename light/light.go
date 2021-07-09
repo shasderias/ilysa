@@ -1,5 +1,7 @@
 package light
 
-type Light interface {}
+import "github.com/shasderias/ilysa/evt"
 
-type LightTransformer interface{}
+type MaxLightIDer interface {
+	MaxLightID(t evt.LightType) int
+}

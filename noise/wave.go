@@ -17,7 +17,7 @@ func Wave(offset float64) func(x float64) float64 {
 	)
 
 	return func(x float64) float64 {
-		r := scale.Clamped(-2, 2, -0.1, 1)((sin(2*x) + sin(pi*x)) + offset)
+		r := scale.Clamp(-2, 2, -0.1, 1)((sin(2*x) + sin(pi*x)) + offset)
 		if r < 0 {
 			r = 0
 		}

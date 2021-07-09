@@ -3,9 +3,9 @@ package light2
 import (
 	"math/rand"
 
-	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/calc"
+	"github.com/shasderias/ilysa/rework"
 )
 
 type SequenceLight struct {
@@ -66,10 +66,10 @@ func (sl SequenceLight) Shuffle() SequenceLight {
 	}
 }
 
-func (sl SequenceLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
+func (sl SequenceLight) LightIDTransform(tfer rework.LightIDTransformer) Light {
 	tfedLights := []Light{}
 	for _, l := range sl.lights {
-		tfl, ok := l.(ilysa.LightIDTransformable)
+		tfl, ok := l.(rework.LightIDTransformable)
 		if !ok {
 			tfedLights = append(tfedLights, l)
 			continue
@@ -79,10 +79,10 @@ func (sl SequenceLight) LightIDTransform(tfer ilysa.LightIDTransformer) Light {
 	return NewSequenceLight(tfedLights...)
 }
 
-func (sl SequenceLight) LightIDSetTransform(tfer ilysa.LightIDSetTransformer) Light {
+func (sl SequenceLight) LightIDSetTransform(tfer rework.LightIDSetTransformer) Light {
 	tfedLights := []Light{}
 	for _, l := range sl.lights {
-		tfl, ok := l.(ilysa.LightIDSetTransformable)
+		tfl, ok := l.(rework.LightIDSetTransformable)
 		if !ok {
 			tfedLights = append(tfedLights, l)
 			continue

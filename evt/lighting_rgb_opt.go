@@ -3,14 +3,14 @@ package evt
 import (
 	"image/color"
 
-	"github.com/shasderias/ilysa/light"
+	"github.com/shasderias/ilysa/lightid"
 )
 
 type withLightIDOpt struct {
-	l light.ID
+	l lightid.ID
 }
 
-func WithLightID(id light.ID) withLightIDOpt {
+func WithLightID(id lightid.ID) withLightIDOpt {
 	return withLightIDOpt{id}
 }
 
@@ -24,6 +24,13 @@ type withAlphaOpt struct {
 
 func WithAlpha(a float64) withAlphaOpt {
 	return withAlphaOpt{a}
+}
+
+func (o withAlphaOpt) apply(e Event) {
+	switch te := e.(type) {
+	case *RGBLighting:
+		te.SetAlpha(o.a)
+	}
 }
 
 func (o withAlphaOpt) applyRGBLighting(e *RGBLighting) {

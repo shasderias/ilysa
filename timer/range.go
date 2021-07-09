@@ -15,8 +15,6 @@ type Range interface {
 	First() bool       // true if this is the first iteration
 	Last() bool        // true if this is the last iteration
 
-	NoOffsetB() float64
-
 	Next() bool
 	ToRange() Range
 	ToSequence() Sequence
@@ -36,18 +34,17 @@ func NewRanger(startBeat, endBeat float64, steps int, fn ease.Func) Ranger {
 		endBeat:   endBeat,
 		steps:     steps,
 		easeFn:    fn,
-		tToBeat:   scale.FromUnitIntervalClamped(startBeat, endBeat),
+		tToBeat:   scale.FromUnitClamp(startBeat, endBeat),
 	}
 }
 
-func (r Ranger) Iterate(offset float64) Range {
+func (r Ranger) Iterate() Range {
 	return &RangeIterator{
 		Ranger:  r,
 		ordinal: -1,
-		offset:  offset,
 		beatScaler: func(m float64) float64 {
 			m = r.easeFn(m)
-			return scale.FromUnitIntervalClamped(r.startBeat, r.endBeat)(m)
+			return scale.FromUnitClamp(r.startBeat, r.endBeat)(m)
 		},
 	}
 }
@@ -63,7 +60,6 @@ func (r Ranger) Len() int {
 
 type RangeIterator struct {
 	Ranger
-	offset     float64
 	ordinal    int
 	beatScaler scale.Fn
 }
@@ -76,59 +72,20 @@ func (i *RangeIterator) Next() bool {
 	return true
 }
 
-func (i *RangeIterator) B() float64 {
-	return i.offset + i.beatScaler(i.T())
-}
-
-func (i *RangeIterator) NoOffsetB() float64 {
-	return i.beatScaler(i.T())
-}
-
-func (i *RangeIterator) T() float64 {
-	return float64(i.ordinal) / float64(i.steps-1)
-}
-
-func (i *RangeIterator) Ordinal() int {
-	return i.ordinal
-}
-
-func (i *RangeIterator) StartB() float64 {
-	return i.offset + i.startBeat
-}
-
-func (i *RangeIterator) EndB() float64 {
-	return i.offset + i.endBeat
-}
-
-func (i *RangeIterator) Duration() float64 {
-	return i.endBeat - i.startBeat
-}
-
-func (i *RangeIterator) First() bool {
-	return i.B() == i.StartB()
-}
-
-func (i *RangeIterator) Last() bool {
-	return i.B() == i.EndB()
-}
+func (i *RangeIterator) B() float64        { return i.beatScaler(i.T()) }
+func (i *RangeIterator) T() float64        { return float64(i.ordinal) / float64(i.steps-1) }
+func (i *RangeIterator) Ordinal() int      { return i.ordinal }
+func (i *RangeIterator) StartB() float64   { return i.startBeat }
+func (i *RangeIterator) EndB() float64     { return i.endBeat }
+func (i *RangeIterator) Duration() float64 { return i.endBeat - i.startBeat }
+func (i *RangeIterator) First() bool       { return i.B() == i.StartB() }
+func (i *RangeIterator) Last() bool        { return i.B() == i.EndB() }
 
 // Sequence Methods
-func (i *RangeIterator) SeqT() float64 {
-	return float64(i.ordinal) / float64(i.Len()-1)
-}
-
-func (i *RangeIterator) SeqOrdinal() int {
-	return i.ordinal
-}
-
-func (i *RangeIterator) SeqLen() int {
-	return i.Len()
-}
-
-func (i *RangeIterator) SeqNextB() float64 {
-	return i.offset + i.Idx(i.ordinal+1)
-}
-
+func (i *RangeIterator) SeqT() float64     { return float64(i.ordinal) / float64(i.Len()-1) }
+func (i *RangeIterator) SeqOrdinal() int   { return i.ordinal }
+func (i *RangeIterator) SeqLen() int       { return i.Len() }
+func (i *RangeIterator) SeqNextB() float64 { return i.Idx(i.ordinal + 1) }
 func (i *RangeIterator) SeqNextBOffset() float64 {
 	if i.SeqLast() {
 		// approximation
@@ -136,27 +93,9 @@ func (i *RangeIterator) SeqNextBOffset() float64 {
 	}
 	return i.Idx(i.ordinal+1) - i.Idx(i.ordinal)
 }
-
-func (i *RangeIterator) SeqPrevB() float64 {
-	return i.offset + i.Idx(i.ordinal-1)
-}
-
-func (i *RangeIterator) SeqPrevBOffset() float64 {
-	return i.Idx(i.ordinal) - i.Idx(i.ordinal-1)
-}
-
-func (i *RangeIterator) SeqFirst() bool {
-	return i.ordinal == 0
-}
-
-func (i *RangeIterator) SeqLast() bool {
-	return i.ordinal == i.Len()-1
-}
-
-func (i *RangeIterator) ToRange() Range {
-	return i
-}
-
-func (i *RangeIterator) ToSequence() Sequence {
-	return i
-}
+func (i *RangeIterator) SeqPrevB() float64       { return i.Idx(i.ordinal - 1) }
+func (i *RangeIterator) SeqPrevBOffset() float64 { return i.Idx(i.ordinal) - i.Idx(i.ordinal-1) }
+func (i *RangeIterator) SeqFirst() bool          { return i.ordinal == 0 }
+func (i *RangeIterator) SeqLast() bool           { return i.ordinal == i.Len()-1 }
+func (i *RangeIterator) ToRange() Range          { return i }
+func (i *RangeIterator) ToSequence() Sequence    { return i }

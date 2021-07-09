@@ -5,7 +5,9 @@ import (
 
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/light"
 	"github.com/shasderias/ilysa/timer"
 )
 
@@ -40,11 +42,13 @@ func do() error {
 	// -- your code goes here --
 	s := timer.SequencerFromSlice([]float64{4, 8, 12, 16})
 
-	ctx := p.WithBeatOffset(2)
-	ctx.Sequence(s, func(ctx ilysa.SequenceContext) {
-		ctx.NewLighting(evt.WithLight(evt.CenterLights), evt.WithLightValue(evt.LightRedOn))
+	ctx := p.Offset(2)
+	l := light.NewBasic(ctx, evt.BackLasers)
+	ctx.Sequence(s, func(ctx context.Context) {
+		ctx.Light(l, func(ctx context.LightContext) {
+			ctx.NewRGBLighting()
+		})
 	})
-	ctx.Range()
 
 	// save events back to Expert+ difficulty
 	return p.Dump()

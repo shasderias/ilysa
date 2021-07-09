@@ -40,7 +40,7 @@ p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
     ctx.NewRGBLightingEvent(  // make it Chroma
         ilysa.WithType(beatsaber.EventTypeBackLasers),
         ilysa.WithValue(beatsaber.EventValueLightRedFade),
-        ilysa.WithColor(gradient.Rainbow.Ierp(ctx.FixedRand())), // add Rainbow power
+        evt.WithColor(gradient.Rainbow.Ierp(ctx.FixedRand())), // add Rainbow power
     )
 })
 ```
@@ -71,10 +71,10 @@ backLasersSplit := ilysa.TransformLight(backLasers,
 )
 
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
-    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
     })
 })
@@ -99,10 +99,10 @@ them!
 ```go
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
-    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         e := ctx.NewRGBLightingEvent( // save the event we created to the variable e
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
         // shift each event forward by 0.05 beats * ordinal number of the lightID
         // i.e. 1st lightID is shifted forward by 0 beats
@@ -130,10 +130,10 @@ Lazy lighter: Maybe add an off event so it twinkles real nice?
 ```go
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
-    ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         e := ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
         e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
 
@@ -164,10 +164,10 @@ Lazy lighter: Wait, what happened to my fade effect? Fade effects don't work wit
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
-                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+                evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
             )
             e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
             e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
@@ -195,10 +195,10 @@ Lazy lighter: WTF happened to my colors!
 p.EventsForBeats(0, 1, 4, func(ctx ilysa.TimeContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
-                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+                evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
             )
             e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
             e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
@@ -225,7 +225,7 @@ Lazy lighter: That's... not quite what I'm looking for.
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             // the fx package contains a suite of building blocks you can use to build more complicated effects
             // the Gradient function generates events and colors them based on the gradient passed to it
             e := fx.Gradient(ctx, gradient.Rainbow)
@@ -255,7 +255,7 @@ Lazy lighter: Hm... Can we spice it up?
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             // ColorSweep is a more advanced Gradient that shifts the gradient's position with time
             // the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
@@ -287,7 +287,7 @@ Lazy Lighter: Perfect. Now ease out the alpha fade please!
 // light creation code omitted for brevity
 p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
     ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
-        ctx.WithLight(backLasersSplit, func(ctx ilysa.TimeLightContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
 
             fx.Ripple(ctx, e, 0.2)
@@ -541,9 +541,9 @@ ctx.NewZoomEvent()
 ctx.NewRotationSpeedEvent()
 // accepts:
 // - ilysa.WithDirectionalLaser() for selecting which laser to control
-// e.g. ilysa.WithDirectionalLaser(ilysa.LeftLaser)
-// - ilysa.WithIntValue() for setting the rotation speed of the laser selected
-// e.g. ilysa.WithIntValue(3)
+// e.g. ilysa.WithDirectionalLaser(evt.LeftLaser)
+// - evt.WithIntValue() for setting the rotation speed of the laser selected
+// e.g. evt.WithIntValue(3)
 ```
 
 See [examples/some-basic-examples](examples/some-basic-examples/main.go)  for a few more basic examples.
@@ -560,7 +560,7 @@ p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimeContext) {
     // ... each time, generate a rotation speed event ...
     ctx.NewRotationSpeedEvent(
         // ... that controls the left laser's rotation speed
-        ilysa.WithDirectionalLaser(ilysa.LeftLaser),
+        ilysa.WithDirectionalLaser(evt.LeftLaser),
         // ctx.Ordinal() returns the iteration number, starting at 0
         // i.e. for beat 3.00, ctx.Ordinal is 0, for beat 3.25, ctx.Ordinal is 1
         // the following line will therefore increase the left laser's rotation speed from 0 to 15 over 3.75 beats
@@ -776,8 +776,8 @@ e.g. beat 2, left laser, zooooooooom
 ```go
 p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewRotationSpeedEvent(
-    ilysa.WithDirectionalLaser(ilysa.LeftLaser), 
-    ilysa.WithIntValue(50),
+    ilysa.WithDirectionalLaser(evt.LeftLaser), 
+    evt.WithIntValue(50),
   )
 }
 ```
@@ -801,7 +801,7 @@ e.g. fully loaded
 ctx.NewRGBLightingEvent(
     ilysa.WithType(beatsaber.EventTypeBackLasers),
     ilysa.WithValue(beatsaber.EventValueLightRedOn),
-    ilysa.WithColor(colorful.MustParseHex("#123123")),
+    evt.WithColor(colorful.MustParseHex("#123123")),
     ilysa.WithAlpha(0.3),
     ilysa.WithLightID(ilysa.NewLightID(1, 2, 3)),
 )
@@ -823,7 +823,7 @@ e.g. fully loaded
 ```go
 ctx.NewPreciseRotationSpeedEvent(
     ilysa.WithLockPosition(true),
-    ilysa.WithIntValue(1),
+    evt.WithIntValue(1),
     ilysa.WithSpeed(0),
     ilysa.WithDirection(chroma.Clockwise),
 )
@@ -888,9 +888,9 @@ Wat dis? Light that runs down a sequence of lightIDs, changing color as it moves
 ```go
 func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
 	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimeContext) {
-		ctx.WithLight(light, func(ctx ilysa.TimeLightContext) {
+		ctx.Light(light, func(ctx ilysa.TimeLightContext) {
 			e := ctx.NewRGBLightingEvent(
-				ilysa.WithColor(grad.Ierp(ctx.T())),
+				evt.WithColor(grad.Ierp(ctx.T())),
 			)
 			fx.Ripple(ctx, e, step)
 			fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)

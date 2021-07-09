@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 import (
 	"github.com/shasderias/ilysa/ease"
@@ -26,9 +26,9 @@ type BaseContext interface {
 	Sequence(sequence timer.Sequencer, callback func(ctx SequenceContext))
 	Range(startBeat, endBeat float64, steps int, fn ease.Func, callback func(ctx RangeContext))
 	//ModEventsInRange(startBeat, endBeat float64, filter EventFilter, eventModder func(ctx RangeContext, event Event))
-	//NewBasicLight(eventType beatsaber.EventType) BasicLight
-	//LightIDMax(beatsaber.EventType) int
-	//WithBeatOffset(o float64) BaseContext
+	//NewBasicLight(eventType beatsaber.EventType) Basic
+	//MaxLightID(beatsaber.EventType) int
+	//Offset(o float64) Context
 }
 
 type RangeContext interface {

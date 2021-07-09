@@ -6,7 +6,7 @@ import (
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/chroma"
 	"github.com/shasderias/ilysa/colorful"
-	"github.com/shasderias/ilysa/light"
+	"github.com/shasderias/ilysa/lightid"
 )
 
 type RGBLighting struct {
@@ -51,10 +51,10 @@ func (e *RGBLighting) SetAlpha(a float64) {
 }
 
 func (e *RGBLighting) SetSingleLightID(id int) {
-	e.SetLightID(light.NewID(id))
+	e.SetLightID(lightid.New(id))
 }
 
-func (e *RGBLighting) SetLightID(id light.ID) {
+func (e *RGBLighting) SetLightID(id lightid.ID) {
 	e.RGB.LightID = chroma.LightID(id)
 }
 

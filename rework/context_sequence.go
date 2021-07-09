@@ -1,4 +1,4 @@
-package ilysa
+package rework
 
 import (
 	"github.com/shasderias/ilysa/ease"
