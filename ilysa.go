@@ -12,12 +12,19 @@ import (
 )
 
 type Project struct {
-	*beatsaber.Map
+	Map
 
 	events []evt.Event
 }
 
-func New(bsMap *beatsaber.Map) *Project {
+type Map interface {
+	ActiveDifficultyProfile() *beatsaber.EnvProfile
+	SaveEvents([]beatsaber.Event) error
+	SetActiveDifficulty(c beatsaber.Characteristic, difficulty beatsaber.BeatmapDifficulty) error
+	UnscaleTime(beat float64) beatsaber.Time
+}
+
+func New(bsMap Map) *Project {
 	return &Project{
 		Map:    bsMap,
 		events: []evt.Event{},
@@ -25,7 +32,7 @@ func New(bsMap *beatsaber.Map) *Project {
 }
 
 func (p *Project) Offset(offset float64) context.Context {
-	return context.Base(p).Offset(offset)
+	return context.Base(p).BOffset(offset)
 }
 
 func (p *Project) Range(r timer.Ranger, callback func(context.Context)) {

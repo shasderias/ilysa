@@ -6,7 +6,7 @@ import (
 )
 
 // OffAll generates events to turn all lights/lasers off.
-func OffAll(ctx context.Context) {
+func OffAll(ctx context.Context) evt.Events {
 	var (
 		lights = []evt.LightType{
 			evt.BackLasers,
@@ -17,7 +17,11 @@ func OffAll(ctx context.Context) {
 		}
 	)
 
+	events := evt.Events{}
+
 	for _, l := range lights {
-		ctx.NewLighting(evt.WithLight(l), evt.WithLightValue(evt.LightOff))
+		events = append(events, ctx.NewLighting(evt.WithLight(l), evt.WithLightValue(evt.LightOff)))
 	}
+
+	return events
 }

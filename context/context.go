@@ -13,7 +13,7 @@ type Context interface {
 	Eventer
 	MaxLightID(t evt.LightType) int
 
-	Offset(float64) Context
+	BOffset(float64) Context
 	Sequence(s timer.Sequencer, callback func(ctx Context))
 	Range(r timer.Ranger, callback func(ctx Context))
 	Light(l Light, callback func(ctx LightContext))

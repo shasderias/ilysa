@@ -45,7 +45,7 @@ func newLightCtx(ctx Context, lightTimer timer.Light, l Light, opts []evt.RGBLig
 
 	lightCtx.defaultOptsPre = []evt.Opt{evt.WithBeat(ctx.B())}
 	lightCtx.userOpts = opts
-	lightCtx.defaultOptsPost = []evt.Opt{evt.WithBeatOffset(ctx.offset() - ctx.B())}
+	lightCtx.defaultOptsPost = []evt.Opt{evt.WithBOffset(ctx.offset() - ctx.B())}
 	return lightCtx
 }
 

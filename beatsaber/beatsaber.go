@@ -156,12 +156,12 @@ func (m *Map) calculateBPMRegions() {
 
 	for i, change := range bpmChanges {
 		t := float64(change.Time)
-		lastRegion := bpmRegions[i]
+		prevRegion := bpmRegions[i]
 
 		bpmRegions = append(bpmRegions, bpmRegion{
 			float64(change.Time),
 			change.BPM,
-			math.Ceil((t-lastRegion.start)*startBPM)/change.BPM + lastRegion.startBeat,
+			math.Ceil((t-prevRegion.start)*startBPM/change.BPM) + prevRegion.startBeat,
 		})
 	}
 

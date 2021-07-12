@@ -93,6 +93,14 @@ type withDirectionOpt struct {
 	direction chroma.SpinDirection
 }
 
+func (o withDirectionOpt) apply(e Event) {
+	ple, ok := e.(*PreciseLaser)
+	if !ok {
+		return
+	}
+	ple.Direction = o.direction
+}
+
 func (o withDirectionOpt) applyPreciseLaser(e *PreciseLaser) {
 	e.Direction = o.direction
 }

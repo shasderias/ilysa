@@ -44,6 +44,10 @@ func (s Sequence) Len() int {
 	return len(s.lights)
 }
 
+func (s Sequence) Lights() []context.Light {
+	return s.lights
+}
+
 func (s Sequence) Shuffle() Sequence {
 	rand.Shuffle(len(s.lights), func(i, j int) {
 		s.lights[i], s.lights[j] = s.lights[j], s.lights[i]

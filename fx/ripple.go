@@ -8,7 +8,7 @@ import (
 
 // Ripple offsets each successive lightID by step beats
 func Ripple(ctx context.LightContext, events evt.RGBLightingEvents, step float64) {
-	events.Apply(evt.WithBeatOffset(float64(ctx.LightIDOrdinal()) * step))
+	events.Apply(evt.WithBOffset(float64(ctx.LightIDOrdinal()) * step))
 }
 
 // RippleT offsets each successive lightID by a number of beats such that the last
@@ -18,8 +18,7 @@ func RippleT(ctx context.LightContext, events evt.RGBLightingEvents, delay float
 	for _, o := range opts {
 		t = o.easeT(t)
 	}
-
-	events.Apply(evt.WithBeatOffset(t * delay))
+	events.Apply(evt.WithBOffset(t * delay))
 }
 
 type rippleTOpt interface {

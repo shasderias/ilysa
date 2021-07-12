@@ -20,7 +20,8 @@ func AlphaFadeEx(ctx context.LightContext, events evt.RGBLightingEvents, startT,
 
 	tScale := scale.ToUnitClamp(startT, endT)
 	alphaScale := scale.FromUnitClamp(startAlpha, endAlpha)
-	events.Apply(evt.WithAlpha(alphaScale(tScale(easeFn(ctx.T())))))
+	newAlpha := alphaScale(tScale(easeFn(ctx.T())))
+	events.Apply(evt.WithAlpha(newAlpha))
 }
 
 func NewAlphaFader(startT, endT, startAlpha, endAlpha float64, fn ease.Func) func(context.LightContext, evt.RGBLightingEvents) {

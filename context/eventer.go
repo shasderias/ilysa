@@ -14,7 +14,7 @@ func newEventer(ctx Context) eventer {
 	ec := eventer{ctx: ctx}
 
 	ec.defaultOptsPre = []evt.Opt{evt.WithBeat(ctx.B())}
-	ec.defaultOptsPost = []evt.Opt{evt.WithBeatOffset(ctx.offset() - ctx.B())}
+	ec.defaultOptsPost = []evt.Opt{evt.WithBOffset(ctx.offset() - ctx.B())}
 
 	return ec
 }

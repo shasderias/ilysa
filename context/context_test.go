@@ -12,7 +12,7 @@ import (
 func TestSeqCtx(t *testing.T) {
 	t.Run("Sequence", func(t *testing.T) {
 		proj := context.NewMockProject(t, 3)
-		proj.Sequence(timer.SequencerFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
+		proj.Sequence(timer.SeqFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -25,7 +25,7 @@ func TestSeqCtx(t *testing.T) {
 	})
 	t.Run("Range", func(t *testing.T) {
 		proj := context.NewMockProject(t, 3)
-		proj.Range(timer.NewRanger(1, 2, 5, ease.Linear), func(ctx context.Context) {
+		proj.Range(timer.Rng(1, 2, 5, ease.Linear), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -39,12 +39,12 @@ func TestSeqCtx(t *testing.T) {
 
 		proj.Cmp(want)
 	})
-	t.Run("Offset/Sequence/Range/Light", func(t *testing.T) {
+	t.Run("BOffset/Sequence/Range/Light", func(t *testing.T) {
 		proj := context.NewMockProject(t, 3)
 		light := proj.MockLight()
 		ctx := context.WithOffset(context.Base(proj), 2)
-		ctx.Sequence(timer.SequencerFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
-			ctx.Range(timer.NewRanger(0, 1, 3, ease.Linear), func(ctx context.Context) {
+		ctx.Sequence(timer.SeqFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
+			ctx.Range(timer.Rng(0, 1, 3, ease.Linear), func(ctx context.Context) {
 				ctx.Light(light, func(ctx context.LightContext) {
 					ctx.NewRGBLighting()
 				})

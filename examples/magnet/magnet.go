@@ -5,155 +5,15 @@ import (
 
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/beatsaber"
-	"github.com/shasderias/ilysa/colorful"
-	"github.com/shasderias/ilysa/colorful/gradient"
 )
 
-const mapPath = `D:\Beat Saber Data\CustomWIPLevels\MagnetLights`
+const mapPath = `D:\Beat Saber Data\CustomWIPLevels\Magnet`
 
 func main() {
 	if err := do(); err != nil {
 		fmt.Println(err)
 	}
 }
-
-var (
-	magnetRainbowPale = gradient.New(
-		colorful.MustParseHex("#F48DB4"),
-		colorful.MustParseHex("#BCA2D8"),
-		colorful.MustParseHex("#70B5D8"),
-		colorful.MustParseHex("#44BFB4"),
-		colorful.MustParseHex("#6DBE81"),
-		colorful.MustParseHex("#A5B559"),
-		colorful.MustParseHex("#D6A454"),
-		colorful.MustParseHex("#F49472"),
-	)
-
-	magnetRainbow = gradient.New(
-		colorful.MustParseHex("#FF0000"),
-		colorful.MustParseHex("#FF8000"),
-		colorful.MustParseHex("#FFFF00"),
-		colorful.MustParseHex("#00FF00"),
-		colorful.MustParseHex("#00FFFF"),
-		colorful.MustParseHex("#0000FF"),
-		colorful.MustParseHex("#8000FF"),
-		colorful.MustParseHex("#FF00FF"),
-	)
-)
-
-var (
-	shirayukiGold   = colorful.MustParseHex("#F5CA1C")
-	shirayukiPurple = colorful.MustParseHex("#711FCF")
-	sukoyaPink      = colorful.MustParseHex("#F521CF")
-	sukoyaWhite     = colorful.MustParseHex("#FFFCFF")
-)
-
-var (
-	magnetRed       = colorful.MustParseHex("#600F45")
-	magnetPurpleRed = colorful.MustParseHex("#8A317C")
-	magnetPurple    = colorful.MustParseHex("#B241BA")
-	magnetPink      = colorful.MustParseHex("#C856D9")
-	magnetWhite     = colorful.MustParseHex("#FFBEFF")
-)
-
-var (
-	allColors = colorful.NewSet(
-		shirayukiGold,
-		shirayukiPurple,
-		sukoyaWhite,
-		sukoyaPink,
-		magnetPurple,
-		magnetPink,
-		magnetWhite,
-	)
-
-	magnetColors = colorful.NewSet(
-		magnetRed,
-		magnetPurpleRed,
-		magnetPurple,
-		magnetPink,
-		magnetWhite,
-	)
-
-	shirayukiColors = colorful.NewSet(
-		shirayukiGold,
-		shirayukiPurple,
-	)
-
-	sukoyaColors = colorful.NewSet(
-		sukoyaPink,
-		sukoyaWhite,
-	)
-
-	crossickColors = colorful.NewSet(
-		shirayukiGold,
-		shirayukiPurple,
-		sukoyaWhite,
-		sukoyaPink,
-	)
-)
-
-var (
-	magnetGradient = gradient.Table{
-		{magnetRed, 0.0},
-		{magnetPurpleRed, 0.25},
-		{magnetPurple, 0.50},
-		{magnetPink, 0.75},
-		{magnetWhite, 1.00},
-	}
-
-	allColorsGradient = gradient.Table{
-		{shirayukiGold, 0.0},
-		{shirayukiPurple, 0.167},
-		{sukoyaPink, 0.167 * 2},
-		{sukoyaWhite, 0.167 * 3},
-		{magnetPurple, 0.167 * 4},
-		{magnetPink, 0.167 * 5},
-		{magnetWhite, 1.0},
-	}
-
-	//shirayukiGradient = gradient.Table{
-	//	{shirayukiPurple, 0},
-	//	{shirayukiGold, 0.33},
-	//	{shirayukiPurple, 0.5},
-	//	{shirayukiGold, 0.66},
-	//	{shirayukiPurple, 1},
-	//}
-
-	shirayukiGradient = gradient.New(
-		shirayukiPurple,
-		shirayukiGold,
-		shirayukiGold,
-		shirayukiPurple,
-	)
-
-	shirayukiSingleGradient = gradient.New(
-		shirayukiPurple,
-		shirayukiGold,
-	)
-
-	sukoyaGradient = gradient.New(
-		sukoyaPink,
-		sukoyaWhite,
-		sukoyaWhite,
-		sukoyaPink,
-	)
-
-	shirayukiWhiteGradient = gradient.New(
-		shirayukiPurple,
-		magnetWhite,
-	)
-
-	sukoyaSingleGradient = gradient.New(
-		sukoyaPink,
-		sukoyaWhite,
-	)
-
-	sukoyaWhiteGradient = gradient.New(
-		sukoyaPink,
-		magnetWhite,
-	)
-)
 
 func do() error {
 	magnet, err := beatsaber.Open(mapPath)
@@ -168,102 +28,53 @@ func do() error {
 		return err
 	}
 
-	leadIn1 := NewLeadIn(p, 4)
-	leadIn1.Play()
+	//sb := NewSandbox(p, 4)
+	//sb.Play1()
 
-	intro1 := NewIntro(p, 16)
-	intro1.Play()
-
-	verse1 := NewVerse1a(p, 52)
-	verse1.Play1()
-
-	verse2 := NewVerse1b(p, 84)
-	verse2.Play()
-
-	chorus := NewChorus(p, 114)
-	chorus.Play()
-
-	breakdown := NewBreakdown(p, 149)
-	breakdown.Play()
+	//leadIn := NewLeadInOut(p, 4)
+	//leadIn.PlayIn()
 	//
-	//verse3 := NewVerse1a(p, 164)
-	//verse3.Play2()
+	//intro1 := NewIntro(p, 16)
+	//intro1.Play1()
 	//
-	//verse4 := NewVerse1b(p, 196)
-	//verse4.Play()
+	//verse1a := NewVerseA(p, 52)
+	//verse1a.Play1()
+	//
+	//verse1b := NewVerseB(p, 84)
+	//verse1b.Play1()
+	//
+	//chorus := NewChorus(p, 114)
+	//chorus.Play1()
+	//
+	//breakdown := NewBreakdown(p, 149)
+	//breakdown.Play()
+	//
+	//verse2a := NewVerseA(p, 164)
+	//verse2a.Play2()
+	//
+	//verse2b := NewVerseB(p, 196)
+	//verse2b.Play1()
 	//
 	//chorus2 := NewChorus(p, 226)
-	//chorus2.Play()
+	//chorus2.Play1()
 	//
 	//guitarSolo := NewGuitarSolo(p, 260)
 	//guitarSolo.Play()
+	//
+	//verse3 := NewVerseC(p, 292)
+	//verse3.Play()
+	//
+	//chorus3 := NewChorus(p, 326)
+	//chorus3.Play3()
+	//
+	//chorus4 := NewChorus(p, 359)
+	//chorus4.Play4()
+	//
+	//outro := NewIntro(p, 391)
+	//outro.Play2()
+	//
+	//leadout := NewLeadInOut(p, 423)
+	//leadout.PlayOut()
 
 	return p.Save()
 }
-
-//func Shimmer(p *ilysa.Project, startBeat, endBeat float64, steps int, light beatsaber.EventTypeSet, colorSweepSpeed, shimmerSweepSpeed float64) {
-//	var (
-//		duration   = endBeat - startBeat
-//		offset     = rand.Float64() * math.Pi * 2
-//		MaxLightID = p.ActiveDifficultyProfile().MaxLightID(light)
-//		sin        = math.Sin
-//		pi         = math.Pi
-//	)
-//
-//	colorSweepSpeed *= duration
-//	shimmerSweepSpeed *= duration
-//
-//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.rng) {
-//		for i := 1; i <= MaxLightID; i++ {
-//			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightRedOn)
-//			e.SetSingleLightID(i)
-//			e.SetColor(magnetRainbow.Lerp(
-//				sin(ctx.t*colorSweepSpeed + (float64(i)/float64(MaxLightID))*pi + offset),
-//			))
-//			e.SetAlpha(5)
-//		}
-//	})
-//
-//	//p.ModEventsInRange(startBeat, endBeat,
-//	//	ilysa.FilterLightingEvents(light),
-//	//	func(ctx ilysa.rng, event ilysa.Event) {
-//	//		e := event.(*ilysa.RGBLightingEvent)
-//	//		lightID := float64(e.FirstLightID())
-//	//		e.SetAlpha(e.Alpha() * util.DefaultNoise(ctx.t*shimmerSweepSpeed+lightID/float64(MaxLightID)*pi+offset))
-//	//	})
-//
-//	//fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
-//	//
-//	//modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.2), 0, 1, ease.InCubic)
-//	//modfx.RGBAlphaFade(p, light, fadeScale(0.9), endBeat, 1, 0, ease.OutCubic)
-//	fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
-//	modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.5), 0, 1, ease.InCubic)
-//	modfx.RGBAlphaFade(p, light, fadeScale(0.501), endBeat, 1, 0, ease.OutCubic)
-//}
-//
-//
-//func SimpleShimmer(p *ilysa.Project, startBeat, endBeat float64) {
-//	const steps = 60
-//
-//	var (
-//		sin        = math.Sin
-//		light      = beatsaber.EventTypeBackLasers
-//		MaxLightID = p.ActiveDifficultyProfile().MaxLightID(light)
-//		pi         = math.Pi
-//	)
-//
-//	p.rangeTimer(startBeat, endBeat, steps, ease.Linear, func(ctx ilysa.rng) {
-//		for i := 1; i <= MaxLightID; i++ {
-//			e := ctx.NewRGBLighting(light, beatsaber.EventValueLightBlueOn)
-//			e.SetSingleLightID(i)
-//			e.SetColor(magnetGradient.Lerp(
-//				sin(ctx.t*3 + (float64(i)/float64(MaxLightID))*pi + 4),
-//			))
-//			e.SetAlpha(5)
-//		}
-//	})
-//
-//	fadeScale := scale.Clamped(startBeat, endBeat, 0, 1)
-//	modfx.RGBAlphaFade(p, light, startBeat, fadeScale(0.5), 0, 1, ease.InCubic)
-//	modfx.RGBAlphaFade(p, light, fadeScale(0.501), endBeat, 1, 0, ease.OutBounce)
-//}

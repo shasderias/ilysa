@@ -5,6 +5,8 @@ import (
 )
 
 type Sequence interface {
+	// SeqT is the current time for current sequence on a 0-1 scale. As a special
+	// case, SeqT returns 1 when the sequence only has one beat.
 	SeqT() float64
 	SeqOrdinal() int
 	SeqLen() int
@@ -25,7 +27,7 @@ type Sequencer struct {
 	g float64
 }
 
-func NewSequencer(seq []float64, ghostBeat float64) Sequencer {
+func Seq(seq []float64, ghostBeat float64) Sequencer {
 	return Sequencer{
 		s: seq,
 		g: ghostBeat,
@@ -50,7 +52,7 @@ func Interval(startBeat, duration float64, count int) Sequencer {
 	}
 }
 
-func SequencerFromSlice(seq []float64) Sequencer {
+func SeqFromSlice(seq []float64) Sequencer {
 	l := len(seq)
 	if l < 2 {
 		panic("sequence must have at least one beat and one ghost beat")
@@ -61,21 +63,6 @@ func SequencerFromSlice(seq []float64) Sequencer {
 		g: seq[l-1],
 	}
 }
-
-//func (s Sequencer) offset(o float64) Sequencer {
-//	newSeq := make([]float64, s.Len())
-//
-//	copy(newSeq, s.s)
-//
-//	for i := 0; i < len(newSeq); i++ {
-//		newSeq[i] += o
-//	}
-//
-//	return Sequencer{
-//		s: newSeq,
-//		g: s.g + o,
-//	}
-//}
 
 func (s Sequencer) Idx(i int) float64 { return s.s[calc.WraparoundIdx(s.Len(), i)] }
 func (s Sequencer) Len() int          { return len(s.s) }
@@ -97,7 +84,12 @@ func (i *SequenceIterator) Next() bool {
 	return true
 }
 
-func (i *SequenceIterator) SeqT() float64     { return float64(i.ordinal) / float64(i.Len()-1) }
+func (i *SequenceIterator) SeqT() float64 {
+	if i.Len() == 1 {
+		return 1
+	}
+	return float64(i.ordinal) / float64(i.Len()-1)
+}
 func (i *SequenceIterator) SeqOrdinal() int   { return i.ordinal }
 func (i *SequenceIterator) SeqLen() int       { return i.Len() }
 func (i *SequenceIterator) SeqNextB() float64 { return i.Idx(i.ordinal + 1) }

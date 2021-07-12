@@ -287,6 +287,35 @@ func (r rotate) Sequence() rotate {
 	return rotate{r.steps, true}
 }
 
+type rotateSet struct {
+	steps    int
+	sequence bool
+}
+
+func RotateSet(steps int) rotateSet {
+	return rotateSet{steps, false}
+}
+
+func (r rotateSet) do(set lightid.Set) lightid.Set {
+	steps := r.steps
+
+	if steps > len(set) {
+		steps = steps % len(set)
+	}
+	newSet := append(lightid.Set{}, set[steps:]...)
+	newSet = append(newSet, set[:steps]...)
+
+	return newSet
+}
+
+func (r rotateSet) LightTransform(l context.Light) context.Light {
+	return applyLightIDSetTransformer(l, r.do, r.sequence)
+}
+
+func (r rotateSet) Sequence() rotateSet {
+	return rotateSet{r.steps, true}
+}
+
 //
 //
 //func Slice(ti, tj float64) Transformer {

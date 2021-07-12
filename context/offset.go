@@ -29,7 +29,7 @@ func (c offsetCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 func (c offsetCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }
-func (c offsetCtx) Offset(o float64) Context {
+func (c offsetCtx) BOffset(o float64) Context {
 	return WithOffset(c, o)
 }
 

@@ -6,8 +6,10 @@ import (
 )
 
 type Range interface {
-	B() float64        // current beat
-	T() float64        // current time in the current sequence, on a 0-1 scale
+	B() float64 // current beat
+	// T is the current time in the current range on a 0-1 scale. As a special case,
+	// T returns 1 when the range only has 1 step.
+	T() float64
 	Ordinal() int      // ordinal number of the current iteration, starting from 0
 	StartB() float64   // first beat of the current sequence
 	EndB() float64     // last beat of the current sequence
@@ -28,7 +30,7 @@ type Ranger struct {
 	tToBeat   func(float64) float64
 }
 
-func NewRanger(startBeat, endBeat float64, steps int, fn ease.Func) Ranger {
+func Rng(startBeat, endBeat float64, steps int, fn ease.Func) Ranger {
 	return Ranger{
 		startBeat: startBeat,
 		endBeat:   endBeat,

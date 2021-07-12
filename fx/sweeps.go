@@ -45,7 +45,7 @@ func ColorSweep(ctx context.LightContext, sweepSpeed float64, grad gradient.Tabl
 
 func AlphaShimmer(ctx context.LightContext, events evt.RGBLightingEvents, shimmerSpeed float64) {
 	for _, e := range events {
-		e.SetAlpha(e.Alpha() * noise.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT()))
+		e.Apply(evt.WithAlpha(e.Alpha() * noise.DefaultWave(shimmerSpeed*ctx.T()+ctx.LightIDT())))
 	}
 }
 

@@ -1,9 +1,9 @@
 package fx
 
-//func RainbowProp(p rework.Context, light light2.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
-//	p.Range(startBeat, startBeat+duration, frames, ease.Linear, func(ctx context.Context) {
-//		ctx.Light(light, func(ctx context.LightContext) {
-//			e := ctx.NewRGBLightingEvent(
+//func RainbowProp(p context.Context, rng timer.Ranger, l context.Light, grad gradient.Table, opts ... RainbowPropOpt) {
+//	p.Range(rng, func(ctx context.Context) {
+//		ctx.Light(l, func(ctx context.LightContext) {
+//			e := ctx.NewRGBLighting(
 //				evt.WithColor(grad.Lerp(ctx.T())),
 //			)
 //			Ripple(ctx, e, step)
@@ -11,4 +11,8 @@ package fx
 //			AlphaFadeEx(ctx, e, 0.4, 1, 1, 0, ease.OutCirc)
 //		})
 //	})
+//}
+//
+//type RainbowPropOpt interface {
+//	apply()
 //}

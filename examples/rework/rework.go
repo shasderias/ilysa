@@ -40,7 +40,7 @@ func do() error {
 	}
 
 	// -- your code goes here --
-	s := timer.SequencerFromSlice([]float64{4, 8, 12, 16})
+	s := timer.SeqFromSlice([]float64{4, 8, 12, 16})
 
 	ctx := p.Offset(2)
 	l := light.NewBasic(ctx, evt.BackLasers)

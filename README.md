@@ -1,5 +1,7 @@
 # Ilysa
 
+## Everything is currently broken. Repo is made public for testing purposes. Please wait for the release announcement before using.
+
 Ilysa is a Go library that helps you create your favorite lighting patterns with speed and ease (probably)!
 
 ## Sell Me

@@ -21,30 +21,91 @@ func NewChorus(project *ilysa.Project, startBeat float64) Chorus {
 	return Chorus{project.Offset(startBeat)}
 }
 
-func (c Chorus) Play() {
+func (c Chorus) Play1() {
+	// 114
 	c.RhythmBridge(0)
 
 	c.Rhythm(2)
 	c.Rhythm(6)
 	c.Rhythm(10)
 
-	c.Refrain1(1)
-	c.Refrain2(4.5)
-	c.Refrain3(8.5)
+	c.Refrain1(1.25, shirayukiWhiteGradient)
+
+	//c.Refrain1a(1.25)
+	c.Refrain2(4.75)
+	c.Refrain3a(8.75)
 	c.Climax(14)
 	c.Refrain4(18)
 	c.Refrain5(20.75)
-	c.Refrain6(24.50)
-	c.Refrain7(30)
-
+	c.Refrain6(24.75)
+	c.Refrain7a(30)
+	//
 	c.Rhythm2(18)
 	c.Rhythm2(22)
 	c.Rhythm2(26)
 	c.Rhythm2(30)
 }
 
+func (c Chorus) Play3() {
+	// 326
+	c.Rhythm(1)
+	c.Rhythm(5)
+	c.Rhythm(9)
+
+	c.Refrain1(0.25, shirayukiWhiteGradient)
+
+	c.Refrain2(3.75)
+	c.Refrain3a(7.75)
+	c.Climax(13)
+	c.Refrain4(17)
+	c.Refrain5(19.75)
+	c.Refrain6(23.75)
+	c.Refrain7b(29)
+	c.Refrain2(35.75)
+	c.Refrain3b(39.75)
+	c.ClimaxB(46)
+	c.Refrain4(49)
+	c.Refrain5(51.75)
+	c.Refrain6(55.75)
+	c.Refrain7a(61)
+
+	c.Rhythm2(17)
+	c.Rhythm2(21)
+	c.Rhythm2(25)
+	c.Rhythm2(29)
+	c.Rhythm2(33)
+	c.Rhythm2(37)
+	c.Rhythm2(41)
+	c.Rhythm2(48)
+	c.Rhythm2(52)
+	c.Rhythm2(56)
+	c.Rhythm2(60)
+}
+
+func (c Chorus) Play4() {
+	// 359
+	//c.Rhythm(1)
+	//c.Rhythm(5)
+	//c.Rhythm(9)
+
+	//c.Refrain1b(0.5)
+	//c.Refrain2(2.75)
+	//c.Refrain3b(6.75)
+	//c.Climax(12)
+	//c.Refrain4(13.5)
+	//c.Refrain5(19.75)
+	//c.Refrain6(23.50)
+	//c.Refrain7a(29)
+	//
+	//c.Rhythm2(17)
+	//c.Rhythm2(21)
+	//c.Rhythm2(25)
+	//c.Rhythm2(29)
+}
+
 func (c Chorus) RhythmBridge(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
+
 	var (
 		grad = magnetRainbow
 		l    = light.Combine(
@@ -55,28 +116,27 @@ func (c Chorus) RhythmBridge(startBeat float64) {
 		)
 	)
 
-	ctx.Sequence(timer.Beat(0), func(ctx context.Context) {
-		ctx.NewPreciseRotation(evt.WithReset(true))
-	})
-
 	ctx.Sequence(timer.Beat(0.5), func(ctx context.Context) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(180),
-			evt.WithRotationStep(15),
-			evt.WithRotationSpeed(2.8),
-			evt.WithProp(0.9),
+			evt.WithRotationStep(12),
+			evt.WithRotationSpeed(8),
+			evt.WithProp(10),
 			evt.WithRotationDirection(chroma.Clockwise),
 		)
 	})
 
-	seq := timer.NewSequencer([]float64{0, 0.5}, 0)
+	seq := timer.Seq([]float64{0, 0.5}, 0.99)
 	ctx.Sequence(seq, func(ctx context.Context) {
 		fx.ZeroSpeedRandomizedLasers(ctx, evt.LeftLaser)
 		fx.ZeroSpeedRandomizedLasers(ctx, evt.RightLaser)
 
-		rng := timer.NewRanger(0, 0.5, 12, ease.Linear)
+		if ctx.SeqLast() {
+			e := fx.OffAll(ctx)
+			e.Apply(evt.WithBOffset(ctx.SeqNextBOffset()))
+		}
 
-		ctx.Range(rng, func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, 0.5, 12, ease.Linear), func(ctx context.Context) {
 			if ctx.Ordinal() == 1 {
 				grad = grad.Reverse()
 			}
@@ -89,7 +149,7 @@ func (c Chorus) RhythmBridge(startBeat float64) {
 }
 
 func (c Chorus) Rhythm(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
 	l := light.NewSequence(
 		light.NewBasic(ctx, evt.LeftRotatingLasers),
@@ -116,7 +176,7 @@ func (c Chorus) Rhythm(startBeat float64) {
 		//rippleEnd      = rippleStart + rippleDuration
 		//rippleLights   = c.NewBasicLight(beatsaber.EventTypeRingLights).Transform(rework.DivideSingle)
 		//rippleTime     = 0.8
-		rng  = timer.NewRanger(0, 4, 60, ease.Linear)
+		rng  = timer.Rng(0, 4, 60, ease.Linear)
 		grad = gradient.Table{
 			{shirayukiPurple, 0.0},
 			{sukoyaWhite, 0.3},
@@ -128,8 +188,8 @@ func (c Chorus) Rhythm(startBeat float64) {
 	RingRipple(ctx, rng, grad,
 		WithRippleTime(0.8),
 		WithSweepSpeed(1.2),
-		WithFadeIn(fx.NewAlphaFader(0, 0.2, 0, 0.3, ease.InCubic)),
-		WithFadeOut(fx.NewAlphaFader(0.2, 1.0, 0.3, 0, ease.OutCubic)),
+		WithFadeIn(fx.NewAlphaFader(0, 0.2, 0, 1.2, ease.InCirc)),
+		WithFadeOut(fx.NewAlphaFader(0.2, 1.0, 1.2, 0, ease.OutCirc)),
 	)
 
 	//ctx.Range(rippleStart, rippleEnd, 60, ease.Linear, func(ctx context.Context) {
@@ -144,40 +204,72 @@ func (c Chorus) Rhythm(startBeat float64) {
 	//})
 }
 
-func (c Chorus) Refrain1(startBeat float64) {
-	ctx := c.Offset(startBeat)
-	c.Sweep(ctx, 0.25, 1, shirayukiWhiteGradient, false)
-	c.SweepSpin(ctx, 1, false)
-	c.FadeToGold(ctx, 1, []float64{0.5, 0.75, 1.25, 1.75})
+func (c Chorus) Refrain1(startBeat float64, windupGrad gradient.Table) {
+	ctx := c.BOffset(startBeat)
+
+	var (
+		windupEndBeat = 0.75
+		fadeSeq       = timer.Seq([]float64{1.25, 1.50, 2.00, 2.50}, 0)
+	)
+
+	c.Sweep(ctx, 0, windupEndBeat, windupGrad, false)
+	c.SweepSpin(ctx, windupEndBeat, false)
+	c.FadeToGold(ctx, fadeSeq)
 }
+
+//func (c Chorus) Refrain1a(startBeat float64) {
+//	ctx := c.BOffset(startBeat)
+//	c.Sweep(ctx, 0, 0.75, shirayukiWhiteGradient, false)
+//	c.SweepSpin(ctx, 0.75, false)
+//	c.FadeToGold(ctx, timer.Seq([]float64{1.25, 1.50, 2.00, 2.50}, 0))
+//}
+//
+//func (c Chorus) Refrain1b(startBeat float64) {
+//	ctx := c.BOffset(startBeat)
+//	c.FadeToGold(ctx, timer.Seq([]float64{0.0, 0.25, 0.75, 1.25}, 0))
+//}
 
 func (c Chorus) Refrain2(startBeat float64) {
-	ctx := c.Offset(startBeat)
-	c.Sweep(ctx, 0, 1.25, sukoyaGradient, true)
-	c.SweepSpin(ctx, 1.25, true)
-	c.FadeToGold(ctx, 1.25, []float64{0.5, 1.0, 1.5, 2.0})
+	ctx := c.BOffset(startBeat)
+	c.Sweep(ctx, 0, 1.00, sukoyaGradient, false)
+	c.SweepSpin(ctx, 1.00, false)
+	c.FadeToGold(ctx, timer.Seq([]float64{1.50, 2.00, 2.50, 3.00}, 0))
 }
 
-func (c Chorus) Refrain3(startBeat float64) {
-	ctx := c.Offset(startBeat)
+func (c Chorus) Refrain3a(startBeat float64) {
+	ctx := c.BOffset(startBeat)
 
-	c.Sweep(ctx, 0, 1.25, shirayukiWhiteGradient, false)
-	c.SweepSpin(ctx, 1.25, false)
-	c.FadeToSukoya(ctx, 1.25, []float64{0, 0.5, 1.0, 1.5})
-	c.HalfCollapse(ctx, 3, []float64{0}, false)
+	c.Sweep(ctx, 0, 0.50, shirayukiWhiteGradient, false)
+	c.SweepSpin(ctx, 0.50, false)
+	c.FadeToSukoya(ctx, timer.Seq([]float64{1.25, 1.75, 2.25, 2.75}, 0))
+	c.HalfCollapse(ctx, timer.Beat(3), false)
 
-	collapseSeq := []float64{2.5, 3.0, 3.5, 4.0}
+	collapseSeq := timer.Seq([]float64{3.75, 4.25, 4.75}, 0)
 
-	//c.HalfCollapse(ctx, 1.0, collapseSeq, false)
-	c.FadeToGold(ctx, 1.00, collapseSeq)
+	c.HalfCollapse(ctx, collapseSeq, false)
+	c.FadeToGold(ctx, collapseSeq)
+}
+
+func (c Chorus) Refrain3b(startBeat float64) {
+	ctx := c.BOffset(startBeat)
+
+	c.Sweep(ctx, 0, 0.50, shirayukiWhiteGradient, false)
+	c.SweepSpin(ctx, 0.50, false)
+	c.FadeToSukoya(ctx, timer.Seq([]float64{1.00, 1.50, 2.00, 2.75}, 0))
+	c.HalfCollapse(ctx, timer.Beat(3), false)
+
+	collapseSeq := timer.Seq([]float64{3.75, 4.25, 4.75, 5.25}, 0)
+
+	c.HalfCollapse(ctx, collapseSeq, false)
+	c.FadeToGold(ctx, collapseSeq)
 }
 
 func (c Chorus) Climax(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
 	bl := light.NewBasic(ctx, evt.BackLasers)
 
-	seq := timer.NewSequencer([]float64{0, 2, 2.75, 3.5}, 4)
+	seq := timer.Seq([]float64{0, 2, 2.75, 3.5}, 4)
 	ctx.Sequence(seq, func(ctx context.Context) {
 		dir := chroma.Clockwise
 		if ctx.Ordinal() == 1 {
@@ -193,12 +285,39 @@ func (c Chorus) Climax(startBeat float64) {
 		)
 
 		col := crossickColors.Next()
-		rng := timer.NewRanger(0, ctx.SeqNextBOffset(), 18, ease.Linear)
-		ctx.Range(rng, func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, ctx.SeqNextBOffset(), 18, ease.Linear), func(ctx context.Context) {
 			ctx.Light(bl, func(ctx context.LightContext) {
-				e := ctx.NewRGBLighting(
-					evt.WithColor(col),
-				)
+				e := ctx.NewRGBLighting(evt.WithColor(col))
+				fx.AlphaFadeEx(ctx, e, 0, 1, 2+float64(ctx.SeqOrdinal()), 0.3, ease.OutCubic)
+			})
+		})
+	})
+}
+
+func (c Chorus) ClimaxB(startBeat float64) {
+	ctx := c.BOffset(startBeat)
+
+	bl := light.NewBasic(ctx, evt.BackLasers)
+
+	seq := timer.Seq([]float64{0, 0.5, 1, 1.75, 2.5}, 3)
+	ctx.Sequence(seq, func(ctx context.Context) {
+		dir := chroma.Clockwise
+		if ctx.Ordinal() == 1 {
+			dir = dir.Reverse()
+		}
+
+		ctx.NewPreciseRotation(
+			evt.WithRotation(45*float64(ctx.Ordinal()+1)),
+			evt.WithRotationStep(float64(90/(ctx.Ordinal()+1))),
+			evt.WithRotationSpeed(16),
+			evt.WithProp(1.3),
+			evt.WithRotationDirection(dir),
+		)
+
+		col := crossickColors.Next()
+		ctx.Range(timer.Rng(0, ctx.SeqNextBOffset(), 18, ease.Linear), func(ctx context.Context) {
+			ctx.Light(bl, func(ctx context.LightContext) {
+				e := ctx.NewRGBLighting(evt.WithColor(col))
 				fx.AlphaFadeEx(ctx, e, 0, 1, 2+float64(ctx.SeqOrdinal()), 0.3, ease.OutCubic)
 			})
 		})
@@ -207,7 +326,7 @@ func (c Chorus) Climax(startBeat float64) {
 
 // キスをして
 func (c Chorus) Refrain4(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
 	ctx.Sequence(timer.Beat(0), func(ctx context.Context) {
 		ctx.NewPreciseRotation(
@@ -226,7 +345,7 @@ func (c Chorus) Refrain4(startBeat float64) {
 		light.NewBasic(ctx, evt.RightRotatingLasers),
 	)
 
-	ctx.Sequence(timer.NewSequencer([]float64{0, 2}, 0), func(ctx context.Context) {
+	ctx.Sequence(timer.Seq([]float64{0, 2}, 0), func(ctx context.Context) {
 		opt := evt.NewOpts(
 			evt.WithLaserSpeed(30),
 			evt.WithPreciseLaserSpeed(0),
@@ -239,39 +358,40 @@ func (c Chorus) Refrain4(startBeat float64) {
 		})
 	})
 
-	c.Rush(ctx, -1, 0, 1.5, 10, gradient.FromSet(sukoyaColors))
+	c.Rush(ctx, -0.5, 0.8, 0.9, 10, gradient.FromSet(sukoyaColors))
 	// キスを
 	c.Sweep(ctx, 0, 0.75, magnetGradient, false)
 
 	// して
 	c.Unsweep(ctx, 0, []float64{1.25, 1.75})
-	c.FadeToGold(ctx, 0, []float64{1.25, 1.75})
+	//c.FadeToGold(ctx, 0, []float64{1.25, 1.75})
 
-	ctx.Sequence(timer.NewSequencer([]float64{1.25, 1.75}, 0), func(ctx context.Context) {
-		ctx.NewPreciseZoom(evt.WithZoomStep(0.33))
+	ctx.Sequence(timer.Seq([]float64{1.25, 1.75}, 0), func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(0.33 * (1 - float64(ctx.SeqT()))))
 	})
 }
 
 func (c Chorus) Refrain5(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
 	c.Sweep(ctx, 0, 0.50, shirayukiWhiteGradient, false)
 	c.SweepSpin(ctx, 0.5, false)
-	c.FadeToGold(ctx, -0.5, []float64{1.25, 1.75, 2.25, 2.75, 3.25})
+	c.FadeToGold(ctx, timer.Seq([]float64{1.00, 1.50, 2.00, 2.50, 3.00}, 0))
+	//c.FadeToGold(ctx, -0.5, []float64{1.25, 1.75, 2.25, 2.75, 3.25})
 }
 
 func (c Chorus) Refrain6(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
-	c.Sweep(ctx, 0, 0.75, sukoyaGradient, true)
-	c.SweepSpin(ctx, 0.75, true)
-	c.HalfCollapse(ctx, 2.75, []float64{0}, true)
-	c.FadeToSukoya(ctx, -0.25, []float64{1.25, 2.00, 2.50, 3.00})
-	c.FadeToGold(ctx, -0.50, []float64{4.0, 4.5, 5.0, 5.5})
+	c.Sweep(ctx, 0, 0.50, sukoyaGradient, true)
+	c.SweepSpin(ctx, 0.50, true)
+	c.HalfCollapse(ctx, timer.Beat(2.50), true)
+	c.FadeToSukoya(ctx, timer.Seq([]float64{1.00, 1.75, 2.25, 2.75}, 0))
+	c.FadeToGold(ctx, timer.Seq([]float64{3.75, 4.25, 4.75, 5.25}, 0))
 }
 
-func (c Chorus) Refrain7(startBeat float64) {
-	ctx := c.Offset(startBeat)
+func (c Chorus) Refrain7a(startBeat float64) {
+	ctx := c.BOffset(startBeat)
 
 	ctx.Sequence(timer.Beat(0), func(ctx context.Context) {
 		ctx.NewPreciseRotation(
@@ -281,37 +401,24 @@ func (c Chorus) Refrain7(startBeat float64) {
 			evt.WithProp(1.2),
 			evt.WithRotationDirection(chroma.Clockwise),
 		)
-
 		ctx.NewPreciseZoom(evt.WithZoomStep(-0.66))
 	})
 
-	l := transform.Light(
-		light.NewBasic(ctx, evt.RingLights),
-		transform.Reverse(),
-		transform.DivideSingle(),
+	RingRipple(ctx, timer.Rng(-1, 0, 40, ease.OutExpo), shirayukiGradient,
+		WithSweepSpeed(4),
+		WithRippleTime(0.8),
+		WithReverse(true),
+		WithFadeIn(fx.NewAlphaFader(0.0, 0.6, 2, 10, ease.InSin)),
+		WithFadeOut(fx.NewAlphaFader(0.6, 1.0, 10, 0, ease.InCirc)),
 	)
 
-	rng := timer.NewRanger(-1, 0, 45, ease.InExpo)
-	ctx.Range(rng, func(ctx context.Context) {
-		grad := shirayukiGradient
-		ctx.Light(l, func(ctx context.LightContext) {
-			e := fx.BiasedColorSweep(ctx, 4, grad)
-			fx.Ripple(ctx, e, 1.5)
-			fx.AlphaFadeEx(ctx, e, 0, 0.6, 2, 10, ease.OutCubic)
-			fx.AlphaFadeEx(ctx, e, 0.6, 1.0, 10, 0, ease.OutCubic)
-		})
-	})
-
-	seq := timer.NewSequencer([]float64{1, 1.75, 2.5, 3.0, 3.5, 4.5}, 0)
-	ctx.Sequence(seq, func(ctx context.Context) {
+	ctx.Sequence(timer.Seq([]float64{1.0, 2.0, 2.75, 3.5, 4.0, 5.0}, 6.0), func(ctx context.Context) {
 		grad := sukoyaGradient
-		c.Rush(ctx, ctx.B(), ctx.B()+0.4, 0.4, 2*float64(ctx.Ordinal()), grad)
-		//c.RushNoFade(ctx, ctx.B(), ctx.B()+0.4, 0.4, 2*float64(ctx.Ordinal()), grad)
-		ctx.NewPreciseZoom(evt.WithZoomStep(-0.33))
+		offset := -0.50
+		c.Rush(ctx, 0+offset, ctx.SeqNextBOffset()+offset-0.10, 0.70, 2*float64(ctx.Ordinal()), grad)
 	})
 
-	seq = timer.NewSequencer([]float64{2, 2.75, 3.5}, 0)
-	ctx.Sequence(seq, func(ctx context.Context) {
+	ctx.Sequence(timer.Seq([]float64{2, 2.75, 3.5}, 0), func(ctx context.Context) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(30*float64(ctx.Ordinal())),
 			evt.WithRotationStep(7*float64(ctx.Ordinal()*5)),
@@ -319,10 +426,6 @@ func (c Chorus) Refrain7(startBeat float64) {
 			evt.WithProp(1.2),
 			evt.WithRotationDirection(chroma.Clockwise),
 		)
-	})
-
-	ctx.Sequence(timer.Beat(3.5), func(ctx context.Context) {
-		ctx.NewPreciseZoom(evt.WithZoomStep(-1))
 	})
 
 	ctx.Sequence(timer.Beat(4), func(ctx context.Context) {
@@ -353,7 +456,7 @@ func (c Chorus) Refrain7(startBeat float64) {
 		)
 		ctx.NewPreciseZoom(evt.WithZoomStep(1.5))
 
-		rng := timer.NewRanger(0, 4, 60, ease.Linear)
+		rng := timer.Rng(0, 4, 60, ease.Linear)
 		ctx.Range(rng, func(ctx context.Context) {
 			ctx.Light(bl, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 1.2, magnetRainbow)
@@ -363,8 +466,91 @@ func (c Chorus) Refrain7(startBeat float64) {
 	})
 }
 
+func (c Chorus) Refrain7b(startBeat float64) {
+	ctx := c.BOffset(startBeat)
+
+	ctx.Sequence(timer.Seq([]float64{0, 1}, 0), func(ctx context.Context) {
+		ctx.NewPreciseRotation(
+			evt.WithRotation(180),
+			evt.WithRotationStep(180),
+			evt.WithRotationSpeed(20),
+			evt.WithProp(1.2),
+			evt.WithRotationDirection(chroma.Clockwise),
+		)
+		ctx.NewPreciseZoom(evt.WithZoomStep(-0.66))
+
+		RingRipple(ctx, timer.Rng(-1, 0, 30, ease.OutExpo), shirayukiGradient,
+			WithSweepSpeed(4),
+			WithRippleTime(0.8),
+			WithReverse(true),
+			WithFadeIn(fx.NewAlphaFader(0.0, 0.6, 2, 10, ease.InSin)),
+			WithFadeOut(fx.NewAlphaFader(0.6, 1.0, 10, 0, ease.InCirc)),
+		)
+	})
+
+	ctx.Sequence(timer.Seq([]float64{1.5, 2.0, 2.75, 3.5}, 4.0), func(ctx context.Context) {
+		grad := sukoyaGradient
+		offset := -0.35
+		c.Rush(ctx, 0+offset, ctx.SeqNextBOffset()+offset-0.10, 0.70, 2*float64(ctx.Ordinal()), grad)
+	})
+
+	ctx.Sequence(timer.Seq([]float64{2, 2.75, 3.5}, 0), func(ctx context.Context) {
+		ctx.NewPreciseRotation(
+			evt.WithRotation(30*float64(ctx.Ordinal())),
+			evt.WithRotationStep(7*float64(ctx.Ordinal()*5)),
+			evt.WithRotationSpeed(20),
+			evt.WithProp(1.2),
+			evt.WithRotationDirection(chroma.Clockwise),
+		)
+	})
+
+	ctx.Sequence(timer.Beat(4), func(ctx context.Context) {
+		ctx.NewPreciseRotation(
+			evt.WithRotation(90),
+			evt.WithRotationStep(12.5),
+			evt.WithRotationSpeed(4),
+			evt.WithProp(1),
+			evt.WithRotationDirection(chroma.CounterClockwise),
+		)
+
+		//c.Rush(ctx, 0+offset, ctx.SeqNextBOffset()+offset-0.10, 0.70, 2*float64(ctx.Ordinal()), grad)
+
+		ctx.NewRGBLighting(evt.WithLight(evt.BackLasers), evt.WithLightValue(evt.LightRedFlash),
+			evt.WithColor(sukoyaWhite),
+		)
+		ctx.NewPreciseZoom(evt.WithZoomStep(0))
+	})
+	c.FadeToGold(ctx, timer.Seq([]float64{4.50, 4.75, 5.25, 5.75}, 6.00))
+	//ctx.Sequence(, func(ctx context.Context) {
+	//
+	//
+	//})
+
+	//bl := transform.Light(light.NewBasic(ctx, evt.BackLasers),
+	//	transform.DivideSingle(),
+	//)
+
+	//ctx.Sequence(timer.Beat(5), func(ctx context.Context) {
+	//	ctx.NewPreciseRotation(
+	//		evt.WithRotation(90),
+	//		evt.WithRotationStep(0),
+	//		evt.WithRotationSpeed(1.6),
+	//		evt.WithProp(0.9),
+	//		evt.WithRotationDirection(chroma.Clockwise),
+	//	)
+	//	ctx.NewPreciseZoom(evt.WithZoomStep(0))
+	//
+	//	//rng := timer.Rng(0, 0.5, 20, ease.Linear)
+	//	//ctx.Range(rng, func(ctx context.Context) {
+	//	//	ctx.Light(bl, func(ctx context.LightContext) {
+	//	//		e := fx.ColorSweep(ctx, 1.2, magnetRainbow)
+	//	//		fx.AlphaFadeEx(ctx, e, 0, 1, 6, 0.0, ease.InOutQuad)
+	//	//	})
+	//	//})
+	//})
+}
 func (c Chorus) Rhythm2(startBeat float64) {
-	ctx := c.Offset(startBeat)
+	ctx := c.BOffset(startBeat)
 
 	l := light.NewSequence(
 		light.NewBasic(ctx, evt.LeftRotatingLasers),
@@ -398,7 +584,7 @@ func (c Chorus) Sweep(ctx context.Context, startBeat, endBeat float64, grad grad
 	lightSweep := transform.Light(backLasers, transform.DivideSingle())
 	lightSweepSeq := transform.Light(backLasers, transform.DivideSingle().Sequence())
 
-	ctx.Range(timer.NewRanger(startBeat, endBeat, 30, ease.OutCubic), func(ctx context.Context) {
+	ctx.Range(timer.Rng(startBeat, endBeat, 30, ease.OutCubic), func(ctx context.Context) {
 		ctx.Light(lightSweepSeq, func(ctx context.LightContext) {
 			ctx.NewRGBLighting(evt.WithColor(grad.Lerp(ctx.T())))
 		})
@@ -426,27 +612,24 @@ func (c Chorus) SweepSpin(ctx context.Context, startBeat float64, reverse bool) 
 	})
 }
 
-func (c Chorus) HalfCollapse(ctx context.Context, startBeat float64, sequence []float64, reverse bool) {
-	ctx = ctx.Offset(startBeat)
-
+func (c Chorus) HalfCollapse(ctx context.Context, seq timer.Sequencer, reverse bool) {
 	dir := chroma.Clockwise.ReverseIf(reverse)
 
-	seq := timer.NewSequencer(sequence, 0)
 	ctx.Sequence(seq, func(ctx context.Context) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(90),
 			evt.WithRotationStep(9),
 			evt.WithRotationSpeed(8),
-			evt.WithProp(0.8),
+			evt.WithProp(20),
 			evt.WithRotationDirection(dir),
 		)
 	})
 }
 
 func (c Chorus) Unsweep(ctx context.Context, startBeat float64, sequence []float64) {
-	ctx = ctx.Offset(startBeat)
+	ctx = ctx.BOffset(startBeat)
 
-	seq := timer.NewSequencer(sequence, 0)
+	seq := timer.Seq(sequence, 0)
 	ctx.Sequence(seq, func(ctx context.Context) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(45),
@@ -458,20 +641,18 @@ func (c Chorus) Unsweep(ctx context.Context, startBeat float64, sequence []float
 	})
 }
 
-func (c Chorus) Rush(ctx context.Context, startBeat, endBeat, step, peakAlpha float64, grad gradient.Table) {
+func (c Chorus) Rush(ctx context.Context, startBeat, endBeat, rippleDuration, peakAlpha float64, grad gradient.Table) {
 	l := transform.Light(light.NewBasic(ctx, evt.RingLights),
 		transform.Reverse(),
 		transform.DivideSingle(),
 	)
 
-	rng := timer.NewRanger(startBeat, endBeat, 45, ease.InExpo)
-
-	ctx.Range(rng, func(ctx context.Context) {
+	ctx.Range(timer.Rng(startBeat, endBeat, 30, ease.InExpo), func(ctx context.Context) {
 		ctx.Light(l, func(ctx context.LightContext) {
-			e := fx.ColorSweep(ctx, 2, grad)
-			fx.Ripple(ctx, e, step)
-			fx.AlphaFadeEx(ctx, e, 0, 0.6, 2, peakAlpha, ease.OutCubic)
-			fx.AlphaFadeEx(ctx, e, 0.6, 1.0, peakAlpha, 0, ease.OutCubic)
+			e := fx.ColorSweep(ctx, 2.4, grad)
+			fx.RippleT(ctx, e, rippleDuration)
+			//fx.AlphaFadeEx(ctx, e, 0, 0.3, 2, peakAlpha, ease.Linear)
+			fx.AlphaFadeEx(ctx, e, 0.0, 1.0, peakAlpha, 0, ease.InQuart)
 		})
 	})
 }
@@ -482,7 +663,7 @@ func (c Chorus) RushNoFade(ctx context.Context, startBeat, endBeat, step, peakAl
 		transform.DivideSingle(),
 	)
 
-	rng := timer.NewRanger(startBeat, endBeat, 45, ease.InExpo)
+	rng := timer.Rng(startBeat, endBeat, 45, ease.InExpo)
 
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(l, func(ctx context.LightContext) {
@@ -493,9 +674,7 @@ func (c Chorus) RushNoFade(ctx context.Context, startBeat, endBeat, step, peakAl
 	})
 }
 
-func (c Chorus) FadeToSukoya(ctx context.Context, startBeat float64, sequence []float64) {
-	seq := timer.NewSequencer(sequence, 0)
-
+func (c Chorus) FadeToSukoya(ctx context.Context, seq timer.Sequencer) {
 	lightSweepDiv := transform.Light(light.NewBasic(ctx, evt.BackLasers),
 		transform.Fan(2),
 		transform.Flatten(),
@@ -505,8 +684,7 @@ func (c Chorus) FadeToSukoya(ctx context.Context, startBeat float64, sequence []
 	lightSweepDiv = lightSweepDiv.Shuffle()
 
 	ctx.Sequence(seq, func(ctx context.Context) {
-		rng := timer.NewRanger(0, 0.5, 16, ease.OutCubic)
-		ctx.Range(rng, func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, 0.5, 16, ease.OutCubic), func(ctx context.Context) {
 			ctx.Light(lightSweepDiv, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 3.6, gradient.FromSet(sukoyaColors))
 				fx.AlphaFadeEx(ctx, e, 0, 1, 0.3, 3, ease.OutElastic)
@@ -515,25 +693,23 @@ func (c Chorus) FadeToSukoya(ctx context.Context, startBeat float64, sequence []
 	})
 }
 
-func (c Chorus) FadeToGold(ctx context.Context, startBeat float64, sequence []float64) {
-	seq := timer.NewSequencer(sequence, 0)
-
+func (c Chorus) FadeToGold(ctx context.Context, seq timer.Sequencer) {
 	lightSweepDiv := transform.Light(light.NewBasic(ctx, evt.BackLasers),
 		transform.Fan(2),
 		transform.Flatten(),
 		transform.Rotate(3),
 		transform.Divide(seq.Len()).Sequence(),
+		transform.DivideSingle(),
 	).(light.Sequence)
 
 	lightSweepDiv = lightSweepDiv.Shuffle()
 
 	ctx.Sequence(seq, func(ctx context.Context) {
 		grad := magnetRainbowPale.RotateRand()
-		rng := timer.NewRanger(0, 0.5, 16, ease.OutCubic)
-		ctx.Range(rng, func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, 0.5, 16, ease.OutCubic), func(ctx context.Context) {
 			ctx.Light(lightSweepDiv, func(ctx context.LightContext) {
-				e := fx.ColorSweep(ctx, 4, grad)
-				fx.AlphaFadeEx(ctx, e, 0, 1, 10, 0, ease.OutElastic)
+				e := fx.ColorSweep(ctx, 1, grad)
+				fx.AlphaFadeEx(ctx, e, 0, 1, 10, 0, ease.OutCirc)
 			})
 		})
 	})

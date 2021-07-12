@@ -17,6 +17,10 @@ func (events Events) Apply(opts ...Opt) {
 	}
 }
 
+func (events *Events) Add(newEvents ...Event) {
+	*events = append(*events, newEvents...)
+}
+
 type RGBLightingEvents []*RGBLighting
 
 func (events RGBLightingEvents) Apply(opts ...RGBLightingOpt) {

@@ -39,7 +39,7 @@ func (b base) addEvents(events ...evt.Event) {
 	b.project.AddEvents(events...)
 }
 
-func (b base) Offset(o float64) Context {
+func (b base) BOffset(o float64) Context {
 	return WithOffset(b, o)
 }
 func (b base) Sequence(s timer.Sequencer, callback func(ctx Context)) {

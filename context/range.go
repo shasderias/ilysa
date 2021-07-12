@@ -29,7 +29,7 @@ type rangeTimerCtx struct {
 }
 
 // public
-func (c rangeTimerCtx) Offset(o float64) Context { return WithOffset(c, o) }
+func (c rangeTimerCtx) BOffset(o float64) Context { return WithOffset(c, o) }
 func (c rangeTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 	WithSequence(c, s, callback)
 }

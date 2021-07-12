@@ -52,7 +52,7 @@ func (o withBeatOpt) applyPreciseZoom(e *PreciseZoom) {
 	e.SetBeat(o.b)
 }
 
-func WithBeatOffset(o float64) withBeatOffsetOpt {
+func WithBOffset(o float64) withBeatOffsetOpt {
 	return withBeatOffsetOpt{o}
 }
 

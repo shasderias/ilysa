@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math"
+
 	"github.com/shasderias/ilysa/colorful/gradient"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/ease"
@@ -38,13 +40,28 @@ func (p Intro) PianoGlow(ctx context.Context, seq timer.Sequencer, divisor int, 
 
 	ctx.Sequence(seq, func(ctx context.Context) {
 		grad := magnetRainbowPale.RotateRand()
-		ctx.Range(timer.NewRanger(0, duration, steps, ease.Linear), func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, duration, steps, ease.Linear), func(ctx context.Context) {
 			ctx.Light(lightSweepDiv, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, sweepSpeed, grad)
-				fx.RippleT(ctx, e, 0.05)
-				fx.AlphaFadeEx(ctx, e, 0, 1, 1, 0, ease.OutCubic)
+				fx.RippleT(ctx, e, 0.1)
+				fx.AlphaFadeEx(ctx, e, 0, 1, 0.6, 0, ease.InCirc)
 			})
 		})
+	})
+}
+
+func (p Intro) SlowMotionLasers(ctx context.Context, rng timer.Ranger, startSpeed, endSpeed float64) {
+	ctx.Range(rng, func(ctx context.Context) {
+		speed := (1-ctx.T())*startSpeed + endSpeed
+		intSpeed := int(math.Round(speed))
+
+		opts := evt.NewOpts(evt.WithLaserSpeed(intSpeed), evt.WithPreciseLaserSpeed(speed))
+		if !ctx.First() {
+			opts.Add(evt.WithLockPosition(true))
+		}
+
+		ctx.NewPreciseLaser(evt.WithDirectionalLaser(evt.LeftLaser), opts)
+		ctx.NewPreciseLaser(evt.WithDirectionalLaser(evt.RightLaser), opts)
 	})
 }
 
@@ -61,7 +78,7 @@ func (p Intro) PianoTransmute(ctx context.Context, sequence timer.Sequencer, div
 	}
 
 	ctx.Sequence(sequence, func(ctx context.Context) {
-		rng := timer.NewRanger(0, 0.435, 12, ease.Linear)
+		rng := timer.Rng(0, 0.435, 12, ease.Linear)
 		ctx.Range(rng, func(ctx context.Context) {
 			ctx.Light(backLasers, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 4, grad)
@@ -72,20 +89,20 @@ func (p Intro) PianoTransmute(ctx context.Context, sequence timer.Sequencer, div
 	})
 }
 
-func (p Intro) Rush(ctx context.Context, startBeat, endBeat, step, peakAlpha float64, grad gradient.Table) {
+func (p Intro) Rush(ctx context.Context, startBeat, endBeat, rippleDuration, peakAlpha float64, grad gradient.Table) {
 	ringLasers := transform.Light(light.NewBasic(ctx, evt.RingLights),
 		transform.Reverse(),
 		transform.DivideSingle(),
 	)
 
-	rng := timer.NewRanger(startBeat, endBeat, 30, ease.InExpo)
+	rng := timer.Rng(startBeat, endBeat, 30, ease.InExpo)
 
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(ringLasers, func(ctx context.LightContext) {
 			e := fx.ColorSweep(ctx, 2, grad)
-			fx.RippleT(ctx, e, step)
-			fx.AlphaFadeEx(ctx, e, 0, 0.6, 1, peakAlpha, ease.OutCubic)
-			fx.AlphaFadeEx(ctx, e, 0.6, 1.0, peakAlpha, 0, ease.InCubic)
+			fx.RippleT(ctx, e, rippleDuration)
+			fx.AlphaFadeEx(ctx, e, 0, 0.6, 1, peakAlpha, ease.OutCirc)
+			fx.AlphaFadeEx(ctx, e, 0.6, 1.0, peakAlpha, 0, ease.InCirc)
 		})
 	})
 }
