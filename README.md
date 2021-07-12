@@ -1,8 +1,12 @@
 # Ilysa
 
+## Everything is currently broken. Repo is made public for testing purposes. Please wait for the release announcement before using.
+
 Ilysa is a Go library that helps you create your favorite lighting patterns with speed and ease (probably)!
 
 ## Sell Me
+
+[Too Many Words, Gif Video Pls](#too-many-words-not-convinced-video-pls)
 
 Lazy lighter: I wanna place a back lasers red fade block every beat for 50 beats!
 
@@ -10,7 +14,7 @@ Lazy lighter: I wanna place a back lasers red fade block every beat for 50 beats
 <summary>See the Ilysa code</summary>
 
 ```go
-p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) { // startBeat 0, beat length 1, repeat 50 times
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) { // startBeat 0, beat length 1, repeat 50 times
     ctx.NewLightingEvent(
         ilysa.WithType(beatsaber.EventTypeBackLasers),
         ilysa.WithValue(beatsaber.EventValueLightRedFade),
@@ -27,18 +31,18 @@ p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) { // startBeat 0, beat 
 
 </details>
 
-Lazy lighter: Well, that's not as exciting as I thought. I heard Chroma lights gives downloads! I want rainbow gaming
-lights! Make every fade a different color!
+Lazy lighter: Well, that's not as exciting as I thought. I heard Chroma lights gives upvotes! I want gamer lights! Make
+every fade a different color!
 
 <details>
 <summary>See the Ilysa code</summary>
 
 ```go
-p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
     ctx.NewRGBLightingEvent(  // make it Chroma
         ilysa.WithType(beatsaber.EventTypeBackLasers),
         ilysa.WithValue(beatsaber.EventValueLightRedFade),
-        ilysa.WithColor(gradient.Rainbow.Ierp(ctx.FixedRand())), // add Rainbow power
+        evt.WithColor(gradient.Rainbow.Ierp(ctx.FixedRand())), // add Rainbow power
     )
 })
 ```
@@ -68,11 +72,11 @@ backLasersSplit := ilysa.TransformLight(backLasers,
     ilysa.ToLightTransformer(ilysa.DivideSingle), 
 )
 
-p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
     })
 })
@@ -96,11 +100,11 @@ them!
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         e := ctx.NewRGBLightingEvent( // save the event we created to the variable e
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
         // shift each event forward by 0.05 beats * ordinal number of the lightID
         // i.e. 1st lightID is shifted forward by 0 beats
@@ -127,11 +131,11 @@ Lazy lighter: Maybe add an off event so it twinkles real nice?
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimingContext) {
-    ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 50, func(ctx ilysa.TimeContext) {
+    ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
         e := ctx.NewRGBLightingEvent(
             ilysa.WithValue(beatsaber.EventValueLightRedFade),
-            ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+            evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
         )
         e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
 
@@ -159,13 +163,13 @@ Lazy lighter: Wait, what happened to my fade effect? Fade effects don't work wit
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
-    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
-                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+                evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
             )
             e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
             e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
@@ -190,13 +194,13 @@ Lazy lighter: WTF happened to my colors!
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 4, func(ctx ilysa.TimingContext) {
+p.EventsForBeats(0, 1, 4, func(ctx ilysa.TimeContext) {
     // for each beat, create events at regular intervals from beat to beat + 0.5 beats, for a total of 8 beats
-    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := ctx.NewRGBLightingEvent(
                 // ilysa.WithValue(beatsaber.EventValueLightRedFade), // we never needed this
-                ilysa.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
+                evt.WithColor(gradient.Rainbow.Ierp(rand.Float64())),
             )
             e.ShiftBeat(float64(ctx.LightIDOrdinal()) * 0.05)
             e.SetAlpha(1 - ctx.T()) // linear alpha fade to 0
@@ -221,9 +225,9 @@ Lazy lighter: That's... not quite what I'm looking for.
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             // the fx package contains a suite of building blocks you can use to build more complicated effects
             // the Gradient function generates events and colors them based on the gradient passed to it
             e := fx.Gradient(ctx, gradient.Rainbow)
@@ -251,9 +255,9 @@ Lazy lighter: Hm... Can we spice it up?
 
 ```go
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             // ColorSweep is a more advanced Gradient that shifts the gradient's position with time
             // the 2nd argument (1.2 below) controls the speed at which the gradient "moves"
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
@@ -282,11 +286,10 @@ Lazy Lighter: Perfect. Now ease out the alpha fade please!
 <summary>See the Ilysa code</summary>
 
 ```go
-
 // light creation code omitted for brevity
-p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
-    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-        ctx.UseLight(backLasersSplit, func(ctx ilysa.TimingContextWithLight) {
+p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimeContext) {
+    ctx.EventsForRange(ctx.T(), ctx.T()+0.5, 8, ease.Linear, func(ctx ilysa.TimeContext) {
+        ctx.Light(backLasersSplit, func(ctx ilysa.TimeLightContext) {
             e := fx.ColorSweep(ctx, 1.2, gradient.Rainbow)
 
             fx.Ripple(ctx, e, 0.2)
@@ -303,351 +306,26 @@ p.EventsForBeats(0, 1, 1, func(ctx ilysa.TimingContext) {
 
 ## Too Many Words, Not Convinced, Video Pls
 
-Same code for all 5 effects. Ilysa automatically adapts to the lightIDs available in the selected environment.
-Documentating the effect took more time than building it.
-
 [![Ilysa Showcase](https://img.youtube.com/vi/PUoUHLk8hiY/0.jpg)](https://www.youtube.com/watch?v=PUoUHLk8hiY)
 
-<details>
-  <summary>See the Ilysa code</summary>
-
-```go
-package main
-
-import (
-	"fmt"
-
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
-	"github.com/shasderias/ilysa/pkg/util"
-)
-
-// set mapPath to the directory containing your beatmap
-const mapPath = `D:\Beat Saber Data\CustomWIPLevels\Ilysa`
-
-// please use a working copy dedicated to Ilysa (and make backups!) as Ilysa
-// WILL OVERWRITE ALL LIGHTING EVENTS IN THE SELECTED DIFFICULTY
-
-func main() {
-	if err := do(); err != nil {
-		fmt.Println("error:", err)
-	}
-}
-
-func do() error {
-	// open the beatmap at mapPath
-	bsMap, err := beatsaber.Open(mapPath)
-	if err != nil {
-		return err
-	}
-
-	// create a new Ilysa project
-	p := ilysa.New(bsMap)
-
-	// load the Expert+ difficulty with the standard characteristic
-	err = p.Map.SetActiveDifficulty(beatsaber.CharacteristicStandard, beatsaber.BeatmapDifficultyExpertPlus)
-	if err != nil {
-		return err
-	}
-
-	// we are only lighting beats 116 to 140 for this showcase
-	const showcaseStart = 116
-
-	// create a new context that offsets all subsequent beat numbers, this is
-	// useful when creating reusable lights
-	ctx := p.WithBeatOffset(showcaseStart)
-
-	// Beats 116-128 - Left/Right Lasers
-	// Starting off with a relatively simple effect, here we will:
-	// (1) alternate between the left and right lasers;
-	// (2) smoothly change the lasers' colors through a gradient;
-	// (3) increase the rotation speed of the lasers as the music approaches the drop.
-	var (
-		leftLaser  = ilysa.NewBasicLight(beatsaber.EventTypeLeftRotatingLasers, p)  // base game left laser
-		rightLaser = ilysa.NewBasicLight(beatsaber.EventTypeRightRotatingLasers, p) // base game right laser
-
-		// this creates a new Ilysa light that alternates between the left light and right lasers
-		leftRightSequence = ilysa.NewSequenceLight(leftLaser, rightLaser)
-
-		// this creates a gradient that blends from blue to red to purple, uncomment the 4th line to add a yellow
-		// it is possible to create gradient tables with non-linear positions
-		// e.g. red at 0.0, green at 0.3 and blue at 1.0
-		grad = gradient.New(
-			colorful.MustParseHex("#0c71c9"),             // blue
-			colorful.MustParseHex("#ff145f"),             // red
-			colorful.Color{R: 1.5, G: 0.6, B: 1.2, A: 1}, // PURPLE
-			//colorful.MustParseHex("#fffb0d"), // yellow
-		)
-	)
-
-	// generate events every half (0.5) beat, starting at beat (0), repeat a total of 24 times ...
-	ctx.EventsForBeats(0, 0.5, 24, func(ctx ilysa.TimingContext) {
-		// ... generate Chroma precise rotation speed events for the left and right lasers,
-		// setting speed to the iteration count with locked positions
-		// i.e. beat = 0.0, speed = 0
-		//      beat = 0.5, speed = 1
-		//      beat = 1.0, speed = 2, etc
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithIntValue(ctx.Ordinal()), ilysa.WithSpeed(float64(ctx.Ordinal())),
-			ilysa.WithLockPosition(true),
-		)
-		ctx.NewPreciseRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithIntValue(ctx.Ordinal()), ilysa.WithSpeed(float64(ctx.Ordinal())),
-			ilysa.WithLockPosition(true),
-		)
-
-		// alphaEase is a function that will scale a number from the unit interval ([0,1]) to the interval [0.5,6]
-		// we use this later to blend the alpha of the generated events from 0.5 to 6
-		alphaEase := util.ScaleFromUnitInterval(0.5, 6)
-
-		// ... use the light we created earlier ...
-		ctx.UseLight(leftRightSequence, func(ctx ilysa.TimingContextWithLight) {
-			// ... to create a Chroma RGB event
-			// UseLight automatically sets _eventType for us to alternate between left and right rotating lights
-			ctx.NewRGBLightingEvent(
-				// use the gradient we created earlier to set the color
-				ilysa.WithColor(grad.Ierp(ctx.T())),
-				// use the alphaEase function we made above here, with an in-out quadratic ease
-				ilysa.WithAlpha(alphaEase(ease.InOutQuad(ctx.T()))),
-			)
-
-			// create a Chroma event to turn off the light ...
-			oe := ctx.NewRGBLightingEvent(ilysa.WithValue(beatsaber.EventValueLightOff))
-			// ... 0.5 beats later
-			oe.ShiftBeat(0.5)
-		})
-	})
-
-	// Beats 116-128 - Big Rings
-	// Here we:
-	// (1) divide the big ring's lightIDs into 3 groups (in the Nice environment, [1:13], [14:26] and [27:40]);
-	// (2) flicker each group in time with the rhythm's sounds;
-	// (3) for each flicker, color the lightIDs in a gradient; and
-	// (4) do a precision rotation of the rings, increasing rotation, speed and step as we approach the drop.
-	var (
-		flickerDuration = 0.35
-		rhythmSeq       = []float64{
-			0, 0.5, // 116
-			1.0, 1.5, 1.75, // 117
-			2.0, 2.25, 2.50, // 118
-			3.0,                   // 119, we underlight here to give the drum rolls leading to the drop more emphasis
-			4.0,                   // 120
-			5.0,                   // 121
-			6.0,                   // 122
-			7.0,                   // 123
-			8.0, 8.25, 8.50, 8.75, // 124
-			9.0, 9.25, 9.50, 9.75, // 125
-			10.0, 10.5, // 126
-			11.0, 11.5, // 127
-		}
-		bigRings = ilysa.NewBasicLight(beatsaber.EventTypeRingLights, p)
-		// take base game's ring lights
-		bigRingsSplit = ilysa.TransformLight(bigRings,
-			// and split it into 3 lights, each with 1/3 the lightIDs of the base game's ring lights
-			// i.e. [1:13], [14:26], [27:40] in the Nice environment
-			ilysa.ToSequenceLightTransformer(ilysa.Divide(3)),
-			// within each group, divide the lightIDs into single lightIDs so that we can light them in a gradient
-			// i.e. group1: [1], [2] ... [13], group2: [14], [15] ... [26], group3: [27], [28] ... [40]
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
-		).(ilysa.SequenceLight)
-		// colors we will be using to light the ring lights
-		bigRingColors = colorful.NewSet(
-			colorful.MustParseHex("#34eb4f"), // lime green
-			colorful.MustParseHex("#b8f3ff"), // sky blue
-			colorful.MustParseHex("#f76f3e"), // orange
-			colorful.MustParseHex("#f73edc"), // pink
-		)
-	)
-
-	// generate events starting at beat 0, with the rhythmSeq's offsets
-	ctx.EventsForSequence(0, rhythmSeq, func(ctx ilysa.SequenceContext) {
-		// create a function that scales a number from the unit interval ([0,1] to [0.5,6])
-		// we use this to set the propagation speed of the ring spins
-		propScale := util.ScaleFromUnitInterval(0.5, 5)
-
-		// create a Chroma precise rotation event
-		re := ctx.NewPreciseRotationEvent(
-			ilysa.WithRotation(45+float64(ctx.Ordinal())*5), // with rotation 45, increasing by 5 with each spin
-			ilysa.WithStep(25+(float64(ctx.Ordinal())*1.5)), // with step 25, increasing by 1.5 with each spin
-			ilysa.WithSpeed(0.5+float64(ctx.Ordinal())*0.5), // with speed 0.5, increasing by 0.5 with each spin
-			ilysa.WithProp(propScale(ctx.T())),              // with propagation 0.5, scaling to 6 over this sequence
-		)
-
-		// for beats [1,8), rotate counterclockwise on even spins, clockwise on odd spins
-		if ctx.Ordinal()%2 == 0 && ctx.B() < 8 {
-			re.Mod(ilysa.WithDirection(chroma.CounterClockwise))
-		} else {
-			re.Mod(ilysa.WithDirection(chroma.Clockwise))
-		}
-
-		seqCtx := ctx
-		// get the nth light, Index() wraparounds, so this will give us ...
-		// ... on the 1st iteration, big ring lights with lightIDs [1:13]
-		// ... on the 2nd iteration, big ring lights with lightIDs [14:26]
-		// etc el
-		light := bigRingsSplit.Index(ctx.Ordinal())
-
-		// create:
-		// - 30 evenly spaced events (ease.Linear);
-		// - starting from the current beat in rhythmSeq - 0.05 beats (ctx.B() - 0.05)); and (we start a little to make the lights feel more responsive)
-		// - ending flickerDuration later (ctx.B() + flickerDuration - 0.05).
-		ctx.EventsForRange(ctx.B()-0.05, ctx.B()+flickerDuration-0.05, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-			// use the light we picked out
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
-				// generate a gradient from the color set we selected
-				// i.e. on the 1st iteration, lime green to sky blue
-				//      on the 2nd iteration, sky blue to orange
-				// etc el
-				grad := gradient.New(
-					bigRingColors.Index(seqCtx.Ordinal()),
-					bigRingColors.Index(seqCtx.Ordinal()+1),
-				)
-
-				// apply the gradient, fx.Gradient will generate the requisite events based on the light we are using and the gradient passed to it
-				e := fx.Gradient(ctx, grad)
-				// set the alpha of the generated events to 15
-				e.SetAlpha(15)
-				// apply a ripple effect (stagger the starting time of each lightID), with 0.10 beats between each successive lightID
-				fx.Ripple(ctx, e, 0.10,
-					// and apply an alpha fade from 1 to 0, starting halfway (0.5) through the sequence, with the OutCirc easing
-					fx.WithAlphaBlend(0.5, 1.0, 1, 0, ease.OutCirc))
-			})
-		})
-	})
-
-	// Beats 116-128 - Center Lights/Back Lights
-	// Here we:
-	// - do a zoom every 4 beats;
-	// - animate a (synced!) rainbow gradient over the center lights and the back lights;
-	// - fade the center and back lights out.
-	// This effect is rather subtle in the Nice environment due to the limited number of lightIDs. We do it anyways
-	// as Ilysa takes into account the number of lightIDs available in the selected environment when generating
-	// events, and this lets gets us a whole new lightshow just by changing the environment.
-	var (
-		centerLights = ilysa.TransformLight(
-			ilysa.NewBasicLight(beatsaber.EventTypeCenterLights, p), // take the base game's center lights
-			ilysa.ToLightTransformer(ilysa.DivideSingle),            // divide into single lightIDs
-		)
-		backLights = ilysa.TransformLight(
-			ilysa.NewBasicLight(beatsaber.EventTypeBackLasers, p), // repeat for back lasers
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
-		)
-		combinedLights = ilysa.NewCombinedLight(centerLights, backLights) // combine them
-	)
-
-	// this is similar to the pattern we used for the previous effect, see above for commentary
-	ctx.EventsForBeats(0, 4, 3, func(ctx ilysa.TimingContext) {
-		ctx.NewZoomEvent() // base game zoom event
-		ctx.EventsForRange(ctx.B(), ctx.B()+3.9, 60, ease.Linear, func(ctx ilysa.TimingContext) {
-			ctx.UseLight(combinedLights, func(ctx ilysa.TimingContextWithLight) {
-				// ColorSweep is an effect that comes with Ilysa that animates a gradient moving over a set of
-				// lightIDs. The "speed" of the animation is controllable using the 2nd argument (1.4 in this case).
-				fx.ColorSweep(ctx, 1.4, gradient.Rainbow,
-					fx.WithAlphaBlend(0.3, 1, 1, 0, ease.OutCirc),
-				)
-			})
-		})
-	})
-
-	// Beats 128-140 - Drop
-	const (
-		dropOffset = 12
-		dropLength = 12
-	)
-
-	// once the drop lands
-	ctx.EventForBeat(dropOffset, func(ctx ilysa.TimingContext) {
-		ctx.NewPreciseRotationEvent( // do a precision rotation event
-			ilysa.WithRotation(720),
-			ilysa.WithStep(17),
-			ilysa.WithProp(0.5),
-			ilysa.WithDirection(chroma.CounterClockwise),
-			ilysa.WithSpeed(3),
-		)
-		ctx.NewRotationSpeedEvent( // slow down the left and right lasers
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser),
-			ilysa.WithIntValue(1),
-		)
-		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser),
-			ilysa.WithIntValue(1),
-		)
-	})
-
-	// Beats 128-140 - Big Rings
-	// This takes the ColorSweep effect introduced earlier, applies it to the whole big ring and adds a
-	// shimmery effect to it.
-	var (
-		bigRingsWhole = ilysa.TransformLight( // here we take the ring lights as a whole ...
-			bigRings,
-			ilysa.ToLightTransformer(ilysa.DivideSingle), // .. and divide the lightIDs into individual units
-		)
-	)
-
-	// over the length of the drop
-	ctx.EventsForRange(dropOffset, dropOffset+dropLength, 120, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(bigRingsWhole, func(ctx ilysa.TimingContextWithLight) {
-			// animate a gradient moving over the ring lasers
-			e := fx.ColorSweep(ctx, 0.6, gradient.Rainbow)
-			// add a shimmer effect by setting the alpha values of each lightID based on 1d-noise generated
-			// with a bunch of sine functions
-			fx.AlphaShimmer(ctx, e, 3)
-			// fade to black
-			fx.AlphaBlend(ctx, e, 0.6, 1, 1, 0, ease.OutSine)
-		})
-	})
-
-	// Beats 128-136 - Left/Right Lasers
-	// Reuse of the concepts introduced earlier to alternate between the left and right rotating lasers, with each
-	// laser being it in a gradient with a ripple effect. The higher step value for the ripple changes the feel of
-	// the effect to be less like a ripple and more like the lasers lighting up in random order.
-	var (
-		leftRightSequenceSplit = ilysa.TransformLight(
-			leftRightSequence,
-			ilysa.ToLightTransformer(ilysa.DivideSingle),
-		).(ilysa.SequenceLight)
-		dropColors = colorful.NewSet(
-			colorful.MustParseHex("#3775bd"), // shades of blue
-			colorful.MustParseHex("#add4ed"),
-			colorful.MustParseHex("#b0aded"),
-		)
-	)
-
-	ctx.EventsForBeats(dropOffset, 1, 8, func(ctx ilysa.TimingContext) {
-		light := leftRightSequenceSplit.Index(ctx.Ordinal())
-		seqCtx := ctx
-		ctx.EventsForRange(ctx.B(), ctx.B()+0.75, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-			grad := gradient.New(
-				dropColors.Index(seqCtx.Ordinal()),
-				dropColors.Index(seqCtx.Ordinal()+2),
-			)
-			ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
-				e := fx.Gradient(ctx, grad)
-				fx.Ripple(ctx, e, 1.2,
-					fx.WithAlphaBlend(0, 0.3, 0, 1, ease.InSine),
-					fx.WithAlphaBlend(0.3, 1, 1, 0, ease.OutSine),
-				)
-			})
-		})
-	})
-
-	// save events back to Expert+ difficulty
-	return p.Save()
-}
-```
-
-</details>
+* Same [code](examples/showcase/main.go) for all 5 environments
+* Ilysa automatically adapts to the lightIDs available in the selected environment
+* Documentating the effect took more time than building it
 
 ## Is Ilysa for me?
 
-Advanced Beat Saber lighting knowledge and intermediate computer skills required. Ilysa is not for you if:
+Advanced Beat Saber lighting knowledge and intermediate computer skills required.
+
+Ilysa may be for you if:
+
+- you are experienced with lighting, can't code, but want to get started with scripting lights; starting with Ilysa is
+  probably easier than trying to cobble together code from scratch;
+- you are already scripting lights, and want a little more structure or help with dealing with the more tedious parts;
+  or
+- you are experienced with lighting, can code and want to raise the bar; the author thinks there are interesting things
+  that can be done to make doing good lighting easier - check out the `Light` interface.
+
+Ilysa is not for you if:
 
 - you have never placed a Chroma event in ChroMapper;
 - `_eventType` and `_eventValue` don't mean anything to you; or
@@ -671,7 +349,7 @@ If you want to achieve novel effects, you'll need at least a rudimentary underst
 If you can already program in another language, Go should be a snap. Take a stroll
 through [A Tour of Go](https://tour.golang.org/welcome/1) and carry on.
 
-If you have never programmed, Go is an easy language to learn. Try
+If you have no programming experience, Go is an easy language to learn. Try
 taking [A Tour of Go](https://tour.golang.org/welcome/1). If you can make it to the section on Methods, you should be
 good to go.
 
@@ -719,8 +397,8 @@ Ahahahahahahahahahahahahahahahahahahahahahahahahaha. You definitely know what yo
 
 #### Something Else
 
-You really want something that supports `gopls` or something similar. Code assistance will make your life a lot easier.
-If you're not sure what that means, please try starting out with Visual Studio Code.
+You really want something that provides code assistance via `gopls` or something similar. If you are unsure, please try
+starting out with Visual Studio Code.
 
 ### Beatmap
 
@@ -737,11 +415,11 @@ Ilysa and make backups (you should be making backups regardless)!⚠️**
 
 ### Alpha Testers Only
 
-Add your SSH key to GitHub.
-Instructions [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
-if unsure.
+Add your SSH key to GitHub. Instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+.
 
-If you clone the repo by executing the following command, you're good to go.
+If you can clone the repo with the following command, your SSH key configuration is correct.
 
 ```
 git clone github.com/shasderias/ilysa
@@ -752,6 +430,18 @@ Before following the instructions below, execute:
 ```
 go env -w GOPRIVATE=github.com/shasderias/ilysa
 git config --add --global url."git@github.com:".insteadOf https://github.com
+```
+
+After the alpha is over, execute `go env`, make sure the `set GOPRIVATE` line looks like so:
+
+```
+set GOPRIVATE=github.com/shasderias/ilysa
+```
+
+then reset your configuration back to the default state by executing:
+
+```
+go env -w GOPRIVATE=
 ```
 
 ### Regular Instructions Here
@@ -772,57 +462,8 @@ go get -u github.com/shasderias/ilysa
 
 ## Boilerplate
 
-Experienced Go programmer? Ilysa imposes no structure on your code, copy and paste the lines in the `do()` function and
-you're off to the races.
-
-New to Go? Create a main.go in your project directory and copy and paste the following:
-
-main.go (from ```examples/getting-started```)
-
-```go
-package main
-
-import (
-	"fmt"
-
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-)
-
-// set mapPath to the directory containing your beatmap
-const mapPath = `C:\directory\containing\your\beatmap\goes\here`
-
-// please use a working copy dedicated to Ilysa (and make backups!) as Ilysa
-// WILL OVERWRITE ALL LIGHTING EVENTS IN THE SELECTED DIFFICULTY
-
-func main() {
-	if err := do(); err != nil {
-		fmt.Println("error:", err)
-	}
-}
-
-func do() error {
-	// open the beatmap at mapPath
-	bsMap, err := beatsaber.Open(mapPath)
-	if err != nil {
-		return err
-	}
-
-	// create a new Ilysa project
-	p := ilysa.New(bsMap)
-
-	// load the Expert+ difficulty with the standard characteristic
-	err = p.Map.SetActiveDifficulty(beatsaber.CharacteristicStandard, beatsaber.BeatmapDifficultyExpertPlus)
-	if err != nil {
-		return err
-	}
-
-	// -- your code goes here --
-
-	// save events back to Expert+ difficulty
-	return p.Save()
-}
-```
+New to Go? Create a file named `main.go` in your project directory and copy and paste the contents
+of [examples/getting-started/main.go](examples/getting-started/main.go) into it.
 
 Compile and run your code by executing:
 
@@ -830,50 +471,67 @@ Compile and run your code by executing:
 go run .
 ```
 
-This will remove all lighting events from your map and add all events generated by Ilysa to it. As the code above does
-not generate any events, it will simply remove all existing lighting events.
+This will remove all lighting events from your map and add all events generated by Ilysa to it. The boilerplate code
+does not generate any events, so this will simply remove all existing events.
+
+Experienced programmer? Ilysa does not impose any structure on you, use the example as a starting point and feel free to
+organize your code any way you want.
 
 ## Your First Ilysa Event
 
-Add the following lines to your program:
+Edit `main.go` and add the following lines after the line `// -- your code goes here --`
 
 ```go
-package main
-
-// snip
-func do() error {
-	// snip
-	// -- your code goes here --
-	p.EventForBeat(2, func(ctx ilysa.TimingContext) { // generate events for beat 2:
-		ctx.NewLightingEvent( // generate a new base game (non-Chroma) lighting event
-			ilysa.WithType(beatsaber.EventTypeBackLasers),   // back lasers
-			ilysa.WithValue(beatsaber.EventValueLightRedOn), // red on
-		)
-	})
-	// snip
-}
+// -- your code goes here --
+p.EventForBeat(2, func(ctx ilysa.TimeContext) { // generate events for beat 2:
+    ctx.NewLightingEvent( // generate a new base game (non-Chroma) lighting event
+        ilysa.WithType(beatsaber.EventTypeBackLasers),   // back lasers
+        ilysa.WithValue(beatsaber.EventValueLightRedOn), // red on
+    )
+})
 ```
 
-The value returned by ```ilysa.New()``` (```p``` in the snippet above) represents an Ilysa project and is your entry
-point for working with the library.
+Compile and run by executing `go run .` and open the map in your beatmap editor. You should see a single red on event
+for back lasers at beat 2.
 
-There are a few methods defined on ```p``` that can be used to generate events, of which ```EventForBeat``` is the
-simplest. ```EventForBeat``` accepts two arguments, a beat number (2 in the example above) and a callback function. The
-callback function has one argument, a context value. You call methods on this context value to generate lighting events.
+### Explain Pls!
 
-The signature of the callback function changes based on the method. So it is easiest to let your editor's code
-assistance do the work. In Visual Studio Code, type `p.EventForBeat(2, `, hit `Ctrl-Space`, select the first option and
-the editor will fill in the rest.
+Generally, you use Ilysa by:
 
-The method ```NewLightingEvent``` generates a base game lighting event. It accepts 0 or more functional arguments. In
-the example above:
+1. defining a time sequence within which you want to create events, this can be a single beat (e.g. beat 2), a sequence
+   of beats (e.g. beats 4, 5 and 5.5) or a range of beats (beats 4 to 6); and
+2. telling Ilysa what events to create in that time sequence.
 
-* passing ```ilysa.WithType(beatsaber.EventTypeBackLasers)``` to ```NewLightingEvent``` tells Ilysa to create an event
-  that controls the lights in the Back Lasers group; and
-* passing ```ilysa.WithValue(beatsaber.EventValueLightRedOn)``` to ```NewLightingEvent``` tells Ilysa to create an event
-  that changes the back laser lights to red and turns them on.
+The value returned by `ilysa.New()` (`p` in the snippet above) represents an Ilysa project and is your entry point for
+working with the library. `p` has several methods you can call to define a time sequence and `EventForBeat` is one of
+them.
 
-For generating base game events, ```ctx``` has the following methods:
+`EventForBeat` defines a time sequence containing a single beat. In the example above, we indicate we want to create
+events for beat 2 by passing `2` as the 1st argument.
+
+The 2nd argument is a callback function which you use to actually create events. In Ilysa, these functions usually only
+have one argument, a context value - `ctx` in the example above. You call methods on this `ctx` value to generate the
+events you want.
+
+### So Much Typing, How Do I Know What To Type D:
+
+The signature of the callback function changes based on the method you are using to define the time sequence. So let
+your editor's code assistance help you out. In Visual Studio Code you can type `p.EventForBeat(2,`, hit `Ctrl-Space` and
+the first auto-completion offered by your editor should be what you need.
+
+### Okay, What About Events?
+
+The method `ctx.NewLightingEvent` generates a base game lighting event. You define the properties of the event by
+passing in arguments. In the example above:
+
+* we pass in `ilysa.WithType(beatsaber.EventTypeBackLasers)` to create an event that controls the lights in the Back
+  Lasers group; and
+* we pass in `ilysa.WithValue(beatsaber.EventValueLightRedOn)` to create an event that changes the back laser lights to
+  red and turns them on.
+
+### What Events Can I Generate?
+
+For generating base game events, `ctx` has the following methods:
 
 ```go
 ctx.NewRotationEvent()
@@ -885,26 +543,26 @@ ctx.NewZoomEvent()
 ctx.NewRotationSpeedEvent()
 // accepts:
 // - ilysa.WithDirectionalLaser() for selecting which laser to control
-// e.g. ilysa.WithDirectionalLaser(ilysa.LeftLaser)
-// - ilysa.WithIntValue() for setting the rotation speed of the laser selected
-// e.g. ilysa.WithIntValue(3)
+// e.g. ilysa.WithDirectionalLaser(evt.LeftLaser)
+// - evt.WithIntValue() for setting the rotation speed of the laser selected
+// e.g. evt.WithIntValue(3)
 ```
 
-See ```examples/some-basic-examples```  for a few more basic examples.
+See [examples/some-basic-examples](examples/some-basic-examples/main.go)  for a few more basic examples.
 
-## Something a Little More Fancy
+## How is This Better  Than Placing Event Blocks!?
 
-```p```  has other methods that can be used to generate events. Let's take a look at
+```p```  has other methods that can be used to define time sequences. Let's take a look at
 ```EventsForBeats```:
 
 ```go
 // generate events every quarter beat (0.25), starting at beat 3, do this a total of 16 times ...
 // i.e. 3.00, 3.25, 3.50, 3.75, 4.00 ... 6.50, 6.75
-p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimingContext) {  
+p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimeContext) {  
     // ... each time, generate a rotation speed event ...
     ctx.NewRotationSpeedEvent(
         // ... that controls the left laser's rotation speed
-        ilysa.WithDirectionalLaser(ilysa.LeftLaser),
+        ilysa.WithDirectionalLaser(evt.LeftLaser),
         // ctx.Ordinal() returns the iteration number, starting at 0
         // i.e. for beat 3.00, ctx.Ordinal is 0, for beat 3.25, ctx.Ordinal is 1
         // the following line will therefore increase the left laser's rotation speed from 0 to 15 over 3.75 beats
@@ -913,9 +571,8 @@ p.EventsForBeats(3, 0.25, 16, func(ctx ilysa.TimingContext) {
 })
 ```
 
-### Context
-
-```ctx``` has a number of methods that return values useful for varying events properties to time:
+Whenever you define a time sequence, you get a `ctx` value that contains all sorts of handy methods that return values
+for varying events with time. Take a look:
 
 ```go
 B() float64         // current beat
@@ -929,12 +586,13 @@ Last() bool         // true if this is the last iteration
 FixedRand() float64 // a number from 0-1, fixed for the current sequence, but different for every sequence
 ```
 
-In some cases, `ctx` may have additional methods relevant to the current scope.
+In the above example, we used `ctx.Ordinal()` to vary the left laser's rotation speed with time. With a little
+creativity, you can vary all sorts of things with time, colors, events and even time itself.
 
-In the above example, we used ```ctx.Ordinal()``` to vary the left laser's rotation speed with time.
+### A Few More Ways to Define Time Sequences
 
-Finally, to create events that recur at specific beats, we have ```EventsForSequence``` which accepts a sequence of
-beats and creates events based on that sequence.
+To create events that recur at specific beats, `p` has the `EventsForSequence` method which accepts a sequence of beats
+and creates events based on that sequence.
 
 ```go
 // generate events on beats 0, 0.25, 0.75 and 1.25, starting from beat 4
@@ -947,7 +605,11 @@ p.EventsForSequence(4, []float64{0, 0.25, 0.75, 1.25}, func(ctx ilysa.SequenceCo
 })
 ```
 
-The above snippet turns the ring lights on and fades them to black at beats 4.00, 4.25, 4.75 and 5.25.
+The above snippet creates fade events for the ring lights at beats 4.00, 4.25, 4.75 and 5.25.
+
+## Next Steps
+
+TODO
 
 # Gimme cut and paste! I want to ...
 
@@ -958,13 +620,13 @@ The above snippet turns the ring lights on and fades them to black at beats 4.00
 Use
 
 ```go
-EventForBeat(beat float64, callback func(TimingContext))
+EventForBeat(beat float64, callback func(ctx TimeContext))
 ```
 
 e.g. beat 24.5
 
 ```go
-p.EventForBeat(24.5, func(ctx ilysa.TimingContext) {
+p.EventForBeat(24.5, func(ctx ilysa.TimeContext) {
   // use ctx to generate events here
 })
 ```
@@ -978,13 +640,13 @@ p.EventForBeat(24.5, func(ctx ilysa.TimingContext) {
 Use
 
 ```go
-EventsForBeats(startBeat, duration float64, count int, callback func(TimingContext))
+EventsForBeats(startBeat, duration float64, count int, callback func(ctx TimeContext))
 ```
 
 e.g. beats 0, 4, 8, 12, 16
 
 ```go
-p.EventsForBeats(0, 4, 5, func(ctx ilysa.TimingContext) {
+p.EventsForBeats(0, 4, 5, func(ctx ilysa.TimeContext) {
   // use ctx to generate events here
 })
 ```
@@ -1016,13 +678,13 @@ p.EventsForSequence(0, []float64{2,2.25,2.75,3.0,3.75}, func(ctx ilysa.SequenceC
 Use
 
 ```go
-EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(TimingContext))
+EventsForRange(startBeat, endBeat float64, steps int, easeFunc ease.Func, callback func(TimeContext))
 ```
 
 e.g. beats 2.0, 2.1, 2.2 ... 3.0
 
 ```go
-p.EventsForRange(2, 3, 11, ease.Linear, func(tc ilysa.TimingContext) {
+p.EventsForRange(2, 3, 11, ease.Linear, func(tc ilysa.TimeContext) {
    // use ctx to generate events here
 })
 ```
@@ -1043,7 +705,7 @@ NewLightingEvent(opts ...BasicLightingEventOpt) *BasicLightingEvent
 e.g. beat 2, back lasers, blue flash
 
 ```go
-p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewLightingEvent(
     ilysa.WithType(beatsaber.EventTypeBackLasers),
     ilysa.WithValue(beatsaber.EventValueLightBlueFlash),
@@ -1065,7 +727,7 @@ NewLightingEvent(opts ...BasicLightingEventOpt) *BasicLightingEvent
 e.g. beat 2, spin
 
 ```go
-p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewRotationEvent()
 }
 ```
@@ -1073,7 +735,7 @@ p.EventForBeat(2, func(ctx ilysa.TimingContext) {
 e.g. beat 2, raise hydraulics, all cars
 
 ```go
-p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewRotationEvent(
     ilysa.WithType(beatsaber.EventTypeInterscopeRaiseHydraulics),
     ilysa.WithValue(1), // TODO: add Interscope environment enums
@@ -1095,7 +757,7 @@ NewZoomEvent()
 e.g. beat 2, zoom pls
 
 ```go
-p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewZoomEvent()
 }
 ```
@@ -1114,10 +776,10 @@ NewRotationSpeedEvent(opts ...RotationSpeedEventOpt) *RotationSpeedEvent
 e.g. beat 2, left laser, zooooooooom
 
 ```go
-p.EventForBeat(2, func(ctx ilysa.TimingContext) {
+p.EventForBeat(2, func(ctx ilysa.TimeContext) {
   ctx.NewRotationSpeedEvent(
-    ilysa.WithDirectionalLaser(ilysa.LeftLaser), 
-    ilysa.WithIntValue(50),
+    ilysa.WithDirectionalLaser(evt.LeftLaser), 
+    evt.WithIntValue(50),
   )
 }
 ```
@@ -1132,7 +794,7 @@ p.EventForBeat(2, func(ctx ilysa.TimingContext) {
 Use
 
 ```go
-NewRGBLightingEvent(options...)
+NewRGBLightingEvent(opts ...RGBLightingEventOpt) *RGBLightingEvent
 ```
 
 e.g. fully loaded
@@ -1141,7 +803,7 @@ e.g. fully loaded
 ctx.NewRGBLightingEvent(
     ilysa.WithType(beatsaber.EventTypeBackLasers),
     ilysa.WithValue(beatsaber.EventValueLightRedOn),
-    ilysa.WithColor(colorful.MustParseHex("#123123")),
+    evt.WithColor(colorful.MustParseHex("#123123")),
     ilysa.WithAlpha(0.3),
     ilysa.WithLightID(ilysa.NewLightID(1, 2, 3)),
 )
@@ -1155,7 +817,7 @@ ctx.NewRGBLightingEvent(
 Use
 
 ```go
-NewPreciseRotationSpeedEvent(options...)
+NewPreciseRotationSpeedEvent(opts ...PreciseRotationSpeedEventOpt) *PreciseRotationSpeedEvent
 ```
 
 e.g. fully loaded
@@ -1163,7 +825,7 @@ e.g. fully loaded
 ```go
 ctx.NewPreciseRotationSpeedEvent(
     ilysa.WithLockPosition(true),
-    ilysa.WithIntValue(1),
+    evt.WithIntValue(1),
     ilysa.WithSpeed(0),
     ilysa.WithDirection(chroma.Clockwise),
 )
@@ -1183,7 +845,6 @@ NewPreciseRotationEvent(opts ...PreciseRotationEventOpt) *PreciseRotationEvent
 e.g. fully loaded
 
 ```go
-
 ctx.NewPreciseRotationEvent(
     ilysa.WithNameFilter("BigTrackLaneRings"),
     ilysa.WithReset(false),
@@ -1228,10 +889,10 @@ Wat dis? Light that runs down a sequence of lightIDs, changing color as it moves
 
 ```go
 func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
-	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimeContext) {
+		ctx.Light(light, func(ctx ilysa.TimeLightContext) {
 			e := ctx.NewRGBLightingEvent(
-				ilysa.WithColor(grad.Ierp(ctx.T())),
+				evt.WithColor(grad.Ierp(ctx.T())),
 			)
 			fx.Ripple(ctx, e, step)
 			fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
@@ -1255,23 +916,23 @@ By convention:
 * LightID or lightID - is always 1-indexed
 * Ordinal - is always 0-indexed
 
-# Utility Packages
+# Helper Packages
 
 ## Ease
 
-The `ease` package implements all the easing functions at https://easings.net/.
+The `ease` package implements Robert Penner's easing functions. Visualize them at https://easings.net/.
 
-## Util
+## Scale
 
-The `util` package implements a few functions handy for scaling numbers:
+The `scale` package implements a few functions handy for scaling numbers:
 
 ```go
 // returns a function that scales a number from [rMin,rMax] to [tMin,tMax]
-func Scale(rMin, rMax, tMin, tMax float64) func(m float64) float64
+func Clamped(rMin, rMax, tMin, tMax float64) func(m float64) float64
 // returns a function that scales a number from [0,1] to [tMin,tMax]
-func ScaleFromUnitInterval(tMin, tMax float64) func(m float64) float64 
+func ToUnitIntervalClamped(tMin, tMax float64) func(m float64) float64 
 // returns a function that scales a number from [rMin,rMax] to [0,1]
-func ScaleToUnitInterval(rMin, rMax float64) func(m float64) float64 
+func FromUnitIntervalClammped(rMin, rMax float64) func(m float64) float64 
 ```
 
 ## Colors
@@ -1318,7 +979,6 @@ set.Index(ctx.Ordinal())
 Iterate. Useful when `ctx.Ordinal()` doesn't have sufficient range to cycle through all the colors.
 
 ```go
-
 // returns the next color in the set, starting with the 1st one
 // the set maintains internal state keeping track of the last color returned
 set.Next() 
@@ -1386,9 +1046,14 @@ grad.Ierp(ctx.T())
 
 * Alice (Alice#5792) for lighting advice and being a sounding board. Check her out
   on [Twitch](https://www.twitch.tv/alicexiv)!
+* Andrey Sitnik and Ivan Solovev for the excellent visualizations of Robert Penner's easing equations
+  at https://easings.net/.
+* George McGinley Smith for the implementation of Robert Penner's easing equations in
+  the [jquery.easing](https://github.com/gdsmith/jquery.easing) library.
 * Lucas Beyer, Bastien Dejean (@baskerville), Phil Kulak (@pkulak), Christian Muehlhaeuser (@muesli), makeworld (
   @makeworld-the-better-one) and the other contributors to the [go-colorful](https://github.com/lucasb-eyer/go-colorful)
   library, used under the MIT License.
 * Pennock Tech, LLC for the [swallowjson](https://github.com/PennockTech/swallowjson) library, used under the MIT
   License.
+* Robert Penner for the original easing functions. Find out more [here](http://robertpenner.com/easing/).
 * Top_Cat (Top_Cat#1961) for the Beat Saber environment definition files at https://github.com/Top-Cat/bs-env.

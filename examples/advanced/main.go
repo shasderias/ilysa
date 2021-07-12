@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/colorful"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/colorful/gradient"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/fx"
+	"github.com/shasderias/ilysa/light2"
+	"github.com/shasderias/ilysa/rework"
 )
 
 // set mapPath to the directory containing your beatmap
@@ -39,25 +42,25 @@ func do() error {
 		return err
 	}
 
-	ringLights := ilysa.TransformLight(
-		ilysa.NewBasicLight(beatsaber.EventTypeRingLights, p),
-		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
-		ilysa.ToLightTransformer(ilysa.DivideSingle),
-	).(ilysa.SequenceLight)
+	ringLights := transform.Light(
+		light.NewBasic(beatsaber.EventTypeRingLights, p),
+		rework.ToSequenceLightTransformer(rework.Fan(2)),
+		rework.ToLightTransformer(rework.DivideSingle),
+	).(light2.SequenceLight)
 
-	light := ilysa.NewCombinedLight(
+	light := light2.NewCombinedLight(
 		ringLights.Index(0),
 		ringLights.Index(1),
 	)
 
-	ringLightsReverse := ilysa.TransformLight(
-		ilysa.NewBasicLight(beatsaber.EventTypeRingLights, p),
-		ilysa.ToSequenceLightTransformer(ilysa.Fan(2)),
-		ilysa.ToLightTransformer(ilysa.DivideSingle),
-		ilysa.LightIDSetTransformerToLightTransformer(ilysa.Reverse),
-	).(ilysa.SequenceLight)
+	ringLightsReverse := transform.Light(
+		light.NewBasic(beatsaber.EventTypeRingLights, p),
+		rework.ToSequenceLightTransformer(rework.Fan(2)),
+		rework.ToLightTransformer(rework.DivideSingle),
+		rework.LightIDSetTransformerToLightTransformer(rework.ReverseSet),
+	).(light2.SequenceLight)
 
-	lightReverse := ilysa.NewCombinedLight(
+	lightReverse := light2.NewCombinedLight(
 		ringLightsReverse.Index(0),
 		ringLightsReverse.Index(1),
 	)
@@ -69,31 +72,12 @@ func do() error {
 		colorful.MustParseHex("#ff145f"),
 	)
 
-	// grad2 := gradient.Table{
+	// grad := gradient.Table{
 	// 	{Col: colorful.MustParseHex("#fbc6d0"), Pos: 0.0},
 	// 	{Col: colorful.MustParseHex("#95bddc"), Pos: 0.2},
 	// 	{Col: colorful.MustParseHex("#0c71c9"), Pos: 0.8},
 	// 	{Col: colorful.MustParseHex("#ff145f"), Pos: 1.0},
 	// }
-
-	// grad2.Ierp(0.3)
-
-	// set := colorful.NewSet(
-	// 	colorful.MustParseHex("#fbc6d0"),
-	// 	colorful.MustParseHex("#95bddc"),
-	// )
-
-	// set.Index(0)
-
-	// // p.EventsForRange(4, 4.5, 8, ease.Linear, func(ctx ilysa.TimingContext) {
-	// // 	ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
-	// // 		e := ctx.NewRGBLightingEvent(
-	// // 			ilysa.WithColor(grad.Ierp(ctx.T())),
-	// // 		)
-	// // 		fx.Ripple(ctx, e, 1)
-	// // 		fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
-	// // 	})
-	// // })
 
 	RainbowProp(p, light, grad, 4, 0.5, 1, 1)
 	RainbowProp(p, lightReverse, gradient.Rainbow, 4, 0.25, 1, 1)
@@ -104,14 +88,14 @@ func do() error {
 	return p.Save()
 }
 
-func RainbowProp(p ilysa.BaseContext, light ilysa.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
-	p.EventsForRange(startBeat, startBeat+duration, frames, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(light, func(ctx ilysa.TimingContextWithLight) {
+func RainbowProp(p rework.BaseContext, light light2.Light, grad gradient.Table, startBeat, duration, step float64, frames int) {
+	p.Range(startBeat, startBeat+duration, frames, ease.Linear, func(ctx context.Context) {
+		ctx.Light(light, func(ctx context.LightContext) {
 			e := ctx.NewRGBLightingEvent(
-				ilysa.WithColor(grad.Ierp(ctx.T())),
+				evt.WithColor(grad.Lerp(ctx.T())),
 			)
 			fx.Ripple(ctx, e, step)
-			fx.AlphaBlend(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
+			fx.AlphaFadeEx(ctx, e, 0.3, 1, 1, 0, ease.OutCirc)
 		})
 	})
 }

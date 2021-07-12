@@ -1,92 +1,107 @@
 package main
 
 import (
-	"github.com/shasderias/ilysa/pkg/beatsaber"
-	"github.com/shasderias/ilysa/pkg/chroma"
-	"github.com/shasderias/ilysa/pkg/colorful/gradient"
-	"github.com/shasderias/ilysa/pkg/ease"
-	"github.com/shasderias/ilysa/pkg/ilysa"
-	"github.com/shasderias/ilysa/pkg/ilysa/fx"
+	"github.com/shasderias/ilysa"
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/context"
+	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/fx"
+	"github.com/shasderias/ilysa/light"
+	"github.com/shasderias/ilysa/timer"
+	"github.com/shasderias/ilysa/transform"
 )
 
-func LeadIn(p *ilysa.Project) {
-	p.EventForBeat(4, func(ctx ilysa.TimingContext) {
-		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.LeftLaser), ilysa.WithIntValue(3),
-		)
-		ctx.NewRotationSpeedEvent(
-			ilysa.WithDirectionalLaser(ilysa.RightLaser), ilysa.WithIntValue(3),
-		)
-
-	})
-
-	LeadInBrokenChord(p, 4)
-	LeadInBrokenChord(p, 5.5)
-	LeadInBrokenChord(p, 8)
-	LeadInBrokenChord(p, 9.5)
-	LeadInBrokenChord(p, 12)
-	LeadInBrokenChord(p, 13.5)
+func NewLeadInOut(p *ilysa.Project, startBeat float64) LeadIn {
+	return LeadIn{p.Offset(startBeat)}
 }
 
-func LeadInBrokenChord(p *ilysa.Project, startBeat float64) {
-	//p.EventsForRange(0, 10, 30, ease.Linear, func(ctx ilysa.Timing) {
-	//	ctx.UseLight(backLasers, func(ctx ilysa.Timing) {
-	//		ctx.NewRGBLightingEvent().SetValue(off).SetColor()
-	//	})
-	//})
+type LeadIn struct {
+	context.Context
+}
 
-	p.EventsForBeats(startBeat, 0.25, 4, func(ctx ilysa.TimingContext) {
-		lights := beatsaber.NewEventTypeSet(beatsaber.EventTypeLeftRotatingLasers, beatsaber.EventTypeRightRotatingLasers)
-		values := beatsaber.NewEventValueSet(
-			beatsaber.EventValueLightRedFade,
-			beatsaber.EventValueLightRedFade,
-			beatsaber.EventValueLightBlueFade,
-			beatsaber.EventValueLightBlueFade,
-		)
-
-		ctx.NewRGBLightingEvent(
-			ilysa.WithType(lights.Pick(ctx.Ordinal())),
-			ilysa.WithValue(values.Pick(ctx.Ordinal())),
-			ilysa.WithColor(allColors.Next()),
-		)
+func (l LeadIn) PlayIn() {
+	l.Sequence(timer.Beat(0), func(ctx context.Context) {
+		ctx.NewLaser(evt.WithDirectionalLaser(evt.LeftLaser), evt.WithLaserSpeed(3))
+		ctx.NewLaser(evt.WithDirectionalLaser(evt.RightLaser), evt.WithLaserSpeed(3))
 	})
 
-	p.EventForBeat(startBeat+0.75, func(ctx ilysa.TimingContext) {
-		ctx.NewPreciseRotationEvent(
-			ilysa.WithRotation(45),
-			ilysa.WithStep(9),
-			ilysa.WithProp(20),
-			ilysa.WithSpeed(1.2),
-			ilysa.WithDirection(chroma.Clockwise),
-			ilysa.WithCounterSpin(false),
+	l.BrokenChord(0)
+	l.BrokenChord(1.5)
+	l.BrokenChord(4)
+	l.BrokenChord(5.5)
+	l.BrokenChord(8)
+	l.BrokenChord(9.5)
+}
+
+func (l LeadIn) PlayOut() {
+	l.BrokenChordOnly(0)
+	l.BrokenChordOnly(1.5)
+}
+
+func (l LeadIn) BrokenChord(startBeat float64) {
+	ctx := l.BOffset(startBeat)
+
+	seqLight := light.NewSequence(
+		light.NewBasic(ctx, evt.LeftRotatingLasers),
+		light.NewBasic(ctx, evt.RightRotatingLasers),
+	)
+
+	ctx.Sequence(timer.Seq([]float64{0, 0.25, 0.50, 0.75}, 0), func(ctx context.Context) {
+		ctx.Light(seqLight, func(ctx context.LightContext) {
+			ctx.NewRGBLighting(evt.WithLightValue(evt.LightRedFade),
+				evt.WithColor(magnetGradient.Lerp(ctx.SeqT())),
+				evt.WithAlpha(0.4),
+			)
+		})
+	})
+
+	ctx.Sequence(timer.Beat(0.75), func(ctx context.Context) {
+		ctx.NewPreciseRotation(
+			evt.WithRotation(45),
+			evt.WithRotationStep(8),
+			evt.WithRotationSpeed(1.2),
+			evt.WithRotationDirection(chroma.Clockwise),
+			evt.WithProp(20),
+			evt.WithCounterSpin(false),
 		)
 	})
 
 	var (
-		backLasers        = p.NewBasicLight(beatsaber.EventTypeBackLasers).Transform(ilysa.DivideSingle)
-		colorSweepSpeed   = 2.2
-		shimmerSweepSpeed = 0.8
+		backLasers = transform.Light(light.NewBasic(ctx, evt.BackLasers),
+			transform.DivideSingle(),
+		)
+		duration          = 1.2
+		steps             = 12
+		colorSweepSpeed   = 2.7
+		shimmerSweepSpeed = 1.2
 		intensity         = 0.8
-		grad              = gradient.Rainbow
-		shimmerStart      = startBeat + 0.75
-		shimmerEnd        = startBeat + 0.75 + 1.1
-		fadeIn            = startBeat + 0.75 + 0.3
-		fadeOut           = startBeat + 0.75 + 0.7
+		grad              = magnetRainbowPale
 	)
 
-	p.EventsForRange(shimmerStart, shimmerEnd, 30, ease.Linear, func(ctx ilysa.TimingContext) {
-		ctx.UseLight(backLasers, func(ctx ilysa.TimingContextWithLight) {
+	ctx.Range(timer.Rng(0.75, 0.75+duration, steps, ease.Linear), func(ctx context.Context) {
+		ctx.Light(backLasers, func(ctx context.LightContext) {
 			e := fx.ColorSweep(ctx, colorSweepSpeed, grad)
-			e.Mod(ilysa.WithAlpha(intensity))
+			fx.AlphaFade(ctx, e, intensity, 0, ease.InCirc)
 			fx.AlphaShimmer(ctx, e, shimmerSweepSpeed)
 		})
 	})
+}
 
-	p.ModEventsInRange(shimmerStart, fadeIn, ilysa.FilterRGBLight(backLasers), func(ctx ilysa.TimingContext, event ilysa.Event) {
-		fx.RGBAlphaBlend(ctx, event, 0, 1, ease.InCubic)
-	})
+func (l LeadIn) BrokenChordOnly(startBeat float64) {
+	ctx := l.BOffset(startBeat)
 
-	p.ModEventsInRange(fadeOut, shimmerEnd, ilysa.FilterRGBLight(backLasers), func(ctx ilysa.TimingContext, event ilysa.Event) {
-		fx.RGBAlphaBlend(ctx, event, 1, 0, ease.OutCirc)
+	seqLight := light.NewSequence(
+		light.NewBasic(ctx, evt.LeftRotatingLasers),
+		light.NewBasic(ctx, evt.RightRotatingLasers),
+	)
+
+	ctx.Sequence(timer.Seq([]float64{0, 0.25, 0.50, 0.75}, 0), func(ctx context.Context) {
+		ctx.Light(seqLight, func(ctx context.LightContext) {
+			ctx.NewRGBLighting(evt.WithLightValue(evt.LightRedFade),
+				evt.WithColor(magnetGradient.Lerp(ctx.SeqT())),
+				evt.WithAlpha(0.4),
+			)
+		})
 	})
 }
