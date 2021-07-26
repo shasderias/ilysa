@@ -5,6 +5,7 @@ import (
 	"image/color"
 
 	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/imath"
 )
 
 type Color []float64
@@ -30,5 +31,9 @@ func (c *Color) UnmarshalJSON(raw []byte) error {
 }
 
 func (c Color) MarshalJSON() ([]byte, error) {
-	return json.Marshal([4]float64{c[0], c[1], c[2], c[3]})
+	r := imath.Round(c[0], 3)
+	g := imath.Round(c[1], 3)
+	b := imath.Round(c[2], 3)
+	a := imath.Round(c[3], 3)
+	return json.Marshal([4]float64{r, g, b, a})
 }
