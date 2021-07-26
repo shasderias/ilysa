@@ -73,6 +73,10 @@ func (m MockMap) UnscaleTime(beat float64) Time {
 	panic(fmt.Sprintf("UnscaleTime(): unreachable code, beat: %f", beat))
 }
 
+func (MockMap) AppendEvents(events []Event) error {
+	return nil
+}
+
 func (MockMap) SaveEvents(events []Event) error {
 	return nil
 }

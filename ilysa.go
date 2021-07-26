@@ -20,6 +20,7 @@ type Project struct {
 
 type Map interface {
 	ActiveDifficultyProfile() *beatsaber.EnvProfile
+	AppendEvents([]beatsaber.Event) error
 	SaveEvents([]beatsaber.Event) error
 	SetActiveDifficulty(c beatsaber.Characteristic, difficulty beatsaber.BeatmapDifficulty) error
 	UnscaleTime(beat float64) beatsaber.Time
@@ -92,6 +93,17 @@ func (p *Project) Save() error {
 	fmt.Printf("generated %d events\n", len(events))
 
 	return p.Map.SaveEvents(events)
+}
+
+func (p *Project) Append() error {
+	events, err := p.generateBeatSaberEvents()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("generated %d events\n", len(events))
+
+	return p.Map.AppendEvents(events)
 }
 
 func (p *Project) Dump() error {

@@ -192,6 +192,25 @@ func (m *Map) loadEnvironmentProfile() {
 	m.activeEnvironmentProfile = profile
 }
 
+func (m *Map) AppendEvents(events []Event) error {
+	m.activeDifficulty.Events = append(m.activeDifficulty.Events, events...)
+
+	f, err := os.OpenFile(m.activeDifficultyPath, os.O_RDWR|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	enc := json.NewEncoder(f)
+
+	err = enc.Encode(m.activeDifficulty)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Map) SaveEvents(events []Event) error {
 	m.activeDifficulty.Events = events
 
