@@ -8,6 +8,7 @@ import (
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/imath"
 	"github.com/shasderias/ilysa/timer"
 )
 
@@ -63,8 +64,9 @@ func (p *Project) generateBeatSaberEvents() ([]beatsaber.Event, error) {
 	p.sortEvents()
 
 	for _, e := range p.events {
+		roundedTime := beatsaber.Time(imath.Round(float64(p.Map.UnscaleTime(e.Beat())), 5))
 		event := beatsaber.Event{
-			Time:  p.Map.UnscaleTime(e.Beat()),
+			Time:  roundedTime,
 			Type:  e.Type(),
 			Value: e.Value(),
 		}
