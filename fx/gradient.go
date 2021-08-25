@@ -11,3 +11,9 @@ func Gradient(ctx context.LightContext, table gradient.Table) evt.RGBLightingEve
 		evt.WithColor(table.Lerp(ctx.LightIDT())),
 	)
 }
+
+func GradientT(ctx context.LightContext, table gradient.Table) evt.RGBLightingEvents {
+	return ctx.NewRGBLighting(
+		evt.WithColor(table.Lerp(ctx.T())),
+	)
+}
