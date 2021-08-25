@@ -63,8 +63,6 @@ func (p *Project) sortEvents() {
 func (p *Project) generateBeatSaberEvents() ([]beatsaber.Event, error) {
 	events := []beatsaber.Event{}
 
-	p.sortEvents()
-
 	for _, e := range p.events {
 		roundedTime := beatsaber.Time(imath.Round(float64(p.Map.UnscaleTime(e.Beat())), 5))
 		event := beatsaber.Event{

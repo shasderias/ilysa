@@ -1,7 +1,7 @@
 package timer
 
 import (
-	"github.com/shasderias/ilysa/calc"
+	"github.com/shasderias/ilysa/internal/calc"
 )
 
 type Sequence interface {
