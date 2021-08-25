@@ -1,6 +1,6 @@
 # Ilysa
 
-Ilysa is a Go library that helps you create lighting patterns with speed and ease (probably)!
+Ilysa is a Go library for creating Beat Saber lighting effects.
 
 ## Interactive Tutorial
 
@@ -91,7 +91,7 @@ go mod init projectName
 Download Ilysa.
 
 ```
-go get -u github.com/shasderias/ilysa
+go get -u github.com/shasderias/ilysa@v0.0.1
 ```
 
 ## Boilerplate
@@ -127,6 +127,14 @@ Compile and run by executing `go run .` and you should see a back laser, red on 
 ## Next Steps
 
 Follow the examples at [Ilysa by Example](https://ilysa.shasderias.com/) for a tour of Ilysa's key features.
+
+# Updating
+
+Run in the root of your project:
+
+```
+go get -u github.com/shasderias/ilysa@v0.0.1
+```
 
 # Helper Packages
 
