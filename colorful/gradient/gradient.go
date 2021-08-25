@@ -7,6 +7,7 @@ import (
 	"github.com/shasderias/ilysa/colorful"
 )
 
+// New returns a gradient with colors equidistant from each other.
 func New(colors ...colorful.Color) Table {
 	if len(colors) < 2 {
 		panic("gradient.New(): gradient must contain at least two colors")
@@ -22,6 +23,40 @@ func New(colors ...colorful.Color) Table {
 	}
 
 	return table
+}
+
+// NewPingPong returns a gradient consisting of:
+// (1) colors in order; followed by
+// (2) count copies of colors, alternating between:
+//   (a) colors in reverse order, with the first color omitted; and
+//   (b) colors in order, with the first color omitted.
+func NewPingPong(count int, colors ...colorful.Color) Table {
+	if count < 1 {
+		panic("gradient.NewPingPong(): count must be 1 or greater")
+	}
+	if len(colors) < 2 {
+		panic("gradient.NewPingPong(): at least 2 colors must be provided")
+	}
+
+	reverseColors := make([]colorful.Color, len(colors)-1)
+
+	for i := 0; i < len(reverseColors); i++ {
+		reverseColors[i] = colors[len(colors)-2-i]
+	}
+
+	gradColors := append([]colorful.Color{}, colors...)
+
+	colors = colors[1:]
+
+	for i := 0; i < count; i++ {
+		if i%2 == 0 {
+			gradColors = append(gradColors, reverseColors...)
+		} else {
+			gradColors = append(gradColors, colors...)
+		}
+	}
+
+	return New(gradColors...)
 }
 
 // This table contains the "keypoints" of the colorgradient you want to generate.
@@ -99,4 +134,16 @@ func (gt Table) Rotate(n int) Table {
 func (gt Table) RotateRand() Table {
 	n := rand.Intn(len(gt))
 	return gt.Rotate(n)
+}
+
+func (gt Table) ToSet() colorful.Set {
+	colors := make([]colorful.Color, len(gt))
+	for i := 0; i < len(gt); i++ {
+		colors[i] = gt[i].Col
+	}
+	return colorful.NewSet(colors...)
+}
+
+func (gt Table) Colors() []colorful.Color {
+	return gt.ToSet().Colors()
 }
