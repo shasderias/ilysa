@@ -1,3 +1,6 @@
+// Package ease implements Robert Penner's easing functions.
+// http://robertpenner.com/easing/
+// See https://easings.net/ for visualizations of the easing functions.
 package ease
 
 import "math"
