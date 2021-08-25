@@ -3,12 +3,10 @@ package light
 import (
 	"math/rand"
 
-	"github.com/shasderias/ilysa/calc"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/internal/calc"
 	"github.com/shasderias/ilysa/lightid"
-	"github.com/shasderias/ilysa/transform"
 )
 
 type Sequence struct {
@@ -65,7 +63,7 @@ func (s Sequence) Slice(i, j int) Sequence {
 func (s Sequence) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	seq := NewSequence()
 	for _, l := range s.lights {
-		tfl, ok := l.(transform.LightIDTransformableLight)
+		tfl, ok := l.(LightIDTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
@@ -78,7 +76,7 @@ func (s Sequence) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Ligh
 func (s Sequence) LightIDSetTransform(fn func(lightid.Set) lightid.Set) context.Light {
 	seq := NewSequence()
 	for _, l := range s.lights {
-		tfl, ok := l.(transform.LightIDSetTransformableLight)
+		tfl, ok := l.(LightIDSetTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
@@ -91,7 +89,7 @@ func (s Sequence) LightIDSetTransform(fn func(lightid.Set) lightid.Set) context.
 func (s Sequence) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	seq := NewSequence()
 	for _, l := range s.lights {
-		tfl, ok := l.(transform.LightIDSequenceTransformableLight)
+		tfl, ok := l.(LightIDSequenceTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
@@ -105,7 +103,7 @@ func (s Sequence) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) cont
 func (s Sequence) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set) context.Light {
 	seq := NewSequence()
 	for _, l := range s.lights {
-		tfl, ok := l.(transform.LightIDSetSequenceTransformableLight)
+		tfl, ok := l.(LightIDSetSequenceTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
