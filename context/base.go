@@ -40,7 +40,7 @@ func (b base) addEvents(events ...evt.Event) {
 }
 
 func (b base) BOffset(o float64) Context {
-	return WithOffset(b, o)
+	return WithBOffset(b, o)
 }
 func (b base) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 	WithSequence(b, s, callback)

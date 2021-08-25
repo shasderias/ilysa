@@ -14,6 +14,7 @@ import (
 
 type Project struct {
 	Map
+	context.Context
 
 	events []evt.Event
 }
@@ -28,22 +29,18 @@ type Map interface {
 }
 
 func New(bsMap Map) *Project {
-	return &Project{
+	p := &Project{
 		Map:    bsMap,
 		events: []evt.Event{},
 	}
+
+	p.Context = context.Base(p)
+
+	return p
 }
 
-func (p *Project) Offset(offset float64) context.Context {
+func (p *Project) BOffset(offset float64) context.Context {
 	return context.Base(p).BOffset(offset)
-}
-
-func (p *Project) Range(r timer.Ranger, callback func(context.Context)) {
-	context.Base(p).Range(r, callback)
-}
-
-func (p *Project) Sequence(s timer.Sequencer, callback func(ctx context.Context)) {
-	context.Base(p).Sequence(s, callback)
 }
 
 func (p *Project) MaxLightID(t evt.LightType) int {

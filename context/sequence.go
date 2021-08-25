@@ -28,7 +28,7 @@ type seqTimerCtx struct {
 }
 
 // public
-func (c seqTimerCtx) BOffset(o float64) Context { return WithOffset(c, o) }
+func (c seqTimerCtx) BOffset(o float64) Context { return WithBOffset(c, o) }
 func (c seqTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 	WithSequence(c, s, callback)
 }

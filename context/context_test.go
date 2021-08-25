@@ -42,7 +42,7 @@ func TestSeqCtx(t *testing.T) {
 	t.Run("BOffset/Sequence/Range/Light", func(t *testing.T) {
 		proj := context.NewMockProject(t, 3)
 		light := proj.MockLight()
-		ctx := context.WithOffset(context.Base(proj), 2)
+		ctx := context.WithBOffset(context.Base(proj), 2)
 		ctx.Sequence(timer.SeqFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
 			ctx.Range(timer.Rng(0, 1, 3, ease.Linear), func(ctx context.Context) {
 				ctx.Light(light, func(ctx context.LightContext) {

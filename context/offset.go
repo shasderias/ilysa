@@ -11,7 +11,7 @@ type offsetCtx struct {
 	eventer
 }
 
-func WithOffset(parent Context, offset float64) Context {
+func WithBOffset(parent Context, offset float64) Context {
 	ctx := offsetCtx{
 		Context: parent,
 		o:       offset,
@@ -30,7 +30,7 @@ func (c offsetCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }
 func (c offsetCtx) BOffset(o float64) Context {
-	return WithOffset(c, o)
+	return WithBOffset(c, o)
 }
 
 func (c offsetCtx) offset() float64 { return c.Context.offset() + c.o }
