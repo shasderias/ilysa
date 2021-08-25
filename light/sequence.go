@@ -6,6 +6,7 @@ import (
 	"github.com/shasderias/ilysa/calc"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/internal/calc"
 	"github.com/shasderias/ilysa/lightid"
 	"github.com/shasderias/ilysa/transform"
 )

@@ -81,6 +81,10 @@ func (MockMap) SaveEvents(events []Event) error {
 	return nil
 }
 
+func (MockMap) Events() []Event {
+	return []Event{}
+}
+
 func (m MockMap) ActiveDifficulty() *Difficulty {
 	return nil
 }

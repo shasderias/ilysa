@@ -8,8 +8,8 @@ import (
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
-	"github.com/shasderias/ilysa/imath"
-	"github.com/shasderias/ilysa/timer"
+	"github.com/shasderias/ilysa/internal/imath"
+	"github.com/shasderias/ilysa/internal/swallowjson"
 )
 
 type Project struct {
@@ -21,6 +21,7 @@ type Project struct {
 type Map interface {
 	ActiveDifficultyProfile() *beatsaber.EnvProfile
 	AppendEvents([]beatsaber.Event) error
+	Events() []beatsaber.Event
 	SaveEvents([]beatsaber.Event) error
 	SetActiveDifficulty(c beatsaber.Characteristic, difficulty beatsaber.BeatmapDifficulty) error
 	UnscaleTime(beat float64) beatsaber.Time
@@ -93,6 +94,92 @@ func (p *Project) Save() error {
 	fmt.Printf("generated %d events\n", len(events))
 
 	return p.Map.SaveEvents(events)
+}
+
+type EventCustomData struct {
+	IlysaDev bool                   `json:"ilysaDev"`
+	Rest     map[string]interface{} `json:"-"`
+}
+
+func (p *Project) getNonIlysaEvents() ([]beatsaber.Event, error) {
+	mapEvents := p.Map.Events()
+
+	fmt.Printf("map has %d events\n", len(mapEvents))
+
+	niEvents := []beatsaber.Event{}
+
+	for _, e := range mapEvents {
+		if len(e.CustomData) == 0 {
+			niEvents = append(niEvents, e)
+			continue
+		}
+
+		cd := EventCustomData{}
+		if err := json.Unmarshal(e.CustomData, &cd); err != nil {
+			return nil, err
+		}
+		if !cd.IlysaDev {
+			niEvents = append(niEvents, e)
+		}
+	}
+
+	fmt.Printf("map has %d non-Ilysa events\n", len(niEvents))
+
+	return niEvents, nil
+}
+
+func (p *Project) SaveDev() error {
+	newEvents, err := p.getNonIlysaEvents()
+	if err != nil {
+		return err
+	}
+
+	generatedEvents, err := p.generateBeatSaberEvents()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("generated %d events\n", len(generatedEvents))
+
+	for i, e := range generatedEvents {
+		cd := EventCustomData{}
+		if err := swallowjson.UnmarshalWith(&cd, "Rest", e.CustomData); err != nil {
+			return err
+		}
+		cd.IlysaDev = true
+		newRawMessage, err := swallowjson.MarshalWith(cd, "Rest")
+		if err != nil {
+			return err
+		}
+
+		generatedEvents[i].CustomData = newRawMessage
+	}
+
+	newEvents = append(newEvents, generatedEvents...)
+
+	fmt.Printf("saving %d events\n", len(newEvents))
+
+	return p.Map.SaveEvents(newEvents)
+}
+
+func (p *Project) SaveProd() error {
+	niEvents, err := p.getNonIlysaEvents()
+	if err != nil {
+		return err
+	}
+
+	events, err := p.generateBeatSaberEvents()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("generated %d events\n", len(events))
+
+	newEvents := append(niEvents, events...)
+
+	fmt.Printf("saving %d events\n", len(newEvents))
+
+	return p.Map.SaveEvents(newEvents)
 }
 
 func (p *Project) Append() error {

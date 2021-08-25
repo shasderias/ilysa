@@ -5,7 +5,7 @@ import (
 	"image/color"
 
 	"github.com/shasderias/ilysa/colorful"
-	"github.com/shasderias/ilysa/imath"
+	"github.com/shasderias/ilysa/internal/imath"
 )
 
 type Color []float64

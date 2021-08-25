@@ -6,8 +6,9 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sort"
 
-	"github.com/shasderias/ilysa/beatsaber/internal/swallowjson"
+	"github.com/shasderias/ilysa/internal/swallowjson"
 )
 
 type Map struct {
@@ -212,6 +213,10 @@ func (m *Map) AppendEvents(events []Event) error {
 }
 
 func (m *Map) SaveEvents(events []Event) error {
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].Time < events[j].Time
+	})
+
 	m.activeDifficulty.Events = events
 
 	f, err := os.OpenFile(m.activeDifficultyPath, os.O_RDWR|os.O_TRUNC, 0755)
@@ -228,6 +233,10 @@ func (m *Map) SaveEvents(events []Event) error {
 	}
 
 	return nil
+}
+
+func (m *Map) Events() []Event {
+	return m.activeDifficulty.Events
 }
 
 func (in *Info) UnmarshalJSON(raw []byte) error {
