@@ -22,10 +22,6 @@ func NewBase(opts ...BaseOpt) Base {
 	return e
 }
 
-func (e Base) ShiftBeat(offset float64) {
-	e.beat += offset
-}
-
 func (e Base) Beat() float64 {
 	return e.beat
 }

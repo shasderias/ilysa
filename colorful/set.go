@@ -9,21 +9,6 @@ type Set struct {
 	i      *int
 }
 
-//func (s *Set) Lerp(t float64, easeFunc ...ease.Func) float64 {
-//	e := ease.Linear
-//
-//	switch len(easeFunc) {
-//	case 0:
-//		// do nothing
-//	case 1:
-//		e = easeFunc[0]
-//	default:
-//		panic("colorful.Set.Lerp: requires 0 or 1 easeFuncs")
-//	}
-//
-//	return
-//}
-
 func NewSet(colors ...Color) Set {
 	c := make([]Color, 0, len(colors))
 	c = append(c, colors...)
