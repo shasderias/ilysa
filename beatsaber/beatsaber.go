@@ -159,10 +159,14 @@ func (m *Map) calculateBPMRegions() {
 		t := float64(change.Time)
 		prevRegion := bpmRegions[i]
 
+		// adapted from https://github.com/Caeden117/ChroMapper/blob/41a64f50212de47b252a7d33881cfab8f78aea32/Assets/__Scripts/MapEditor/Grid/Collections/BPMChangesContainer.cs
+		passedBeats := (t - prevRegion.start - 0.01) / startBPM * prevRegion.bpm
+		scaledBeat := prevRegion.startBeat + math.Ceil(passedBeats)
+
 		bpmRegions = append(bpmRegions, bpmRegion{
-			float64(change.Time),
+			t,
 			change.BPM,
-			math.Ceil((t-prevRegion.start)*startBPM/change.BPM) + prevRegion.startBeat,
+			scaledBeat,
 		})
 	}
 
@@ -178,7 +182,9 @@ func (m *Map) UnscaleTime(beat float64) Time {
 		if beat >= region.startBeat {
 			diff := beat - region.startBeat
 
-			return Time(region.start + (diff / region.bpm * startBPM))
+			scaledBeat := Time(region.start + (diff / region.bpm * startBPM))
+
+			return scaledBeat
 		}
 	}
 
