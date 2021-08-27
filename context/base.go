@@ -10,6 +10,7 @@ import (
 type Project interface {
 	MaxLightID(t evt.LightType) int
 	AddEvents(events ...evt.Event)
+	Events() *[]evt.Event
 }
 
 func Base(project Project) Context {
@@ -25,6 +26,10 @@ type base struct {
 	project   Project
 	fixedRand float64
 	eventer
+}
+
+func (b base) base() base {
+	return b
 }
 
 func (b base) FixedRand() float64 {
@@ -46,6 +51,10 @@ func (b base) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 	WithSequence(b, s, callback)
 }
 func (b base) Range(r timer.Ranger, callback func(ctx Context)) {
+	WithRange(b, r, callback)
+}
+func (b base) TrimRange(r timer.Ranger, callback func(ctx Context)) {
+	trimEvents(b.base().project.Events(), r.Idx(0))
 	WithRange(b, r, callback)
 }
 func (b base) Light(l Light, callback func(ctx LightContext)) {

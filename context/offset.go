@@ -26,6 +26,10 @@ func (c offsetCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 func (c offsetCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 	WithRange(c, r, callback)
 }
+func (c offsetCtx) TrimRange(r timer.Ranger, callback func(ctx Context)) {
+	trimEvents(c.base().project.Events(), r.Idx(0))
+	WithRange(c, r, callback)
+}
 func (c offsetCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }

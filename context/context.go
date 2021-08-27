@@ -16,9 +16,11 @@ type Context interface {
 	BOffset(float64) Context
 	Sequence(s timer.Sequencer, callback func(ctx Context))
 	Range(r timer.Ranger, callback func(ctx Context))
+	TrimRange(r timer.Ranger, callback func(ctx Context))
 	Light(l Light, callback func(ctx LightContext))
 
 	addEvents(events ...evt.Event)
+	base() base
 	baseTimer() bool
 	offset() float64
 }

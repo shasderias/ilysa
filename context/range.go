@@ -36,11 +36,16 @@ func (c rangeTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 func (c rangeTimerCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 	WithRange(c, r, callback)
 }
+func (c rangeTimerCtx) TrimRange(r timer.Ranger, callback func(ctx Context)) {
+	trimEvents(c.base().project.Events(), r.Idx(0))
+	WithRange(c, r, callback)
+}
 func (c rangeTimerCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }
 
 // private
+func (c rangeTimerCtx) base() base      { return c.parent.base() }
 func (c rangeTimerCtx) baseTimer() bool { return false }
 func (c rangeTimerCtx) offset() float64 { return c.parent.offset() + c.rng.B() }
 

@@ -117,6 +117,10 @@ func (p *MockProject) Cmp(t []RefTiming) {
 	}
 }
 
+func (p *MockProject) Events() *[]evt.Event {
+	return &p.events
+}
+
 func (p *MockProject) RefTimings() []RefTiming {
 	return p.refTimings
 }

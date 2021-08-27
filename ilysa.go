@@ -51,6 +51,10 @@ func (p *Project) AddEvents(events ...evt.Event) {
 	p.events = append(p.events, events...)
 }
 
+func (p *Project) Events() *[]evt.Event {
+	return &p.events
+}
+
 func (p *Project) sortEvents() {
 	sort.Slice(p.events, func(i, j int) bool {
 		return p.events[i].Beat() < p.events[j].Beat()
