@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/shasderias/ilysa/internal/swallowjson"
+	"github.com/shasderias/ilysa/scale"
 )
 
 type Map struct {
@@ -179,7 +180,20 @@ func (m *Map) UnscaleTime(beat float64) Time {
 
 	for i := len(bpmRegions) - 1; i >= 0; i-- {
 		region := bpmRegions[i]
+
 		if beat >= region.startBeat {
+			if i != len(bpmRegions)-1 {
+				nextRegion := bpmRegions[i+1]
+
+				if math.Floor(beat)+1.0 == nextRegion.startBeat {
+					integer, frac := math.Modf(beat)
+					unscaledCritStart := region.start + ((integer - region.startBeat) / region.bpm * startBPM)
+
+					scaler := scale.FromUnitClamp(unscaledCritStart, nextRegion.start)
+					return Time(scaler(frac))
+				}
+			}
+
 			diff := beat - region.startBeat
 
 			scaledBeat := Time(region.start + (diff / region.bpm * startBPM))
