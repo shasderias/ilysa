@@ -90,3 +90,12 @@ func (c eventer) NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom {
 	c.ctx.addEvents(&e)
 	return &e
 }
+
+func (c eventer) NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient {
+	e := evt.NewChromaGradient()
+	evt.Apply(&e, c.defaultOptsPre...)
+	e.Apply(opts...)
+	evt.Apply(&e, c.defaultOptsPost...)
+	c.ctx.addEvents(&e)
+	return &e
+}

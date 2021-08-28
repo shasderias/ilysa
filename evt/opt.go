@@ -26,6 +26,8 @@ func (o Opts) apply(e Event) {
 	}
 }
 
+// TODO: expand to all event types
+
 func (o Opts) applyRGBLighting(e *RGBLighting) {
 	for _, opt := range o {
 		lo, ok := opt.(RGBLightingOpt)

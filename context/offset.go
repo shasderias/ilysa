@@ -63,3 +63,6 @@ func (c offsetCtx) NewZoom(opts ...evt.ZoomOpt) *evt.Zoom {
 func (c offsetCtx) NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom {
 	return c.eventer.NewPreciseZoom(opts...)
 }
+func (c offsetCtx) NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient {
+	return c.eventer.NewChromaGradient(opts...)
+}

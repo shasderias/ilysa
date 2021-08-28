@@ -43,6 +43,7 @@ type Eventer interface {
 	NewPreciseRotation(opts ...evt.PreciseRotationOpt) *evt.PreciseRotation
 	NewZoom(opts ...evt.ZoomOpt) *evt.Zoom
 	NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom
+	NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient
 }
 
 type LightEventer interface {
