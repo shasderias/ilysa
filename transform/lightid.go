@@ -148,6 +148,8 @@ func Reverse() reverse {
 }
 
 func (r reverse) do(id lightid.ID) lightid.Set {
+	id = lightid.New(id...)
+
 	for i := len(id)/2 - 1; i >= 0; i-- {
 		opp := len(id) - 1 - i
 		id[i], id[opp] = id[opp], id[i]
