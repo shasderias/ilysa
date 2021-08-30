@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/shasderias/ilysa/context"
+	"github.com/shasderias/ilysa/light"
 	"github.com/shasderias/ilysa/lightid"
 )
 
@@ -318,56 +319,19 @@ func (r rotateSet) Sequence() rotateSet {
 	return rotateSet{r.steps, true}
 }
 
-//
-//
-//func Slice(ti, tj float64) Transformer {
-//	return func(id lightid.ID) lightid.Set {
-//		i := int(math.Round(ti * float64(len(id))))
-//		j := int(math.Round(tj * float64(len(id))))
-//
-//		return lightid.NewSet(id[i:j])
-//	}
-//}
-//
-//
-////type LightIDTransformableLight interface {
-////	LightIDTransform(Transformer) ilysa.Light
-////}
-////
-////func ToLightTransformer(tfer Transformer) ilysa.LightTransformer {
-////	return func(l ilysa.Light) ilysa.Light {
-////		tfl, ok := l.(LightIDTransformableLight)
-////		if !ok {
-////			return l
-////		}
-////		return tfl.LightIDTransform(tfer)
-////	}
-////}
-////
-////type LightIDSequenceTransformable interface {
-////	LightIDSequenceTransform(Transformer) ilysa.Light
-////}
-////
-////func ToSequenceLightTransformer(tfer Transformer) ilysa.LightTransformer {
-////	return func(l ilysa.Light) ilysa.Light {
-////		tfl, ok := l.(LightIDSequenceTransformable)
-////		if !ok {
-////			return l
-////		}
-////		return tfl.LightIDSequenceTransform(tfer)
-////	}
-////}
-////
-////type LightIDSetTransformable interface {
-////	LightIDSetTransform(SetTransformer) ilysa.Light
-////}
-////
-////func LightIDSetTransformerToLightTransformer(tfer SetTransformer) ilysa.LightTransformer {
-////	return func(l ilysa.Light) ilysa.Light {
-////		tfl, ok := l.(LightIDSetTransformable)
-////		if !ok {
-////			return l
-////		}
-////		return tfl.LightIDSetTransform(tfer)
-////	}
-////}
+type sequenceIdx struct {
+	i int
+}
+
+func SequenceIdx(i int) sequenceIdx {
+	return sequenceIdx{i}
+}
+
+func (si sequenceIdx) LightTransform(l context.Light) context.Light {
+	sl, ok := l.(light.Sequence)
+	if !ok {
+		return l
+	}
+
+	return sl.Idx(si.i)
+}
