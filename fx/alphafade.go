@@ -20,7 +20,7 @@ func AlphaFadeEx(ctx context.LightContext, events evt.RGBLightingEvents, startT,
 
 	tScale := scale.ToUnitClamp(startT, endT)
 	alphaScale := scale.FromUnitClamp(startAlpha, endAlpha)
-	newAlpha := alphaScale(tScale(easeFn(ctx.T())))
+	newAlpha := alphaScale(easeFn(tScale(ctx.T())))
 	events.Apply(evt.WithAlpha(newAlpha))
 }
 
