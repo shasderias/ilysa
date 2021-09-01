@@ -1,6 +1,9 @@
 package context
 
 import (
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -26,13 +29,22 @@ func (c offsetCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 func (c offsetCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 	WithRange(c, r, callback)
 }
-func (c offsetCtx) TrimRange(r timer.Ranger, callback func(ctx Context)) {
-	trimEvents(c.base().project.Events(), r.Idx(0))
-	WithRange(c, r, callback)
+func (c offsetCtx) Beat(beat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Beat(beat), callback)
+}
+func (c offsetCtx) BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Seq(seq, ghostBeat), callback)
+}
+func (c offsetCtx) BeatInterval(startBeat, duration float64, count int, callback func(ctx Context)) {
+	WithSequence(c, timer.Interval(startBeat, duration, count), callback)
+}
+func (c offsetCtx) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context)) {
+	WithRange(c, timer.Rng(startB, endB, steps, easeFn), callback)
 }
 func (c offsetCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }
+
 func (c offsetCtx) BOffset(o float64) Context {
 	return WithBOffset(c, o)
 }
@@ -65,4 +77,29 @@ func (c offsetCtx) NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom {
 }
 func (c offsetCtx) NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient {
 	return c.eventer.NewChromaGradient(opts...)
+}
+
+func (c offsetCtx) EZLighting(typ evt.LightType, val evt.LightValue) *evt.Lighting {
+	return c.eventer.EZLighting(typ, val)
+}
+func (c offsetCtx) EZRGBLighting(color colorful.Color) *evt.RGBLighting {
+	return c.eventer.EZRGBLighting(color)
+}
+func (c offsetCtx) EZLaser(laser evt.DirectionalLaser, speed int) *evt.Laser {
+	return c.eventer.EZLaser(laser, speed)
+}
+func (c offsetCtx) EZPreciseLaser(laser evt.DirectionalLaser, speed float64) *evt.PreciseLaser {
+	return c.eventer.EZPreciseLaser(laser, speed)
+}
+func (c offsetCtx) EZRotation() *evt.Rotation {
+	return c.eventer.EZRotation()
+}
+func (c offsetCtx) EZPreciseRotation(rotation, step, prop, speed float64, direction chroma.SpinDirection) *evt.PreciseRotation {
+	return c.eventer.EZPreciseRotation(rotation, step, prop, speed, direction)
+}
+func (c offsetCtx) EZZoom() *evt.Zoom {
+	return c.eventer.EZZoom()
+}
+func (c offsetCtx) EZPreciseZoom(step float64) *evt.PreciseZoom {
+	return c.eventer.EZPreciseZoom(step)
 }

@@ -1,6 +1,9 @@
 package context
 
 import (
+	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -16,7 +19,9 @@ type Context interface {
 	BOffset(float64) Context
 	Sequence(s timer.Sequencer, callback func(ctx Context))
 	Range(r timer.Ranger, callback func(ctx Context))
-	TrimRange(r timer.Ranger, callback func(ctx Context))
+	Beat(beat float64, callback func(ctx Context))
+	BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context))
+	BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context))
 	Light(l Light, callback func(ctx LightContext))
 
 	addEvents(events ...evt.Event)
@@ -44,10 +49,20 @@ type Eventer interface {
 	NewZoom(opts ...evt.ZoomOpt) *evt.Zoom
 	NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom
 	NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient
+
+	EZLighting(typ evt.LightType, val evt.LightValue) *evt.Lighting
+	EZRGBLighting(color colorful.Color) *evt.RGBLighting
+	EZLaser(laser evt.DirectionalLaser, speed int) *evt.Laser
+	EZPreciseLaser(laser evt.DirectionalLaser, speed float64) *evt.PreciseLaser
+	EZRotation() *evt.Rotation
+	EZPreciseRotation(rotation, step, prop, speed float64, direction chroma.SpinDirection) *evt.PreciseRotation
+	EZZoom() *evt.Zoom
+	EZPreciseZoom(step float64) *evt.PreciseZoom
 }
 
 type LightEventer interface {
 	NewRGBLighting(opts ...evt.RGBLightingOpt) evt.RGBLightingEvents
+	EZRGBLighting(color colorful.Color) evt.RGBLightingEvents
 }
 
 type LightRGBLightingContext interface {

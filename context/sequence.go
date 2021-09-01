@@ -3,6 +3,7 @@ package context
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -35,9 +36,14 @@ func (c seqTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 func (c seqTimerCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 	WithRange(c, r, callback)
 }
-func (c seqTimerCtx) TrimRange(r timer.Ranger, callback func(ctx Context)) {
-	trimEvents(c.base().project.Events(), r.Idx(0))
-	WithRange(c, r, callback)
+func (c seqTimerCtx) Beat(beat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Beat(beat), callback)
+}
+func (c seqTimerCtx) BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Seq(seq, ghostBeat), callback)
+}
+func (c seqTimerCtx) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context)) {
+	WithRange(c, timer.Rng(startB, endB, steps, easeFn), callback)
 }
 func (c seqTimerCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
@@ -53,6 +59,13 @@ func (c seqTimerCtx) baseTimer() bool { return false }
 func (c seqTimerCtx) offset() float64 { return c.parent.offset() + c.seq.ToRange().B() }
 
 // passthrough to base
+func (c seqTimerCtx) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
+	return c.parent.FilterEvents(f)
+}
+func (c seqTimerCtx) MapEvents(f func(e evt.Event) evt.Event) {
+	c.parent.MapEvents(f)
+}
+func (c seqTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
 func (c seqTimerCtx) addEvents(events ...evt.Event)  { c.parent.addEvents(events...) }
 func (c seqTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
 

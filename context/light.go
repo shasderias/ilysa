@@ -1,6 +1,7 @@
 package context
 
 import (
+	"github.com/shasderias/ilysa/colorful"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -34,6 +35,10 @@ func (c lightTimerCtx) Next() bool {
 func (c lightTimerCtx) NewRGBLighting(opts ...evt.RGBLightingOpt) evt.RGBLightingEvents {
 	e := c.l.NewRGBLighting(newLightCtx(c.Context, c.Light, c.l, opts))
 	return e
+}
+
+func (c lightTimerCtx) EZRGBLighting(color colorful.Color) evt.RGBLightingEvents {
+	return c.NewRGBLighting(evt.WithColor(color))
 }
 
 func newLightCtx(ctx Context, lightTimer timer.Light, l Light, opts []evt.RGBLightingOpt) lightCtx {

@@ -3,6 +3,7 @@ package context
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -36,9 +37,14 @@ func (c rangeTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 func (c rangeTimerCtx) Range(r timer.Ranger, callback func(ctx Context)) {
 	WithRange(c, r, callback)
 }
-func (c rangeTimerCtx) TrimRange(r timer.Ranger, callback func(ctx Context)) {
-	trimEvents(c.base().project.Events(), r.Idx(0))
-	WithRange(c, r, callback)
+func (c rangeTimerCtx) Beat(beat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Beat(beat), callback)
+}
+func (c rangeTimerCtx) BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context)) {
+	WithSequence(c, timer.Seq(seq, ghostBeat), callback)
+}
+func (c rangeTimerCtx) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context)) {
+	WithRange(c, timer.Rng(startB, endB, steps, easeFn), callback)
 }
 func (c rangeTimerCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
