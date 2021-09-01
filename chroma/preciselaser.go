@@ -1,6 +1,10 @@
 package chroma
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/shasderias/ilysa/internal/imath"
+)
 
 type PreciseLaser struct {
 	LockPosition bool          `json:"_lockPosition"`
@@ -9,5 +13,6 @@ type PreciseLaser struct {
 }
 
 func (pl *PreciseLaser) CustomData() (json.RawMessage, error) {
+	pl.Speed = imath.Round(pl.Speed, 2)
 	return json.Marshal(pl)
 }
