@@ -147,3 +147,15 @@ func (gt Table) ToSet() colorful.Set {
 func (gt Table) Colors() []colorful.Color {
 	return gt.ToSet().Colors()
 }
+
+// Boost returns a new gradient with each color's RGB value multiplied by m.
+// Boost does not affect a color's A or position.
+func (gt Table) Boost(m float64) Table {
+	newTable := make(Table, 0)
+
+	for _, c := range gt {
+		newTable = append(newTable, Point{Col: c.Col.Boost(m), Pos: c.Pos})
+	}
+
+	return newTable
+}
