@@ -55,6 +55,26 @@ func (p *Project) Events() *[]evt.Event {
 	return &p.events
 }
 
+func (p *Project) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
+	filteredEvents := make([]evt.Event, 0)
+
+	for _, e := range p.events {
+		if f(e) {
+			filteredEvents = append(filteredEvents, e)
+		}
+	}
+
+	p.events = filteredEvents
+
+	return &filteredEvents
+}
+
+func (p *Project) MapEvents(f func(e evt.Event) evt.Event) {
+	for i := range p.events {
+		p.events[i] = f(p.events[i])
+	}
+}
+
 func (p *Project) sortEvents() {
 	sort.Slice(p.events, func(i, j int) bool {
 		return p.events[i].Beat() < p.events[j].Beat()

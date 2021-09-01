@@ -51,3 +51,11 @@ func (c Combined) LightIDLen() int {
 	}
 	return max
 }
+
+func (c Combined) Name() []string {
+	name := []string{}
+	for _, l := range c.lights {
+		name = append(name, l.Name()...)
+	}
+	return name
+}

@@ -67,7 +67,6 @@ func (c seqTimerCtx) MapEvents(f func(e evt.Event) evt.Event) {
 }
 func (c seqTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
 func (c seqTimerCtx) addEvents(events ...evt.Event)  { c.parent.addEvents(events...) }
-func (c seqTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
 
 // passthrough to sequence timer
 func (c seqTimerCtx) SeqT() float64              { return c.seq.SeqT() }

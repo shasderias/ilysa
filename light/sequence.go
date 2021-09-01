@@ -113,3 +113,11 @@ func (s Sequence) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set) 
 	}
 	return seq
 }
+
+func (s Sequence) Name() []string {
+	name := []string{}
+	for _, l := range s.lights {
+		name = append(name, l.Name()...)
+	}
+	return name
+}

@@ -24,6 +24,9 @@ type Context interface {
 	BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context))
 	Light(l Light, callback func(ctx LightContext))
 
+	MapEvents(func(e evt.Event) evt.Event)
+	FilterEvents(func(e evt.Event) bool) *[]evt.Event
+
 	addEvents(events ...evt.Event)
 	base() base
 	baseTimer() bool
@@ -76,4 +79,5 @@ type LightRGBLightingContext interface {
 type Light interface {
 	NewRGBLighting(ctx LightRGBLightingContext) evt.RGBLightingEvents
 	LightIDLen() int
+	Name() []string
 }

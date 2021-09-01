@@ -12,6 +12,8 @@ type Project interface {
 	MaxLightID(t evt.LightType) int
 	AddEvents(events ...evt.Event)
 	Events() *[]evt.Event
+	FilterEvents(func(e evt.Event) bool) *[]evt.Event
+	MapEvents(func(e evt.Event) evt.Event)
 }
 
 func Base(project Project) Context {
@@ -68,6 +70,13 @@ func (b base) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callb
 }
 func (b base) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(b, l, callback)
+}
+
+func (b base) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
+	return b.project.FilterEvents(f)
+}
+func (b base) MapEvents(f func(e evt.Event) evt.Event) {
+	b.project.MapEvents(f)
 }
 
 func (b base) baseTimer() bool   { return true }

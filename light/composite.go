@@ -1,6 +1,8 @@
 package light
 
 import (
+	"fmt"
+
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
@@ -9,10 +11,11 @@ import (
 type Composite struct {
 	t   evt.LightType
 	set lightid.Set
+	uid string
 }
 
 func NewComposite(t evt.LightType, set lightid.Set) Composite {
-	return Composite{t, set}
+	return Composite{t, set, getLightUID()}
 }
 
 func (l Composite) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLightingEvents {
@@ -65,4 +68,8 @@ func (l Composite) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set)
 	}
 
 	return seqLight
+}
+
+func (l Composite) Name() []string {
+	return []string{fmt.Sprintf("Composite-%d-%s", l.t, l.uid)}
 }

@@ -61,8 +61,14 @@ func (c rangeTimerCtx) FixedRand() float64 {
 }
 
 // passthrough to base
-func (c rangeTimerCtx) addEvents(events ...evt.Event)  { c.parent.addEvents(events...) }
+func (c rangeTimerCtx) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
+	return c.parent.FilterEvents(f)
+}
+func (c rangeTimerCtx) MapEvents(f func(e evt.Event) evt.Event) {
+	c.parent.MapEvents(f)
+}
 func (c rangeTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
+func (c rangeTimerCtx) addEvents(events ...evt.Event)  { c.parent.addEvents(events...) }
 
 // passthrough to range timer
 func (c rangeTimerCtx) B() float64                 { return c.rng.B() }

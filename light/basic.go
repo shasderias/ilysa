@@ -1,6 +1,8 @@
 package light
 
 import (
+	"fmt"
+
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
@@ -46,4 +48,8 @@ func (l Basic) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) context
 	}
 
 	return sl
+}
+
+func (l Basic) Name() []string {
+	return []string{fmt.Sprintf("Basic-%d", l.lightType)}
 }

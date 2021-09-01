@@ -1,6 +1,7 @@
 package context
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -111,6 +112,10 @@ func (l MockLight) LightIDLen() int {
 	return l.MockProject.maxLightID
 }
 
+func (l MockLight) Name() []string {
+	return []string{fmt.Sprintf("MockLight")}
+}
+
 func (p *MockProject) Cmp(t []RefTiming) {
 	if diff := cmp.Diff(t, p.refTimings, cmpopts.EquateApprox(0.000001, 0)); diff != "" {
 		p.t.Fatal(diff)
@@ -131,5 +136,21 @@ func (p *MockProject) Sequence(s timer.Sequencer, callback func(ctx Context)) {
 
 func (p *MockProject) Range(r timer.Ranger, callback func(ctx Context)) {
 	Base(p).Range(r, callback)
+}
 
+func (p *MockProject) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
+	filteredEvents := make([]evt.Event, 0)
+	for _, e := range p.events {
+		if f(e) {
+			filteredEvents = append(filteredEvents, e)
+		}
+	}
+	p.events = filteredEvents
+	return &filteredEvents
+}
+
+func (p *MockProject) MapEvents(f func(e evt.Event) evt.Event) {
+	for i := range p.events {
+		p.events[i] = f(p.events[i])
+	}
 }

@@ -1,6 +1,8 @@
 package light
 
 import (
+	"fmt"
+
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
@@ -15,6 +17,12 @@ type Custom struct {
 func NewCustom(t evt.LightType, len, offset int) Custom {
 	return Custom{
 		t, len, offset,
+	}
+}
+
+func NewCustomFromRange(t evt.LightType, startID, endID int) Custom {
+	return Custom{
+		t, endID - startID, startID,
 	}
 }
 
@@ -45,4 +53,8 @@ func (c Custom) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) contex
 	}
 
 	return sl
+}
+
+func (c Custom) Name() []string {
+	return []string{fmt.Sprintf("Custom-%d-%d-%d", c.lightType, c.len, c.offset)}
 }

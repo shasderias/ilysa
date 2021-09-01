@@ -14,5 +14,9 @@ type Event interface {
 	Value() beatsaber.EventValue
 	SetValue(value beatsaber.EventValue)
 
+	HasTag(tag ...string) bool
+	SetTag(tag string)
+	ClearTag(tag string)
+
 	CustomData() (json.RawMessage, error)
 }
