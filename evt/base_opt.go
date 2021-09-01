@@ -52,6 +52,10 @@ func (o withBeatOpt) applyPreciseZoom(e *PreciseZoom) {
 	e.SetBeat(o.b)
 }
 
+func (o withBeatOpt) applyChromaGradient(e *ChromaGradient) {
+	e.SetBeat(o.b)
+}
+
 func WithBOffset(o float64) withBeatOffsetOpt {
 	return withBeatOffsetOpt{o}
 }
@@ -98,6 +102,84 @@ func (o withBeatOffsetOpt) applyZoom(e *Zoom) {
 
 func (o withBeatOffsetOpt) applyPreciseZoom(e *PreciseZoom) {
 	e.SetBeat(e.Beat() + o.o)
+}
+
+func (o withBeatOffsetOpt) applyChromaGradient(e *ChromaGradient) {
+	e.SetBeat(e.Beat() + o.o)
+}
+
+func WithTag(tag ...string) withTagOpt {
+	return withTagOpt{tag}
+}
+
+type withTagOpt struct {
+	tag []string
+}
+
+func (o withTagOpt) apply(e Event) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyBase(e *Base) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyLighting(e *Lighting) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyRGBLighting(e *RGBLighting) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyRotation(e *Rotation) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyPreciseRotation(e *PreciseRotation) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyLaser(e *Laser) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyPreciseLaser(e *PreciseLaser) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyZoom(e *Zoom) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyPreciseZoom(e *PreciseZoom) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
+}
+
+func (o withTagOpt) applyChromaGradient(e *ChromaGradient) {
+	for _, t := range o.tag {
+		e.SetTag(t)
+	}
 }
 
 type withTypeOpt struct{ t beatsaber.EventType }
