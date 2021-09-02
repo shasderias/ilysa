@@ -25,6 +25,10 @@ func (l Lighter) Iterate() Light {
 	return &LightIterator{l, -1}
 }
 
+func (l Lighter) IterateFrom(ordinal int) Light {
+	return &LightIterator{l, ordinal}
+}
+
 type LightIterator struct {
 	Lighter
 	ordinal int

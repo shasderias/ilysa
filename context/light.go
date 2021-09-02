@@ -77,3 +77,19 @@ func (c lightCtx) NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting {
 func (c lightCtx) Next() bool {
 	return c.Light.Next()
 }
+
+func WithLightTimer(ctx LightRGBLightingContext, t timer.Light) LightRGBLightingContext {
+	c, ok := ctx.(lightCtx)
+	if !ok {
+		return c
+	}
+
+	return lightCtx{
+		Context:         c.Context,
+		Light:           t,
+		l:               c.l,
+		defaultOptsPre:  c.defaultOptsPre,
+		userOpts:        c.userOpts,
+		defaultOptsPost: c.defaultOptsPost,
+	}
+}

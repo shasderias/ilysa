@@ -36,7 +36,7 @@ func (c Custom) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLight
 }
 
 func (c Custom) LightIDLen() int {
-	return c.len
+	return 1
 }
 
 func (c Custom) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
