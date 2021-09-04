@@ -214,6 +214,31 @@ func (s shuffle) Sequence() shuffle {
 	return shuffle{true}
 }
 
+type shuffleSeed struct {
+	sequence bool
+	seed     int64
+	randSrc  *rand.Rand
+}
+
+func ShuffleSeed(seed int64) shuffleSeed {
+	return shuffleSeed{seed: seed, randSrc: rand.New(rand.NewSource(seed))}
+}
+
+func (s shuffleSeed) do(id lightid.ID) lightid.Set {
+	s.randSrc.Shuffle(len(id), func(i, j int) {
+		id[i], id[j] = id[j], id[i]
+	})
+	return lightid.NewSet(id)
+}
+
+func (s shuffleSeed) LightTransform(l context.Light) context.Light {
+	return applyLightIDTransformer(l, s.do, s.sequence)
+}
+
+func (s shuffleSeed) Sequence() shuffleSeed {
+	return shuffleSeed{true, s.seed, s.randSrc}
+}
+
 //func Even(lightID ID) Set {
 //	evenIDs := New()
 //
