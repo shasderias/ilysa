@@ -46,6 +46,9 @@ func (c rangeTimerCtx) BeatSequence(seq []float64, ghostBeat float64, callback f
 func (c rangeTimerCtx) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context)) {
 	WithRange(c, timer.Rng(startB, endB, steps, easeFn), callback)
 }
+func (c rangeTimerCtx) BeatRangeInterval(startB, endB, interval float64, easeFn ease.Func, callback func(ctx Context)) {
+	WithRange(c, timer.RngInterval(startB, endB, interval, easeFn), callback)
+}
 func (c rangeTimerCtx) Light(l Light, callback func(ctx LightContext)) {
 	WithLight(c, l, callback)
 }

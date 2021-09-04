@@ -17,11 +17,19 @@ type Context interface {
 	MaxLightID(t evt.LightType) int
 
 	BOffset(float64) Context
+
 	Sequence(s timer.Sequencer, callback func(ctx Context))
 	Range(r timer.Ranger, callback func(ctx Context))
+
+	// Beat is syntax sugar for Sequence(timer.Beat())
 	Beat(beat float64, callback func(ctx Context))
+	// BeatSequence is syntax sugar for Sequence(timer.Sequence())
 	BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context))
+	// BeatRange is syntax sugar for Range(timer.Rng())
 	BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context))
+	// BeatRangeInterval is syntax sugar for Range(timer.RngInterval())
+	BeatRangeInterval(startB, endB, interval float64, easeFn ease.Func, callback func(ctx Context))
+
 	Light(l Light, callback func(ctx LightContext))
 
 	MapEvents(func(e evt.Event) evt.Event)

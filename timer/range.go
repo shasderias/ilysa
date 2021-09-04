@@ -1,6 +1,8 @@
 package timer
 
 import (
+	"math"
+
 	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/scale"
 )
@@ -40,6 +42,14 @@ func Rng(startBeat, endBeat float64, steps int, fn ease.Func) Ranger {
 	}
 }
 
+func RngInterval(startBeat, endBeat, interval float64, fn ease.Func) Ranger {
+	steps := int(math.RoundToEven(endBeat-startBeat)*interval) + 1
+	if steps < 1 {
+		steps = 1
+	}
+	return Rng(startBeat, endBeat, steps, fn)
+}
+
 func (r Ranger) Iterate() Range {
 	return &RangeIterator{
 		Ranger:  r,
@@ -52,7 +62,7 @@ func (r Ranger) Iterate() Range {
 }
 
 func (r Ranger) Idx(i int) float64 {
-	t := float64(i) / float64(r.steps)
+	t := float64(i) / float64(r.steps-1)
 	return r.tToBeat(r.easeFn(t))
 }
 
