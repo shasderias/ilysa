@@ -1,4 +1,4 @@
-package colorful
+package colorgen
 
 import (
 	"math/rand"

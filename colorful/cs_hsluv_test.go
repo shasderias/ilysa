@@ -16,11 +16,11 @@ import (
 type mapping map[string]values
 
 type values struct {
-	Rgb   [3]float64
-	Xyz   [3]float64
+	RGB   [3]float64
+	XYZ   [3]float64
 	Luv   [3]float64
 	Lch   [3]float64
-	Hsluv [3]float64
+	HSLuv [3]float64
 	Hpluv [3]float64
 }
 
@@ -33,7 +33,7 @@ func unpack(tuple [3]float64) (float64, float64, float64) {
 }
 
 func fromHex(s string) Color {
-	c, _ := Hex(s)
+	c, _ := ParseHex(s)
 	return c
 }
 
@@ -91,19 +91,19 @@ func TestHSLuv(t *testing.T) {
 		}
 
 		// Adjust color values to be in the ranges this library uses
-		colorValues.Hsluv[1] /= 100.0
-		colorValues.Hsluv[2] /= 100.0
+		colorValues.HSLuv[1] /= 100.0
+		colorValues.HSLuv[2] /= 100.0
 		colorValues.Hpluv[1] /= 100.0
 		colorValues.Hpluv[2] /= 100.0
 
-		compareHex(t, HSLuv(unpack(colorValues.Hsluv)).Hex(), hex, "HsluvToHex", hex)
-		compareTuple(t, pack(HSLuv(unpack(colorValues.Hsluv)).values()), colorValues.Rgb, "HsluvToRGB", hex)
-		compareTuple(t, pack(fromHex(hex).HSLuv()), colorValues.Hsluv, "HsluvFromHex", hex)
-		compareTuple(t, pack(Color{colorValues.Rgb[0], colorValues.Rgb[1], colorValues.Rgb[2]}.HSLuv()), colorValues.Hsluv, "HsluvFromRGB", hex)
+		compareHex(t, HSLuv(unpack(colorValues.HSLuv)).Hex(), hex, "HSLuvToHex", hex)
+		compareTuple(t, pack(HSLuv(unpack(colorValues.HSLuv)).values()), colorValues.RGB, "HSLuvToRGB", hex)
+		compareTuple(t, pack(fromHex(hex).HSLuv()), colorValues.HSLuv, "HSLuvFromHex", hex)
+		compareTuple(t, pack(Color{colorValues.RGB[0], colorValues.RGB[1], colorValues.RGB[2], 1.0}.HSLuv()), colorValues.HSLuv, "HSLuvFromRGB", hex)
 		compareHex(t, HPLuv(unpack(colorValues.Hpluv)).Hex(), hex, "HpluvToHex", hex)
-		compareTuple(t, pack(HPLuv(unpack(colorValues.Hpluv)).values()), colorValues.Rgb, "HpluvToRGB", hex)
+		compareTuple(t, pack(HPLuv(unpack(colorValues.Hpluv)).values()), colorValues.RGB, "HpluvToRGB", hex)
 		compareTuple(t, pack(fromHex(hex).HPLuv()), colorValues.Hpluv, "HpluvFromHex", hex)
-		compareTuple(t, pack(Color{colorValues.Rgb[0], colorValues.Rgb[1], colorValues.Rgb[2]}.HPLuv()), colorValues.Hpluv, "HpluvFromRGB", hex)
+		compareTuple(t, pack(Color{colorValues.RGB[0], colorValues.RGB[1], colorValues.RGB[2], 1.0}.HPLuv()), colorValues.Hpluv, "HpluvFromRGB", hex)
 
 		if !testing.Short() {
 			// internal tests
@@ -120,24 +120,24 @@ func TestHSLuv(t *testing.T) {
 
 			compareTuple(t, pack(LuvLChWhiteRef(
 				colorValues.Lch[0], colorValues.Lch[1], colorValues.Lch[2], hSLuvD65,
-			).values()), colorValues.Rgb, "convLchRgb", hex)
+			).values()), colorValues.RGB, "convLchRGB", hex)
 			compareTuple(t, pack(Color{
-				colorValues.Rgb[0], colorValues.Rgb[1], colorValues.Rgb[2],
-			}.LuvLChWhiteRef(hSLuvD65)), colorValues.Lch, "convRgbLch", hex)
-			compareTuple(t, pack(XyzToLuvWhiteRef(
-				colorValues.Xyz[0], colorValues.Xyz[1], colorValues.Xyz[2], hSLuvD65,
-			)), colorValues.Luv, "convXyzLuv", hex)
-			compareTuple(t, pack(LuvToXyzWhiteRef(
+				colorValues.RGB[0], colorValues.RGB[1], colorValues.RGB[2], 1.0,
+			}.LuvLChWhiteRef(hSLuvD65)), colorValues.Lch, "convRGBLch", hex)
+			compareTuple(t, pack(XYZToLuvWhiteRef(
+				colorValues.XYZ[0], colorValues.XYZ[1], colorValues.XYZ[2], hSLuvD65,
+			)), colorValues.Luv, "convXYZLuv", hex)
+			compareTuple(t, pack(LuvToXYZWhiteRef(
 				colorValues.Luv[0], colorValues.Luv[1], colorValues.Luv[2], hSLuvD65,
-			)), colorValues.Xyz, "convLuvXyz", hex)
+			)), colorValues.XYZ, "convLuvXYZ", hex)
 			compareTuple(t, pack(LuvToLuvLCh(unpack(colorValues.Luv))), colorValues.Lch, "convLuvLch", hex)
 			compareTuple(t, pack(LuvLChToLuv(unpack(colorValues.Lch))), colorValues.Luv, "convLchLuv", hex)
-			compareTuple(t, pack(HSLuvToLuvLCh(unpack(colorValues.Hsluv))), colorValues.Lch, "convHsluvLch", hex)
-			compareTuple(t, pack(LuvLChToHSLuv(unpack(colorValues.Lch))), colorValues.Hsluv, "convLchHsluv", hex)
+			compareTuple(t, pack(HSLuvToLuvLCh(unpack(colorValues.HSLuv))), colorValues.Lch, "convHSLuvLch", hex)
+			compareTuple(t, pack(LuvLChToHSLuv(unpack(colorValues.Lch))), colorValues.HSLuv, "convLchHSLuv", hex)
 			compareTuple(t, pack(HPLuvToLuvLCh(unpack(colorValues.Hpluv))), colorValues.Lch, "convHpluvLch", hex)
 			compareTuple(t, pack(LuvLChToHPLuv(unpack(colorValues.Lch))), colorValues.Hpluv, "convLchHpluv", hex)
-			compareTuple(t, pack(LinearRgb(XyzToLinearRgb(unpack(colorValues.Xyz))).values()), colorValues.Rgb, "convXyzRgb", hex)
-			compareTuple(t, pack(Color{colorValues.Rgb[0], colorValues.Rgb[1], colorValues.Rgb[2]}.Xyz()), colorValues.Xyz, "convRgbXyz", hex)
+			compareTuple(t, pack(LinearRGB(XYZToLinearRGB(unpack(colorValues.XYZ))).values()), colorValues.RGB, "convXYZRGB", hex)
+			compareTuple(t, pack(Color{colorValues.RGB[0], colorValues.RGB[1], colorValues.RGB[2], 1.0}.XYZ()), colorValues.XYZ, "convRGBXYZ", hex)
 		}
 	}
 }

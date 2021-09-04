@@ -3,9 +3,20 @@ package ilysa
 import (
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/draw"
+	"image/png"
+	"os"
 	"sort"
+	"strings"
+
+	"github.com/shasderias/ilysa/colorful"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/math/fixed"
 
 	"github.com/shasderias/ilysa/beatsaber"
+	"github.com/shasderias/ilysa/colorful/gradient"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/internal/imath"
@@ -113,6 +124,98 @@ func (p *Project) Save() error {
 	fmt.Printf("generated %d events\n", len(events))
 
 	return p.Map.SaveEvents(events)
+}
+
+// GenerateGradientReference generates a PNG with all gradients declared at the
+// top level and saves it to path. Each gradient is labelled with its name.
+// Useful as a reference.
+//
+// GenerateGradientReference only works on the machine the program is compiled on.
+func (p *Project) GenerateGradientReference(path string) error {
+	const (
+		topBottomPadding    = 16
+		leftRightPadding    = 16
+		textColWidth        = 160
+		gradientHeight      = 36
+		gradientWidth       = 480
+		textGradientSpacing = 16
+		gradientSpacing     = 8
+	)
+
+	var (
+		backgroundColor = colorful.Hex("#333")
+	)
+
+	grads := gradient.DeclaredGradients
+	l := len(grads)
+
+	h := topBottomPadding + (gradientHeight * l) + (gradientSpacing * (l - 1)) + topBottomPadding
+	w := leftRightPadding + textColWidth + textGradientSpacing + gradientWidth + leftRightPadding
+
+	img := image.NewNRGBA(image.Rect(0, 0, w, h))
+
+	draw.Draw(img, image.Rect(0, 0, w, h), &image.Uniform{backgroundColor}, image.Point{}, draw.Src)
+
+	i := 0
+
+	type namedGrad struct {
+		name string
+		grad gradient.Table
+	}
+	sortedGrads := []namedGrad{}
+
+	for name, grad := range grads {
+		sortedGrads = append(sortedGrads, namedGrad{
+			name: name,
+			grad: grad,
+		})
+	}
+
+	sort.Slice(sortedGrads, func(i, j int) bool {
+		return strings.Compare(sortedGrads[i].name, sortedGrads[j].name) < 0
+	})
+
+	for _, sg := range sortedGrads {
+		name := sg.name
+		grad := sg.grad
+
+		// label
+		x0 := leftRightPadding
+		y0 := topBottomPadding + ((gradientHeight + gradientSpacing) * i)
+
+		addLabel(img, x0, y0+(gradientHeight/2), name)
+
+		// gradient
+		x0 = leftRightPadding + textColWidth + textGradientSpacing
+		y1 := y0 + gradientHeight
+
+		for x := 0; x < gradientWidth; x++ {
+			c := grad.Lerp(float64(x) / float64(gradientWidth))
+			draw.Draw(img, image.Rect(x0+x, y0, x0+x+1, y1), &image.Uniform{c}, image.Point{}, draw.Src)
+		}
+
+		i++
+	}
+	outpng, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer outpng.Close()
+
+	return png.Encode(outpng, img)
+}
+
+func addLabel(img *image.NRGBA, x, y int, label string) {
+	col := colorful.Hex("#fff")
+	point := fixed.Point26_6{fixed.Int26_6(x * 64), fixed.Int26_6(y * 64)}
+
+	d := &font.Drawer{
+		Dst:  img,
+		Src:  image.NewUniform(col),
+		Face: basicfont.Face7x13,
+		Dot:  point,
+	}
+	d.DrawString(label)
 }
 
 type EventCustomData struct {

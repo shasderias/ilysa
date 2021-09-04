@@ -17,10 +17,10 @@ type GradientTable []struct {
 	Pos float64
 }
 
-// This is the meat of the gradient computation. It returns a HCL-blend between
+// This is the meat of the gradient computation. It returns a LABLCH-blend between
 // the two colors around `t`.
 // Note: It relies heavily on the fact that the gradient keypoints are sorted.
-func (gt GradientTable) GetInterpolatedColorFor(t float64) colorful.Color {
+func (gt GradientTable) Lerp(t float64) colorful.Color {
 	for i := 0; i < len(gt)-1; i++ {
 		c1 := gt[i]
 		c2 := gt[i+1]
@@ -35,11 +35,10 @@ func (gt GradientTable) GetInterpolatedColorFor(t float64) colorful.Color {
 	return gt[len(gt)-1].Col
 }
 
-
 // This is a very nice thing Golang forces you to do!
 // It is necessary so that we can write out the literal of the colortable below.
 func MustParseHex(s string) colorful.Color {
-	c, err := colorful.Hex(s)
+	c, err := colorful.ParseHex(s)
 	if err != nil {
 		panic("MustParseHex: " + err.Error())
 	}
@@ -48,6 +47,11 @@ func MustParseHex(s string) colorful.Color {
 
 func main() {
 	// The "keypoints" of the gradient.
+	//keypoints := gradient.New(
+	//	colorful.MustParseHex("#ff0000"),
+	//	colorful.MustParseHex("#0000ff"),
+	//)
+	//fmt.Println(keypoints)
 	keypoints := GradientTable{
 		{MustParseHex("#9e0142"), 0.0},
 		{MustParseHex("#d53e4f"), 0.1},
@@ -62,14 +66,13 @@ func main() {
 		{MustParseHex("#5e4fa2"), 1.0},
 	}
 
-	for i := range keypoints {
-		a := float64(i) * 0.1
-		keypoints[i].Col.R *= a
-		keypoints[i].Col.G *= a
-		keypoints[i].Col.B *= a
-		keypoints[i].Col.A = a
-	}
-
+	//for i := range keypoints {
+	//	a := float64(i) * 0.1
+	//	keypoints[i].Col.R *= a
+	//	keypoints[i].Col.G *= a
+	//	keypoints[i].Col.B *= a
+	//	keypoints[i].Col.A = a
+	//}
 
 	h := 600
 	w := 200
@@ -83,7 +86,7 @@ func main() {
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 
 	for y := h - 1; y >= 0; y-- {
-		c := keypoints.GetInterpolatedColorFor(float64(y) / float64(h))
+		c := keypoints.Lerp(float64(y) / float64(h))
 		draw.Draw(img, image.Rect(0, y, w, y+1), &image.Uniform{c}, image.Point{}, draw.Src)
 	}
 

@@ -8,10 +8,13 @@ import (
 	"github.com/shasderias/ilysa/colorful/gradient"
 )
 
+var (
+	R = colorful.Red
+	G = colorful.Green
+	B = colorful.Blue
+)
+
 func TestNewPingPong(t *testing.T) {
-	R := colorful.MustParseHex("#FF0000")
-	G := colorful.MustParseHex("#00FF00")
-	B := colorful.MustParseHex("#0000FF")
 
 	tests := []struct {
 		name   string
@@ -64,6 +67,41 @@ func TestNewPingPong(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+	}
+}
+
+func TestRotate(t *testing.T) {
+	testCases := []struct {
+		Grad gradient.Table
+		N    int
+		Want gradient.Table
+	}{
+		{
+			gradient.New(R, G, B),
+			1,
+			gradient.New(G, B, R),
+		},
+		{
+			gradient.New(R, G, B),
+			2,
+			gradient.New(B, R, G),
+		},
+		{
+			gradient.New(R, G, B),
+			3,
+			gradient.New(R, G, B),
+		},
+		{
+			gradient.New(R, G, B),
+			4,
+			gradient.New(G, B, R),
+		},
+	}
+
+	for _, tt := range testCases {
+		if diff := cmp.Diff(tt.Grad.Rotate(tt.N), tt.Want); diff != "" {
+			t.Fatal(diff)
+		}
 	}
 }
 

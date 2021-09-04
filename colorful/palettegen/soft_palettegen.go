@@ -1,12 +1,14 @@
 // Largely inspired by the descriptions in http://lab.medialab.sciences-po.fr/iwanthue/
 // but written from scratch.
 
-package colorful
+package palettegen
 
 import (
 	"fmt"
 	"math"
 	"math/rand"
+
+	"github.com/shasderias/ilysa/colorful"
 )
 
 // The algorithm works in L*a*b* color space and converts to RGB in the end.
@@ -23,7 +25,7 @@ type SoftPaletteSettings struct {
 	Iterations int
 
 	// Use up to 160000 or 8000 samples of the L*a*b* space (and thus calls to CheckColor).
-	// Set this to true only if your CheckColor shapes the Lab space weirdly.
+	// Set this to true only if your CheckColor shapes the LAB space weirdly.
 	ManySamples bool
 }
 
@@ -32,11 +34,11 @@ type SoftPaletteSettings struct {
 // as a new palette of distinctive colors. Falls back to K-medoid if the mean
 // happens to fall outside of the color-space, which can only happen if you
 // specify a CheckColor function.
-func SoftPaletteEx(colorsCount int, settings SoftPaletteSettings) ([]Color, error) {
+func SoftPaletteEx(colorsCount int, settings SoftPaletteSettings) ([]colorful.Color, error) {
 
 	// Checks whether it's a valid RGB and also fulfills the potentially provided constraint.
 	check := func(col lab_t) bool {
-		c := Lab(col.L, col.A, col.B)
+		c := colorful.LAB(col.L, col.A, col.B)
 		return c.IsValid() && (settings.CheckColor == nil || settings.CheckColor(col.L, col.A, col.B))
 	}
 
@@ -149,7 +151,7 @@ func SoftPaletteEx(colorsCount int, settings SoftPaletteSettings) ([]Color, erro
 }
 
 // A wrapper which uses common parameters.
-func SoftPalette(colorsCount int) ([]Color, error) {
+func SoftPalette(colorsCount int) ([]colorful.Color, error) {
 	return SoftPaletteEx(colorsCount, SoftPaletteSettings{nil, 50, false})
 }
 
@@ -170,16 +172,20 @@ func lab_eq(lab1, lab2 lab_t) bool {
 		math.Abs(lab1.B-lab2.B) < LAB_DELTA
 }
 
-// That's faster than using colorful's DistanceLab since we would have to
+// That's faster than using colorful's DistanceLAB since we would have to
 // convert back and forth for that. Here is no conversion.
 func lab_dist(lab1, lab2 lab_t) float64 {
 	return math.Sqrt(sq(lab1.L-lab2.L) + sq(lab1.A-lab2.A) + sq(lab1.B-lab2.B))
 }
 
-func labs2cols(labs []lab_t) (cols []Color) {
-	cols = make([]Color, len(labs))
+func labs2cols(labs []lab_t) (cols []colorful.Color) {
+	cols = make([]colorful.Color, len(labs))
 	for k, v := range labs {
-		cols[k] = Lab(v.L, v.A, v.B)
+		cols[k] = colorful.LAB(v.L, v.A, v.B)
 	}
 	return cols
+}
+
+func sq(v float64) float64 {
+	return v * v
 }

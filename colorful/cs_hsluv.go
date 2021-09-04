@@ -75,7 +75,7 @@ func HPLuvToLuvLCh(h, s, l float64) (float64, float64, float64) {
 	return l / 100.0, c / 100.0, h
 }
 
-// HSLuv creates a new Color from values in the HSLuv color space.
+// HSLuv creates a new Color from the provided HSLuv color space coordinates.
 // Hue in [0..360], a Saturation [0..1], and a Luminance (lightness) in [0..1].
 //
 // The returned color values are clamped (using .Clamped), so this will never output
@@ -83,7 +83,7 @@ func HPLuvToLuvLCh(h, s, l float64) (float64, float64, float64) {
 func HSLuv(h, s, l float64) Color {
 	// HSLuv -> LuvLCh -> CIELUV -> CIEXYZ -> Linear RGB -> sRGB
 	l, u, v := LuvLChToLuv(HSLuvToLuvLCh(h, s, l))
-	return LinearRgb(XyzToLinearRgb(LuvToXyzWhiteRef(l, u, v, hSLuvD65))).Clamped()
+	return LinearRGB(XYZToLinearRGB(LuvToXYZWhiteRef(l, u, v, hSLuvD65))).Clamped()
 }
 
 // HPLuv creates a new Color from values in the HPLuv color space.
@@ -94,7 +94,7 @@ func HSLuv(h, s, l float64) Color {
 func HPLuv(h, s, l float64) Color {
 	// HPLuv -> LuvLCh -> CIELUV -> CIEXYZ -> Linear RGB -> sRGB
 	l, u, v := LuvLChToLuv(HPLuvToLuvLCh(h, s, l))
-	return LinearRgb(XyzToLinearRgb(LuvToXyzWhiteRef(l, u, v, hSLuvD65))).Clamped()
+	return LinearRGB(XYZToLinearRGB(LuvToXYZWhiteRef(l, u, v, hSLuvD65))).Clamped()
 }
 
 // HSLuv returns the Hue, Saturation and Luminance of the color in the HSLuv

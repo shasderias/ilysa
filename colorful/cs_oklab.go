@@ -2,6 +2,7 @@ package colorful
 
 import "math"
 
+// Oklab returns the Oklab coordinates of color.
 func (col Color) Oklab() (l, a, b float64) {
 	l = 0.4122214708*col.R + 0.5363325363*col.G + 0.0514459929*col.B
 	m := 0.2119034982*col.R + 0.6806995451*col.G + 0.1073969566*col.B
@@ -16,6 +17,7 @@ func (col Color) Oklab() (l, a, b float64) {
 		0.0259040371*l_ + 0.7827717662*m_ - 0.8086757660*s_
 }
 
+// Oklab returns a Color with the provided Oklab coordinates.
 func Oklab(L, a, b float64) Color {
 	l_ := L + 0.3963377774*a + 0.2158037573*b
 	m_ := L - 0.1055613458*a - 0.0638541728*b
@@ -33,20 +35,28 @@ func Oklab(L, a, b float64) Color {
 	}
 }
 
+// BlendOklab blends col to c2 in the Oklab colorspace and returns the color
+// at position t.
 func (col Color) BlendOklab(c2 Color, t float64) Color {
-	r1, g1, b1 := col.Oklab()
-	r2, g2, b2 := c2.Oklab()
+	return BlendOklab(col, c2, t)
+}
 
-	a1 := col.A
-	a2 := c2.A
+// BlendOklab blends c1 to c2 in the Oklab colorspace and returns the color
+// at position t.
+func BlendOklab(c1, c2 Color, t float64) Color {
+	l1, a1, b1 := c1.Oklab()
+	l2, a2, b2 := c2.Oklab()
+
+	alpha1 := c1.A
+	alpha2 := c2.A
 
 	c := Oklab(
-		r1+t*(r2-r1),
-		g1+t*(g2-g1),
+		l1+t*(l2-l1),
+		a1+t*(a2-a1),
 		b1+t*(b2-b1),
 	)
 
-	c.A = a1 + t*(a2-a1)
+	c.A = alpha1 + t*(alpha2-alpha1)
 	return c
 }
 

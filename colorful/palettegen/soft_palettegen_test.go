@@ -1,4 +1,4 @@
-package colorful
+package palettegen
 
 import (
 	"fmt"
@@ -57,7 +57,7 @@ func TestConstraint(t *testing.T) {
 			t.Errorf("Color %v in constrained palette is invalid: %v", icol, col)
 		}
 
-		l, a, b := col.Lab()
+		l, a, b := col.LAB()
 		if l > 0.5 || a > 0.0 || b > 0.0 {
 			t.Errorf("Color %v in constrained palette violates the constraint: %v (lab: %v)", icol, col, [3]float64{l, a, b})
 		}

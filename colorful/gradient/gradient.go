@@ -1,3 +1,4 @@
+// Package gradient implements gradients that can be used with Ilysa.
 package gradient
 
 import (
@@ -6,6 +7,21 @@ import (
 	"github.com/mitchellh/copystructure"
 	"github.com/shasderias/ilysa/colorful"
 )
+
+type LerpFn func(c1, c2 colorful.Color, t float64) colorful.Color
+
+// DefaultLerpFn is the function used by Lerp to interpolate between two colors.
+var DefaultLerpFn LerpFn = colorful.BlendOklab
+
+// Table represents a gradient and contains its "points". The position
+// of each keypoint must lie in the range [0,1] and points must be sorted
+// in ascending order.
+type Table []Point
+
+type Point struct {
+	Col colorful.Color
+	Pos float64
+}
 
 // New returns a gradient with colors equidistant from each other.
 func New(colors ...colorful.Color) Table {
@@ -21,6 +37,8 @@ func New(colors ...colorful.Color) Table {
 			Pos: float64(i) / float64(len(colors)-1),
 		})
 	}
+
+	registerGrad(table)
 
 	return table
 }
@@ -59,25 +77,28 @@ func NewPingPong(count int, colors ...colorful.Color) Table {
 	return New(gradColors...)
 }
 
-// This table contains the "keypoints" of the colorgradient you want to generate.
-// The position of each keypoint has to live in the range [0,1]
-type Table []Point
-
-type Point struct {
-	Col colorful.Color
-	Pos float64
+// FromSet creates a gradient from a colorful.Set.
+func FromSet(s colorful.Set) Table {
+	return New(s.Colors()...)
 }
 
-// Lerp returns interpolated color at t. The interpolation is done in the Oklab
-// colorspace
+// Lerp returns interpolated color at t. By default, the interpolation is done
+// in the Oklab colorspace. Change DefaultLerpFn to change the default. Use
+// LerpIn to interpolate in a specific colorspace.
 func (gt Table) Lerp(t float64) colorful.Color {
+	return gt.LerpIn(t, DefaultLerpFn)
+}
+
+// LerpIn returns the interpolated color at t, with the interpolation done
+// by fn.
+func (gt Table) LerpIn(t float64, fn LerpFn) colorful.Color {
 	for i := 0; i < len(gt)-1; i++ {
 		c1 := gt[i]
 		c2 := gt[i+1]
 		if c1.Pos <= t && t <= c2.Pos {
 			// We are in between c1 and c2. Go blend them!
 			t := (t - c1.Pos) / (c2.Pos - c1.Pos)
-			return c1.Col.BlendOklab(c2.Col, t).Clamped()
+			return fn(c1.Col, c2.Col, t).Clamped()
 		}
 	}
 
@@ -85,24 +106,7 @@ func (gt Table) Lerp(t float64) colorful.Color {
 	return gt[len(gt)-1].Col
 }
 
-var Rainbow = Table{
-	{colorful.MustParseHex("#9e0142"), 0.0},
-	{colorful.MustParseHex("#d53e4f"), 0.1},
-	{colorful.MustParseHex("#f46d43"), 0.2},
-	{colorful.MustParseHex("#fdae61"), 0.3},
-	{colorful.MustParseHex("#fee090"), 0.4},
-	{colorful.MustParseHex("#ffffbf"), 0.5},
-	{colorful.MustParseHex("#e6f598"), 0.6},
-	{colorful.MustParseHex("#abdda4"), 0.7},
-	{colorful.MustParseHex("#66c2a5"), 0.8},
-	{colorful.MustParseHex("#3288bd"), 0.9},
-	{colorful.MustParseHex("#5e4fa2"), 1.0},
-}
-
-func FromSet(s colorful.Set) Table {
-	return New(s.Colors()...)
-}
-
+// Reverse returns a copy of the gradient with its colors' order reversed.
 func (gt Table) Reverse() Table {
 	reversedTable := copystructure.Must(copystructure.Copy(gt))
 	rt := reversedTable.(Table)
@@ -115,6 +119,8 @@ func (gt Table) Reverse() Table {
 	return rt
 }
 
+// Rotate returns a copy of the gradient with its colors rotated to the left
+// by n.
 func (gt Table) Rotate(n int) Table {
 	rotatedTable := copystructure.Must(copystructure.Copy(gt))
 	rt := rotatedTable.(Table)
@@ -131,12 +137,21 @@ func (gt Table) Rotate(n int) Table {
 	return rt
 }
 
+// RotateRand returns a new gradient rotated by a random number.
 func (gt Table) RotateRand() Table {
 	n := rand.Intn(len(gt))
 	return gt.Rotate(n)
 }
 
+// ToSet returns the gradient's colors as a colorful.Set.
+//
+// Deprecated: use Set() instead.
 func (gt Table) ToSet() colorful.Set {
+	return gt.Set()
+}
+
+// Set returns the gradient's colors as a colorful.Set.
+func (gt Table) Set() colorful.Set {
 	colors := make([]colorful.Color, len(gt))
 	for i := 0; i < len(gt); i++ {
 		colors[i] = gt[i].Col
@@ -144,8 +159,9 @@ func (gt Table) ToSet() colorful.Set {
 	return colorful.NewSet(colors...)
 }
 
+// Colors returns the gradient's colors as a slice of colorful.Colors.
 func (gt Table) Colors() []colorful.Color {
-	return gt.ToSet().Colors()
+	return gt.Set().Colors()
 }
 
 // Boost returns a new gradient with each color's RGB value multiplied by m.
