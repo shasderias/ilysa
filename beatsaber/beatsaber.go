@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/shasderias/ilysa/internal/swallowjson"
 	"github.com/shasderias/ilysa/scale"
 )
@@ -47,7 +48,8 @@ func openInfo(filename string) (*Info, error) {
 
 	var info Info
 
-	err = json.Unmarshal(inf, &info)
+	jiter := jsoniter.ConfigCompatibleWithStandardLibrary
+	err = jiter.Unmarshal(inf, &info)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +224,8 @@ func (m *Map) AppendEvents(events []Event) error {
 	}
 	defer f.Close()
 
-	enc := json.NewEncoder(f)
+	jiter := jsoniter.ConfigCompatibleWithStandardLibrary
+	enc := jiter.NewEncoder(f)
 
 	err = enc.Encode(m.activeDifficulty)
 	if err != nil {
@@ -245,7 +248,8 @@ func (m *Map) SaveEvents(events []Event) error {
 	}
 	defer f.Close()
 
-	enc := json.NewEncoder(f)
+	jiter := jsoniter.ConfigCompatibleWithStandardLibrary
+	enc := jiter.NewEncoder(f)
 
 	err = enc.Encode(m.activeDifficulty)
 	if err != nil {
@@ -310,7 +314,8 @@ func openDifficulty(filename string) (*Difficulty, error) {
 
 	var difficulty Difficulty
 
-	err = json.Unmarshal(f, &difficulty)
+	jiter := jsoniter.ConfigCompatibleWithStandardLibrary
+	err = jiter.Unmarshal(f, &difficulty)
 	if err != nil {
 		return nil, err
 	}
