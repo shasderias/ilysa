@@ -8,6 +8,10 @@ import (
 )
 
 var DeclaredGradients = map[string]Table{}
+var (
+	fset *token.FileSet
+	a    *ast.File
+)
 
 func registerGrad(grad Table) {
 	defer func() {
@@ -15,12 +19,14 @@ func registerGrad(grad Table) {
 	}()
 	_, f, l, _ := runtime.Caller(2)
 
-	fset := token.NewFileSet()
 	parserMode := parser.ParseComments
 
-	a, err := parser.ParseFile(fset, f, nil, parserMode)
-	if err != nil {
-		return
+	if fset == nil {
+		var err error
+		a, err = parser.ParseFile(fset, f, nil, parserMode)
+		if err != nil {
+			return
+		}
 	}
 
 	for _, d := range a.Decls {
