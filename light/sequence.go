@@ -1,12 +1,15 @@
 package light
 
 import (
+	"math"
 	"math/rand"
 
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/internal/calc"
 	"github.com/shasderias/ilysa/lightid"
+	"github.com/shasderias/ilysa/scale"
+	"github.com/shasderias/ilysa/timer"
 )
 
 type Sequence struct {
@@ -22,7 +25,21 @@ func (s *Sequence) Add(lights ...context.Light) {
 }
 
 func (s Sequence) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLightingEvents {
-	return s.Idx(ctx.SeqOrdinal()).NewRGBLighting(ctx)
+	l := s.Idx(ctx.SeqOrdinal())
+	if l.LightIDLen() == s.LightIDLen() {
+		return l.NewRGBLighting(ctx)
+	}
+
+	lightIDScale := scale.Clamp(1, float64(l.LightIDLen()), 1, float64(s.LightIDLen()))
+	for i := 1; i <= l.LightIDLen(); i++ {
+		if int(math.RoundToEven(lightIDScale(float64(i)))) == ctx.LightIDCur() {
+			lt := timer.NewLighter(l)
+			lctx := context.WithLightTimer(ctx, lt.IterateFrom(i-1))
+			return l.NewRGBLighting(lctx)
+		}
+	}
+
+	return evt.RGBLightingEvents{}
 }
 
 func (s Sequence) LightIDLen() int {
