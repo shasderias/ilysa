@@ -24,7 +24,7 @@ func NewGuitarSolo(p *ilysa.Project, startBeat float64) GuitarSolo {
 		magnetGradient,
 		magnetRainbow,
 	)
-	return GuitarSolo{p.Offset(startBeat), p, gradSet}
+	return GuitarSolo{p.BOffset(startBeat), p, gradSet}
 }
 
 func (g GuitarSolo) Play() {
@@ -100,6 +100,7 @@ func (g GuitarSolo) Beat(startBeat float64, transition bool) {
 	gradSet := gradient.NewSet(shirayukiWhiteGradient, sukoyaWhiteGradient)
 
 	ctx.Sequence(timer.Interval(0, 2, 4), func(ctx context.Context) {
+		centerOn(ctx, magnetColors.Next())
 		ctx.NewPreciseZoom(evt.WithZoomStep(float64(ctx.SeqOrdinal())))
 
 		grad := gradSet.Next()
@@ -132,6 +133,7 @@ func (g GuitarSolo) Beat2(startBeat float64) {
 	gradSet := gradient.NewSet(shirayukiWhiteGradient, sukoyaWhiteGradient)
 
 	ctx.Sequence(timer.Interval(0, 2, 4), func(ctx context.Context) {
+		centerOn(ctx, magnetColors.Next())
 		ctx.NewPreciseZoom(evt.WithZoomStep(float64(ctx.SeqOrdinal())))
 
 		grad := gradSet.Next()

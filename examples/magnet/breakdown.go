@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math"
+
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/chroma"
 	"github.com/shasderias/ilysa/colorful/gradient"
@@ -20,7 +22,7 @@ type Breakdown struct {
 
 func NewBreakdown(p *ilysa.Project, startBeat float64) Breakdown {
 	return Breakdown{
-		Context: p.Offset(startBeat),
+		Context: p.BOffset(startBeat),
 		p:       p,
 	}
 }
@@ -102,6 +104,11 @@ func (b Breakdown) Chord() {
 	)
 
 	b.Sequence(seq, func(ctx context.Context) {
+		_, frac := math.Modf(ctx.B())
+		if frac < 0.0001 {
+			centerOn(ctx, crossickColors.Next())
+		}
+
 		ctx.NewPreciseZoom(evt.WithZoomStep(0))
 		grad := gradient.New(
 			crossickColors.Idx(ctx.Ordinal()),

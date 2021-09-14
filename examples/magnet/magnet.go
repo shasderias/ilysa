@@ -23,13 +23,10 @@ func do() error {
 
 	p := ilysa.New(magnet)
 
-	err = p.Map.SetActiveDifficulty(beatsaber.CharacteristicStandard, beatsaber.BeatmapDifficultyExpertPlus)
+	err = p.Map.SetActiveDifficulty(beatsaber.CharacteristicStandard, beatsaber.BeatmapDifficultyEasy)
 	if err != nil {
 		return err
 	}
-
-	//sb := NewSandbox(p, 4)
-	//sb.Play1()
 
 	leadIn := NewLeadInOut(p, 4)
 	leadIn.PlayIn()
@@ -76,5 +73,6 @@ func do() error {
 	leadout := NewLeadInOut(p, 423)
 	leadout.PlayOut()
 
-	return p.Save()
+	p.Save()
+	return nil
 }

@@ -20,7 +20,7 @@ type Sandbox struct {
 }
 
 func NewSandbox(p *ilysa.Project, startBeat float64) Sandbox {
-	return Sandbox{p.Offset(startBeat)}
+	return Sandbox{p.BOffset(startBeat)}
 }
 
 func (s Sandbox) Play() {
@@ -31,6 +31,13 @@ func (s Sandbox) Play() {
 
 func (s Sandbox) ButterflySweep(startBeat float64) {
 	ctx := s.BOffset(startBeat)
+
+	transform.Light(light.NewBasic(ctx, evt.RingLights),
+		transform.DivideIntoGroups(4),
+		transform.TakeSet(1, 2, 5, 8, 11),
+		transform.Flatten(),
+		transform.DivideSingle(),
+	)
 
 	bl := transform.Light(light.NewBasic(ctx, evt.BackLasers),
 		transform.Fan(2),

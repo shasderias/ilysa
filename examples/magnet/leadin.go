@@ -13,7 +13,7 @@ import (
 )
 
 func NewLeadInOut(p *ilysa.Project, startBeat float64) LeadIn {
-	return LeadIn{p.Offset(startBeat)}
+	return LeadIn{p.BOffset(startBeat)}
 }
 
 type LeadIn struct {
@@ -35,6 +35,10 @@ func (l LeadIn) PlayIn() {
 }
 
 func (l LeadIn) PlayOut() {
+	l.Sequence(timer.Beat(0), func(ctx context.Context) {
+		ctx.NewRGBLighting(evt.WithLight(evt.CenterLights), evt.WithLightValue(evt.LightOff))
+	})
+
 	l.BrokenChordOnly(0)
 	l.BrokenChordOnly(1.5)
 }

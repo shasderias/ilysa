@@ -31,7 +31,7 @@ var (
 
 var (
 	shirayukiGold   = colorful.MustParseHex("#F5CA1C")
-	shirayukiPurple = colorful.MustParseHex("#711FCF")
+	shirayukiPurple = colorful.MustParseHex("#a51fce")
 	sukoyaPink      = colorful.MustParseHex("#F521CF")
 	sukoyaWhite     = colorful.MustParseHex("#FFFCFF")
 )
@@ -142,6 +142,22 @@ var (
 		magnetWhite,
 	)
 
-	sukoyaWing    = gradient.New(sukoyaPink, sukoyaWhite, sukoyaWhite, sukoyaPink)
-	shirayukiWing = gradient.New(shirayukiPurple, shirayukiGold, shirayukiPurple)
+	sukoyaWing           = gradient.New(sukoyaPink, sukoyaWhite, sukoyaWhite, sukoyaPink)
+	sukoyaWingInverse    = gradient.New(sukoyaWhite, sukoyaPink, sukoyaPink, sukoyaWhite)
+	shirayukiWing        = gradient.New(shirayukiPurple, shirayukiGold, shirayukiPurple)
+	shirayukiWingInverse = gradient.New(shirayukiGold, shirayukiPurple, shirayukiGold)
+
+	shirayukiRipple = gradient.Table{
+		{shirayukiPurple, 0.0},
+		{shirayukiGold, 0.3},
+		{shirayukiGold, 0.7},
+		{shirayukiPurple, 1.0},
+	}
+
+	sukoyaRipple = gradient.Table{
+		{sukoyaPink, 0.0},
+		{sukoyaWhite, 0.3},
+		{sukoyaWhite, 0.7},
+		{sukoyaPink, 1.0},
+	}
 )

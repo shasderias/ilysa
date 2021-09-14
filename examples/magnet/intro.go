@@ -17,7 +17,7 @@ import (
 func NewIntro(p *ilysa.Project, startBeat float64) Intro {
 	return Intro{
 		p:       p,
-		Context: p.Offset(startBeat),
+		Context: p.BOffset(startBeat),
 	}
 }
 
@@ -45,7 +45,7 @@ func (p Intro) Play1() {
 	p.Climb(23.5)
 	p.TrillNoFade(26.5)
 	p.Fall(27.25)
-	p.Trill(28.5)
+	p.TrillNoFade(28.5)
 	p.Bridge(29.0)
 	p.Rhythm(30, false)
 	p.Outro(30.5)
@@ -68,7 +68,7 @@ func (p Intro) Play2() {
 	p.Climb(19.5)
 	p.TrillNoFade(22.5)
 	p.Fall(23.25)
-	p.Trill(24.5)
+	p.TrillNoFade(24.5)
 	p.Bridge(25.0)
 	p.Rhythm(26, false)
 	p.Outro(26.5)
@@ -78,6 +78,8 @@ func (p Intro) PianoDoubles(startBeat float64) {
 	ctx := p.BOffset(startBeat)
 
 	colors := colorful.NewSet(magnetPurple, magnetWhite, colorful.Black, magnetPink, shirayukiGold)
+
+	//fx.ColorSweep(ctx, 1.2, gradient)
 
 	ringBackCombined := light.Combine(
 		transform.Light(light.NewBasic(ctx, evt.RingLights), transform.DivideSingle()),
@@ -95,6 +97,8 @@ func (p Intro) PianoDoubles(startBeat float64) {
 			ctx.NewRGBLighting(evt.WithLight(evt.BackLasers), opts)
 		}
 	})
+
+	centerOn(ctx, magnetWhite)
 }
 
 func (p Intro) LeadinDrums(startBeat float64) {
@@ -111,10 +115,14 @@ func (p Intro) LeadinDrums(startBeat float64) {
 		fx.ZeroSpeedRandomizedLasers(ctx, evt.LeftLaser)
 		fx.ZeroSpeedRandomizedLasers(ctx, evt.RightLaser)
 
+		col := magnetColors.Next()
+
 		ctx.Light(l, func(ctx context.LightContext) {
-			ctx.NewRGBLighting(evt.WithColor(magnetColors.Next()))
+			ctx.NewRGBLighting(evt.WithColor(col))
 			ctx.NewRGBLighting(evt.WithBOffset(ctx.SeqNextBOffset()), evt.WithLightValue(evt.LightOff))
 		})
+
+		centerOn(ctx, col)
 	})
 }
 
@@ -126,7 +134,7 @@ func (p Intro) BassTwang(startBeat float64) {
 			transform.DivideSingle(),
 		)
 		duration   = 1.5
-		steps      = 45
+		steps      = 18
 		sweepSpeed = 2.2
 		intensity  = 4.0
 		grad       = magnetRainbowPale
@@ -206,7 +214,7 @@ func (p Intro) Rhythm(startBeat float64, spin bool) {
 		ctx.NewRGBLighting(evt.WithLight(evt.RightRotatingLasers), evt.WithLightValue(evt.LightBlueFade),
 			evt.WithColor(sukoyaColors.Next()),
 		)
-		sukoyaColors.Next()
+		centerOn(ctx, sukoyaColors.Next())
 	})
 
 	ctx.Sequence(timer.Beat(3), func(ctx context.Context) {
@@ -218,7 +226,7 @@ func (p Intro) Rhythm(startBeat float64, spin bool) {
 			evt.WithColor(shirayukiColors.Next()),
 			evt.WithAlpha(3),
 		)
-		shirayukiColors.Next()
+		centerOn(ctx, shirayukiColors.Next())
 	})
 }
 
@@ -289,6 +297,12 @@ func (p Intro) Chorus(startBeat float64) {
 			)
 		}
 
+		ctx.NewPreciseZoom(
+			evt.WithZoomStep(ctx.T()),
+		)
+
+		centerOn(ctx, crossickColors.Next())
+
 		ctx.Light(backLasers, func(ctx context.LightContext) {
 			e := fx.Gradient(ctx, magnetRainbowPale)
 			fx.RippleT(ctx, e, ctx.SeqNextBOffset())
@@ -325,7 +339,11 @@ func (p Intro) Trill(startBeat float64) {
 		evt.WithRotationDirection(chroma.Clockwise),
 	)
 
-	rng := timer.Rng(0, 1.0, 12, ease.Linear)
+	ctx.NewPreciseZoom(evt.WithZoomStep(0.3))
+
+	centerOn(ctx, crossickColors.Next())
+
+	rng := timer.Rng(0, 1.0, 6, ease.Linear)
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(l, func(ctx context.LightContext) {
 			e := fx.Gradient(ctx, magnetRainbow)
@@ -342,19 +360,14 @@ func (p Intro) TrillNoFade(startBeat float64) {
 		transform.DivideSingle(),
 	)
 
-	//ctx.NewPreciseRotation(
-	//	evt.WithRotation(90),
-	//	evt.WithRotationStep(5),
-	//	evt.WithRotationSpeed(12),
-	//	evt.WithProp(4),
-	//	evt.WithRotationDirection(chroma.CounterClockwise),
-	//)
+	centerOn(ctx, crossickColors.Next())
+
+	ctx.NewPreciseZoom(evt.WithZoomStep(-0.3))
 
 	ctx.Range(timer.Rng(0, 0.3, 12, ease.Linear), func(ctx context.Context) {
 		ctx.Light(l, func(ctx context.LightContext) {
 			e := fx.Gradient(ctx, magnetRainbow)
 			fx.RippleT(ctx, e, 0.30)
-			//fx.AlphaFadeEx(ctx, e, 0, 1, 0, 0.8, ease.InSin)
 		})
 	})
 }
@@ -390,6 +403,8 @@ func (p Intro) Climb(startBeat float64) {
 			ctx.NewRGBLighting(evt.WithColor(blGrad.Lerp(ctx.T())))
 		})
 
+		ctx.NewPreciseZoom(evt.WithZoomStep(-ctx.T()))
+
 		switch {
 		case ctx.Last():
 			ctx.NewRGBLighting(evt.WithLight(evt.LeftRotatingLasers), evt.WithLightValue(evt.LightBlueFade),
@@ -399,20 +414,20 @@ func (p Intro) Climb(startBeat float64) {
 				evt.WithColor(magnetPurple),
 			)
 
-			exitArgs := []evt.PreciseLaserOpt{
+			exitArgs := []evt.Opt{
 				evt.WithLaserSpeed(int(rotatingLasersExitSpeed)),
 				evt.WithPreciseLaserSpeed(rotatingLasersExitSpeed),
 				evt.WithLockPosition(true),
 			}
 
 			ctx.NewPreciseLaser(
-				append([]evt.PreciseLaserOpt{
+				append([]evt.Opt{
 					evt.WithDirectionalLaser(evt.LeftLaser),
 					evt.WithLaserDirection(chroma.CounterClockwise),
 				}, exitArgs...)...,
 			)
 			ctx.NewPreciseLaser(
-				append([]evt.PreciseLaserOpt{
+				append([]evt.Opt{
 					evt.WithDirectionalLaser(evt.RightLaser),
 					evt.WithLaserDirection(chroma.Clockwise),
 				}, exitArgs...)...,
@@ -467,6 +482,9 @@ func (p Intro) Fall(startBeat float64) {
 	seq := timer.Seq([]float64{0, 0.25, 0.5, 0.75}, 0)
 	p.PianoGlow(ctx, seq, 4, 0.20, false, false)
 
+	ctx.Sequence(seq, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(ctx.T()))
+	})
 }
 
 func (p Intro) Bridge(startBeat float64) {
@@ -481,10 +499,13 @@ func (p Intro) Bridge(startBeat float64) {
 			evt.WithProp(5),
 			evt.WithCounterSpin(true),
 		)
+
+		ctx.NewPreciseZoom(evt.WithZoomStep(0))
 	})
 
 	l := transform.Light(light.NewBasic(ctx, evt.BackLasers),
 		transform.Divide(2),
+		transform.DivideSingle(),
 	)
 
 	rng := timer.Rng(0, 1, 30, ease.OutCubic)
@@ -521,7 +542,7 @@ func (p Intro) OutroSplash(startBeat float64) {
 		)
 	)
 
-	rng := timer.Rng(-1, 5, 60, ease.Linear)
+	rng := timer.Rng(-1, 5, 40, ease.Linear)
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(backLaser, func(ctx context.LightContext) {
 			e := fx.ColorSweep(ctx, sweepSpeed, grad)
@@ -540,6 +561,7 @@ func (p Intro) OutroSplash(startBeat float64) {
 				evt.WithProp(8),
 				evt.WithRotationDirection(chroma.CounterClockwise),
 			)
+			ctx.NewPreciseZoom(evt.WithZoomStep(-ctx.T() - 0.3))
 			p.Rush(ctx, -0.50, 0, 0.6, float64(ctx.SeqOrdinal())*0.5+1, magnetGradient)
 		} else {
 			ctx.NewPreciseRotation(
@@ -550,6 +572,7 @@ func (p Intro) OutroSplash(startBeat float64) {
 				evt.WithProp(0.8),
 				evt.WithCounterSpin(true),
 			)
+			ctx.NewPreciseZoom(evt.WithZoomStep(0))
 			p.Rush(ctx, -1.20, -0.70, 1.2, 3, gradient.FromSet(crossickColors))
 		}
 

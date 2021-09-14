@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math"
+
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/chroma"
 	"github.com/shasderias/ilysa/colorful"
@@ -20,7 +22,7 @@ type Verse1b struct {
 
 func NewVerseB(p *ilysa.Project, offset float64) Verse1b {
 	return Verse1b{
-		Context: p.Offset(offset),
+		Context: p.BOffset(offset),
 	}
 }
 
@@ -47,15 +49,21 @@ func (v Verse1b) Play1() {
 func (v Verse1b) IntroBridge(startBeat float64, colors colorful.Set) {
 	ctx := v.BOffset(startBeat)
 
-	seq := timer.Seq([]float64{0, 1, 3}, 0)
+	seq := timer.Seq([]float64{0, 1, 2, 3}, 0)
 	ctx.Sequence(seq, func(ctx context.Context) {
 		var (
-			step      = []float64{45, 90, 180}
-			rotation  = []float64{45, 45, 180}
-			speed     = []float64{9, 9, 15}
-			prop      = []float64{1.2, 1.2, 6}
-			direction = []chroma.SpinDirection{chroma.CounterClockwise, chroma.CounterClockwise, chroma.Clockwise}
+			step      = []float64{45, 90, 195, 180}
+			rotation  = []float64{45, 45, 45, 180}
+			speed     = []float64{9, 9, 9, 15}
+			prop      = []float64{1.2, 1.2, 1.2, 0.4}
+			direction = []chroma.SpinDirection{chroma.CounterClockwise, chroma.CounterClockwise, chroma.CounterClockwise, chroma.Clockwise}
 		)
+
+		if !ctx.Last() {
+			ctx.NewPreciseZoom(evt.WithZoomStep(-ctx.T()))
+		} else {
+			ctx.NewPreciseZoom(evt.WithZoomStep(0))
+		}
 
 		ctx.NewPreciseRotation(
 			evt.WithRotation(rotation[ctx.Ordinal()]),
@@ -67,6 +75,9 @@ func (v Verse1b) IntroBridge(startBeat float64, colors colorful.Set) {
 	})
 
 	ctx.Sequence(timer.Seq([]float64{0, 1, 2, 3}, 4), func(ctx context.Context) {
+		if ctx.First() {
+			centerOn(ctx, crossickColors.Next())
+		}
 		ctx.NewRGBLighting(evt.WithLight(evt.BackLasers), evt.WithLightValue(evt.LightBlueFlash),
 			evt.WithColor(crossickColors.Next()),
 			evt.WithAlpha(3),
@@ -91,12 +102,14 @@ func (v Verse1b) Rhythm(startBeat float64, spin bool) {
 		color = magnetColors
 	)
 
+	centerOn(ctx, crossickColors.Next())
+
 	ctx.Sequence(seq, func(ctx context.Context) {
 		if spin {
 			ctx.NewPreciseRotation(
 				evt.WithRotation(90),
 				evt.WithRotationStep(11.25),
-				evt.WithRotationSpeed(7),
+				evt.WithRotationSpeed(10),
 				evt.WithProp(3),
 				evt.WithRotationDirection(chroma.CounterClockwise),
 			)
@@ -111,7 +124,7 @@ func (v Verse1b) Rhythm(startBeat float64, spin bool) {
 		})
 	})
 
-	rng := timer.Rng(1, 3, 30, ease.Linear)
+	rng := timer.Rng(0, 3, 30, ease.Linear)
 	RingRipple(ctx, rng, gradient.FromSet(crossickColors),
 		WithRippleTime(0.8),
 		WithSweepSpeed(2),
@@ -122,13 +135,28 @@ func (v Verse1b) Rhythm(startBeat float64, spin bool) {
 
 func (v Verse1b) PianoRoll(startBeat float64) {
 	ctx := v.BOffset(startBeat)
-	v.PianoHits(ctx, timer.Seq([]float64{0, 0.25, 0.50, 0.75}, 0), 5, 0.6)
+	seq := timer.Seq([]float64{0, 0.25, 0.50, 0.75}, 0)
+	v.PianoHits(ctx, seq, 5, 0.6)
+
+	ctx.Sequence(seq, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(ctx.T()))
+	})
 }
 
 func (v Verse1b) Stinger(startBeat float64) {
 	ctx := v.BOffset(startBeat)
-	v.PianoHits(ctx, timer.Seq([]float64{0.25, 0.50, 0.75, 1.00, 1.25, 1.50}, 0), 6, 0.6)
-	v.PianoHits(ctx, timer.Seq([]float64{2.00, 2.25, 2.50, 2.75, 3.00, 3.50}, 0), 6, 0.6)
+	seq1 := timer.Seq([]float64{0.25, 0.50, 0.75, 1.00, 1.25, 1.50}, 0)
+	seq2 := timer.Seq([]float64{2.00, 2.25, 2.50, 2.75, 3.00, 3.50}, 0)
+
+	v.PianoHits(ctx, seq1, 6, 0.6)
+	v.PianoHits(ctx, seq2, 6, 0.6)
+
+	ctx.Sequence(seq1, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(math.Sin(ctx.T())))
+	})
+	ctx.Sequence(seq2, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(math.Sin(ctx.T())))
+	})
 }
 
 func (v Verse1b) Naosara(startBeat float64) {
@@ -137,6 +165,7 @@ func (v Verse1b) Naosara(startBeat float64) {
 	seq := timer.Seq([]float64{0.4, 0.9, 1.4}, 1.9)
 
 	ctx.Sequence(seq, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(-ctx.T()))
 		if !ctx.SeqLast() {
 			ctx.NewPreciseRotation(
 				evt.WithRotation(90),
@@ -172,6 +201,7 @@ func (v Verse1b) Moeagaru(startBeat float64) {
 	seq := timer.Seq([]float64{0, 0.5, 1.0, 1.5}, 0)
 
 	ctx.Sequence(seq, func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(ctx.T()))
 		if !ctx.SeqLast() {
 			ctx.NewPreciseRotation(
 				evt.WithRotation(90),

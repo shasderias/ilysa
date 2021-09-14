@@ -34,7 +34,7 @@ func (p Intro) PianoGlow(ctx context.Context, seq timer.Sequencer, divisor int, 
 	}
 
 	var (
-		steps      = 8
+		steps      = 6
 		sweepSpeed = 3.0
 	)
 
@@ -78,7 +78,7 @@ func (p Intro) PianoTransmute(ctx context.Context, sequence timer.Sequencer, div
 	}
 
 	ctx.Sequence(sequence, func(ctx context.Context) {
-		rng := timer.Rng(0, 0.435, 12, ease.Linear)
+		rng := timer.Rng(0, 0.435, 7, ease.Linear)
 		ctx.Range(rng, func(ctx context.Context) {
 			ctx.Light(backLasers, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 4, grad)
@@ -95,7 +95,9 @@ func (p Intro) Rush(ctx context.Context, startBeat, endBeat, rippleDuration, pea
 		transform.DivideSingle(),
 	)
 
-	rng := timer.Rng(startBeat, endBeat, 30, ease.InExpo)
+	steps := int(math.Max(math.RoundToEven(endBeat-startBeat)*12, 12))
+
+	rng := timer.Rng(startBeat, endBeat, steps, ease.InExpo)
 
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(ringLasers, func(ctx context.LightContext) {

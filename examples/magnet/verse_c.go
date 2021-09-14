@@ -19,7 +19,7 @@ type VerseC struct {
 }
 
 func NewVerseC(p *ilysa.Project, offset float64) VerseC {
-	return VerseC{p.Offset(offset)}
+	return VerseC{p.BOffset(offset)}
 }
 
 func (v VerseC) Play() {
@@ -58,12 +58,12 @@ func (v VerseC) Bridge(startBeat float64) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(450),
 			evt.WithRotationStep(12),
-			evt.WithRotationSpeed(0.35),
+			evt.WithRotationSpeed(0.008),
 			evt.WithProp(1.2),
 			evt.WithRotationDirection(chroma.Clockwise),
 		)
 
-		ctx.Range(timer.Rng(0, 2, 60, ease.Linear), func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, 2, 30, ease.Linear), func(ctx context.Context) {
 			ctx.Light(l, func(ctx context.LightContext) {
 				e := fx.Gradient(ctx, sukoyaGradient)
 				fx.AlphaFadeEx(ctx, e, 0, 1, 0, 0.40, ease.InCirc)
@@ -85,7 +85,7 @@ func (v VerseC) Lyrics(startBeat float64, seq timer.Sequencer) {
 		startAlpha := 3*ease.InCirc(ctx.SeqT()) + 0.2
 		endAlpha := 1*ease.InCirc(ctx.SeqT()) + 0.2
 
-		ctx.Range(timer.Rng(0, ctx.SeqNextBOffset(), 30, ease.Linear), func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, ctx.SeqNextBOffset(), 12, ease.Linear), func(ctx context.Context) {
 
 			ctx.Light(l, func(ctx context.LightContext) {
 				e := fx.Gradient(ctx, grad)
@@ -108,12 +108,12 @@ func (v VerseC) ShirayukiBridge(startBeat float64) {
 		ctx.NewPreciseRotation(
 			evt.WithRotation(450),
 			evt.WithRotationStep(12),
-			evt.WithRotationSpeed(0.35),
+			evt.WithRotationSpeed(0.05),
 			evt.WithProp(1.2),
 			evt.WithRotationDirection(chroma.CounterClockwise),
 		)
 
-		ctx.Range(timer.Rng(0, 2, 60, ease.Linear), func(ctx context.Context) {
+		ctx.Range(timer.Rng(0, 2, 30, ease.Linear), func(ctx context.Context) {
 			ctx.Light(l, func(ctx context.LightContext) {
 				e := fx.Gradient(ctx, shirayukiGradient)
 				fx.AlphaFadeEx(ctx, e, 0, 1, 0, 0.40, ease.InCirc)
@@ -152,6 +152,9 @@ func (v VerseC) DunDun(startBeat float64) {
 		ctx.NewPreciseZoom(evt.WithZoomStep(0))
 		fx.OffAll(ctx)
 	})
+	ctx.Sequence(timer.Beat(0.51), func(ctx context.Context) {
+		centerOn(ctx, magnetWhite)
+	})
 }
 
 func (v VerseC) Breathe(startBeat float64) {
@@ -162,7 +165,7 @@ func (v VerseC) Breathe(startBeat float64) {
 		evt.RingLights,
 		evt.LeftRotatingLasers,
 		evt.RightRotatingLasers,
-		evt.CenterLights,
+		//evt.CenterLights,
 	}
 
 	cl := light.Combine()
@@ -175,7 +178,7 @@ func (v VerseC) Breathe(startBeat float64) {
 
 	blackGrad := gradient.New(colorful.Black, colorful.MustParseHex("#FFFFFF"))
 
-	ringRng := timer.Rng(-0.75, -0.25, 30, ease.Linear)
+	ringRng := timer.Rng(-0.75, -0.25, 15, ease.Linear)
 	RingRipple(ctx, ringRng, blackGrad,
 		WithSweepSpeed(1.2),
 		WithRippleTime(1.0),
@@ -183,7 +186,7 @@ func (v VerseC) Breathe(startBeat float64) {
 		WithReverse(true),
 	)
 
-	rng := timer.Rng(0, 0.75, 30, ease.Linear)
+	rng := timer.Rng(0, 0.75, 15, ease.Linear)
 	ctx.Range(rng, func(ctx context.Context) {
 		ctx.Light(cl, func(ctx context.LightContext) {
 			e := fx.ColorSweep(ctx, 1.2, blackGrad)

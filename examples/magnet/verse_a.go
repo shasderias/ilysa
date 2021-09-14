@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/shasderias/ilysa"
 	"github.com/shasderias/ilysa/chroma"
+	"github.com/shasderias/ilysa/colorful"
 	"github.com/shasderias/ilysa/colorful/gradient"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/ease"
@@ -20,7 +21,7 @@ type VerseA struct {
 }
 
 func NewVerseA(p *ilysa.Project, offset float64) VerseA {
-	ctx := p.Offset(offset)
+	ctx := p.BOffset(offset)
 	return VerseA{
 		Context: ctx,
 		project: p,
@@ -36,18 +37,18 @@ func (p VerseA) Play1() {
 		ctx.NewPreciseZoom(evt.WithZoomStep(0))
 	})
 
-	p.Rhythm(0, true)
-	p.Rhythm(4, false)
-	p.Rhythm(8, false)
-	p.Rhythm(12, false)
-	p.Rhythm(16, false)
-	p.Rhythm(20, false)
-	p.Rhythm(24, false)
-	p.Rhythm(28, true)
+	p.Rhythm(0, true, sukoyaRipple, sukoyaColors)
+	p.Rhythm(4, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(8, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(12, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(16, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(20, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(24, false, sukoyaRipple, sukoyaColors)
+	p.Rhythm(28, true, sukoyaRipple, sukoyaColors)
 
-	p.PianoBackstep(7, shirayukiWing, shirayukiWing)
-	p.PianoBackstep(15, shirayukiWing, shirayukiWing)
-	p.PianoBackstep(23, shirayukiWing, shirayukiWing)
+	p.PianoBackstep(7, sukoyaWing, sukoyaWing)
+	p.PianoBackstep(15, sukoyaWingInverse, sukoyaWingInverse)
+	p.PianoBackstep(23, sukoyaWing, sukoyaWing)
 	p.RinPun(27)
 }
 
@@ -60,23 +61,23 @@ func (p VerseA) Play2() {
 			evt.WithPreciseLaserSpeed(3.5))
 	})
 
-	p.Rhythm(0, true)
-	p.Rhythm(4, false)
-	p.Rhythm(8, false)
-	p.Rhythm(12, false)
-	p.Rhythm2(16, false)
-	p.Rhythm2(20, false)
-	p.Rhythm2(24, false)
-	p.Rhythm2(28, true)
+	p.Rhythm(0, true, shirayukiRipple, shirayukiColors)
+	p.Rhythm(4, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm(8, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm(12, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm2(16, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm2(20, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm2(24, false, shirayukiRipple, shirayukiColors)
+	p.Rhythm2(28, true, shirayukiRipple, shirayukiColors)
 
 	p.PianoBackstep(7, shirayukiWing, shirayukiWing)
 	//p.PianoBackstep(15)
 	p.SnareDrums(14, timer.Seq([]float64{0.25, 0.50, 1.00, 1.25, 1.75, 2.00}, 2.25))
-	p.PianoBackstep(23, shirayukiWing, shirayukiWing)
+	p.PianoBackstep(23, shirayukiWingInverse, shirayukiWingInverse)
 	p.RinPun(27)
 }
 
-func (p VerseA) Rhythm(startBeat float64, kickOnly bool) {
+func (p VerseA) Rhythm(startBeat float64, kickOnly bool, grad gradient.Table, colorSet colorful.Set) {
 	ctx := p.BOffset(startBeat)
 	var (
 		kickDrumLight = light.NewSequence(
@@ -86,6 +87,8 @@ func (p VerseA) Rhythm(startBeat float64, kickOnly bool) {
 		kickDrumSequence = timer.Seq([]float64{0, 2.5}, 0)
 		kickDrumColors   = magnetColors
 	)
+
+	centerOn(ctx, colorSet.Next())
 
 	ctx.Sequence(kickDrumSequence, func(ctx context.Context) {
 		ctx.Light(kickDrumLight, func(ctx context.LightContext) {
@@ -102,13 +105,7 @@ func (p VerseA) Rhythm(startBeat float64, kickOnly bool) {
 	}
 
 	var (
-		rng  = timer.Rng(0, 2, 30, ease.Linear)
-		grad = gradient.Table{
-			{shirayukiPurple, 0.0},
-			{shirayukiGold, 0.3},
-			{shirayukiGold, 0.7},
-			{shirayukiPurple, 1.0},
-		}
+		rng = timer.Rng(0, 2, 24, ease.Linear)
 	)
 
 	RingRipple(ctx, rng, grad,
@@ -128,7 +125,7 @@ func (p VerseA) Rhythm(startBeat float64, kickOnly bool) {
 	})
 }
 
-func (p VerseA) Rhythm2(startBeat float64, kickOnly bool) {
+func (p VerseA) Rhythm2(startBeat float64, kickOnly bool, grad gradient.Table, colorSet colorful.Set) {
 	ctx := p.BOffset(startBeat)
 	var (
 		kickDrumLight = light.NewSequence(
@@ -138,6 +135,8 @@ func (p VerseA) Rhythm2(startBeat float64, kickOnly bool) {
 		kickDrumSequence = timer.Seq([]float64{0, 1, 2, 2.5, 3}, 0)
 		kickDrumColors   = magnetColors
 	)
+
+	centerOn(ctx, colorSet.Next())
 
 	ctx.Sequence(kickDrumSequence, func(ctx context.Context) {
 		ctx.Light(kickDrumLight, func(ctx context.LightContext) {
@@ -153,15 +152,7 @@ func (p VerseA) Rhythm2(startBeat float64, kickOnly bool) {
 		return
 	}
 
-	var (
-		rng  = timer.Rng(0, 2, 30, ease.Linear)
-		grad = gradient.Table{
-			{shirayukiPurple, 0.0},
-			{shirayukiGold, 0.3},
-			{shirayukiGold, 0.7},
-			{shirayukiPurple, 1.0},
-		}
-	)
+	rng := timer.Rng(0, 2, 24, ease.Linear)
 
 	RingRipple(ctx, rng, grad,
 		WithRippleTime(0.6),
@@ -208,8 +199,10 @@ func (p VerseA) PianoBackstep(startBeat float64, lWingGrad, rWingGrad gradient.T
 		)
 
 		if ctx.Ordinal()%2 == 0 {
+			ctx.NewPreciseZoom(evt.WithZoomStep(0))
 			ctx.NewPreciseRotation(evt.WithRotationDirection(chroma.Clockwise), rotOpt)
 		} else {
+			ctx.NewPreciseZoom(evt.WithZoomStep(-0.5))
 			ctx.NewPreciseRotation(evt.WithRotationDirection(chroma.CounterClockwise), rotOpt)
 		}
 
@@ -344,6 +337,16 @@ func (p VerseA) RinPun(startBeat float64) {
 			transform.ReverseSet(),
 		))
 
+	ctx.Beat(0, func(ctx context.Context) {
+		centerOn(ctx, crossickColors.Next())
+	})
+	ctx.Sequence(timer.Seq([]float64{0, 0.5, 1, 2}, 0), func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(-ctx.T()/2 - 0.1))
+	})
+	ctx.Sequence(timer.Seq([]float64{3, 3.5, 3.75}, 0), func(ctx context.Context) {
+		ctx.NewPreciseZoom(evt.WithZoomStep(ctx.T()/2 - 0.1))
+	})
+
 	ctx.Sequence(timer.Seq([]float64{0, 0.5}, 0), func(ctx context.Context) {
 		if ctx.SeqFirst() {
 			ctx.NewPreciseRotation(
@@ -354,7 +357,7 @@ func (p VerseA) RinPun(startBeat float64) {
 				evt.WithRotationDirection(chroma.CounterClockwise),
 			)
 		}
-		ctx.Range(timer.Rng(-0.3, 0.7, 30, ease.Linear), func(ctx context.Context) {
+		ctx.Range(timer.Rng(-0.3, 0.7, 16, ease.Linear), func(ctx context.Context) {
 			ctx.Light(sl, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 0.4, magnetRainbow)
 				fx.RippleT(ctx, e, 0.30)
@@ -375,7 +378,7 @@ func (p VerseA) RinPun(startBeat float64) {
 			)
 		}
 
-		ctx.Range(timer.Rng(-0.2, 0.5, 30, ease.InOutCirc), func(ctx context.Context) {
+		ctx.Range(timer.Rng(-0.2, 0.5, 12, ease.InOutCirc), func(ctx context.Context) {
 			ctx.Light(sl, func(ctx context.LightContext) {
 				e := fx.ColorSweep(ctx, 0.3, magnetRainbow)
 				fx.RippleT(ctx, e, 0.65)
@@ -410,7 +413,7 @@ func (p VerseA) RinPun(startBeat float64) {
 					evt.WithRotationDirection(chroma.CounterClockwise),
 				)
 			}
-			ctx.Range(timer.Rng(-0.1, 0.2, 30, ease.InOutCirc), func(ctx context.Context) {
+			ctx.Range(timer.Rng(-0.1, 0.2, 10, ease.InOutCirc), func(ctx context.Context) {
 				ctx.Light(sl, func(ctx context.LightContext) {
 					e := fx.ColorSweep(ctx, 0.8, magnetRainbow)
 					fx.RippleT(ctx, e, 0.5)
