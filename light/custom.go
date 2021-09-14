@@ -10,27 +10,26 @@ import (
 
 type Custom struct {
 	lightType evt.LightType
-	len       int
-	offset    int
+	id        lightid.ID
 }
 
 func NewCustom(t evt.LightType, len, offset int) Custom {
-	return Custom{
-		t, len, offset,
-	}
+	return Custom{t, lightid.NewFromInterval(1+offset, len+offset)}
 }
 
 func NewCustomFromRange(t evt.LightType, startID, endID int) Custom {
-	return Custom{
-		t, endID - startID, startID,
-	}
+	return Custom{t, lightid.NewFromInterval(startID, endID)}
+}
+
+func NewCustomFromLightIDs(t evt.LightType, ids ...int) Custom {
+	return Custom{t, lightid.New(ids...)}
 }
 
 func (c Custom) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLightingEvents {
 	return evt.RGBLightingEvents{
 		ctx.NewRGBLighting(
 			evt.WithLight(c.lightType),
-			evt.WithLightID(lightid.NewFromInterval(1+c.offset, c.len+c.offset)),
+			evt.WithLightID(c.id),
 		),
 	}
 }
@@ -40,13 +39,13 @@ func (c Custom) LightIDLen() int {
 }
 
 func (c Custom) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
-	return NewComposite(c.lightType, fn(lightid.NewFromInterval(1+c.offset, c.len+c.offset)))
+	return NewComposite(c.lightType, fn(c.id))
 }
 
 func (c Custom) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	sl := NewSequence()
 
-	idSet := fn(lightid.NewFromInterval(1+c.offset, c.len+c.offset))
+	idSet := fn(c.id)
 
 	for _, id := range idSet {
 		sl.Add(NewComposite(c.lightType, lightid.NewSet(id)))
@@ -56,5 +55,5 @@ func (c Custom) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) contex
 }
 
 func (c Custom) Name() []string {
-	return []string{fmt.Sprintf("Custom-%d-%d-%d", c.lightType, c.len, c.offset)}
+	return []string{fmt.Sprintf("Custom-%d-%v", c.lightType, c.id)}
 }
