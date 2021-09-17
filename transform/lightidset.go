@@ -55,3 +55,41 @@ func (t takeSet) LightTransform(l context.Light) context.Light {
 func (t takeSet) Sequence() takeSet {
 	return takeSet{t.idx, true}
 }
+
+type sliceSet struct {
+	i, j     int
+	sequence bool
+}
+
+// SliceSet is a transformer that returns light IDs in the range [i:j).
+//
+// [1,2,3], [4,5,6], [7,8,0]
+// SliceSet(0, 2)
+// [1,2,3], [4,5,6]
+func SliceSet(i, j int) sliceSet {
+	if i < 0 {
+		panic("transform>.SliceSet(): i must be 0 or greater")
+	}
+	if i > j {
+		panic("transform>.SliceSet(): i must be greater than j")
+	}
+	return sliceSet{i, j, false}
+
+}
+
+func (s sliceSet) do(set lightid.Set) lightid.Set {
+	j := s.j
+	if j > set.Len() {
+		j = set.Len()
+	}
+
+	return set.Slice(s.i, j)
+}
+
+func (s sliceSet) LightTransform(l context.Light) context.Light {
+	return applyLightIDSetTransformer(l, s.do, s.sequence)
+}
+
+func (s sliceSet) Sequence() sliceSet {
+	return sliceSet{s.i, s.j, true}
+}

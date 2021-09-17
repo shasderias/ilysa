@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/shasderias/ilysa/context"
+	"github.com/shasderias/ilysa/internal/calc"
 	"github.com/shasderias/ilysa/light"
 	"github.com/shasderias/ilysa/lightid"
 )
@@ -342,6 +343,78 @@ func (r rotateSet) LightTransform(l context.Light) context.Light {
 
 func (r rotateSet) Sequence() rotateSet {
 	return rotateSet{r.steps, true}
+}
+
+type take struct {
+	indices  []int
+	sequence bool
+}
+
+// Take is a transformer that for each light ID, returns the value at indices
+// idx.
+//
+// [1,2,3,4,5]
+// Take(1,3,5)
+// [1,3,5]
+func Take(idx ...int) take {
+	return take{idx, false}
+}
+
+func (t take) do(id lightid.ID) lightid.Set {
+	l := len(id)
+	newIDs := []int{}
+	for _, idx := range id {
+		newIDs = append(newIDs, id[calc.WraparoundIdx(l, idx)])
+	}
+
+	return lightid.NewSet(lightid.New(newIDs...))
+}
+
+func (t take) Sequence() take {
+	return take{t.indices, true}
+
+}
+
+func (t take) LightTransform(l context.Light) context.Light {
+	return applyLightIDTransformer(l, t.do, t.sequence)
+}
+
+type slice struct {
+	i, j     int
+	sequence bool
+}
+
+// Slice is a transformer that for each light ID of the light, returns light IDs
+// in the range [i:j).
+//
+// [1,2,3 ... 60]
+// Slice(0, 10)
+// [1,2,3 ... 10]
+func Slice(i, j int) slice {
+	if i < 0 {
+		panic("transform.Slice(): i must be 0 or greater")
+	}
+	if i > j {
+		panic("transform.Slice(): i must be smaller than j")
+	}
+	return slice{i, j, false}
+}
+
+func (s slice) do(id lightid.ID) lightid.Set {
+	j := s.j
+	if j > len(id) {
+		j = len(id)
+	}
+
+	return lightid.NewSet(lightid.New(id[s.i:j]...))
+}
+
+func (s slice) Sequence() slice {
+	return slice{s.i, s.j, true}
+}
+
+func (s slice) LightTransform(l context.Light) context.Light {
+	return applyLightIDTransformer(l, s.do, s.sequence)
 }
 
 type sequenceIdx struct {
