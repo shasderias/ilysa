@@ -21,6 +21,10 @@ func (s Set) Index(i int) ID {
 	return s[((i%n)+n)%n]
 }
 
+func (s Set) Slice(i, j int) Set {
+	return s[i:j]
+}
+
 func (s Set) Len() int {
 	return len(s)
 }

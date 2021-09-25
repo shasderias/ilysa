@@ -91,7 +91,7 @@ go mod init projectName
 Download Ilysa.
 
 ```
-go get -u github.com/shasderias/ilysa@v0.0.13
+go get -u github.com/shasderias/ilysa@v0.0.14
 ```
 
 ## Boilerplate
@@ -133,7 +133,7 @@ Follow the examples at [Ilysa by Example](https://ilysa.shasderias.com/) for a t
 Run in the root of your project:
 
 ```
-go get -u github.com/shasderias/ilysa@v0.0.13
+go get -u github.com/shasderias/ilysa@v0.0.14
 ```
 
 # Helper Packages
