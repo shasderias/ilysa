@@ -9,26 +9,30 @@ import (
 )
 
 type Composite struct {
-	t   evt.LightType
+	t   evt.Type
 	set lightid.Set
 	uid string
 }
 
-func NewComposite(t evt.LightType, set lightid.Set) Composite {
+func NewComposite(t evt.Type, set lightid.Set) Composite {
 	return Composite{t, set, getLightUID()}
 }
 
-func (l Composite) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLightingEvents {
-	return evt.RGBLightingEvents{
-		ctx.NewRGBLighting(
-			evt.WithLight(l.t),
-			evt.WithLightID(l.set.Index(ctx.LightIDOrdinal())),
+func (l Composite) GenerateEvents(ctx context.LightContext) evt.Events {
+	return evt.NewEvents(
+		evt.NewChromaLighting(ctx,
+			evt.OptType(l.t),
+			evt.OptLightID(l.set.Index(ctx.LightOrdinal())),
 		),
-	}
+	)
 }
 
-func (l Composite) LightIDLen() int {
+func (l Composite) LightLen() int {
 	return l.set.Len()
+}
+
+func (l Composite) Name() []string {
+	return []string{fmt.Sprintf("Composite-%d-%s", l.t, l.uid)}
 }
 
 func (l Composite) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
@@ -68,8 +72,4 @@ func (l Composite) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set)
 	}
 
 	return seqLight
-}
-
-func (l Composite) Name() []string {
-	return []string{fmt.Sprintf("Composite-%d-%s", l.t, l.uid)}
 }

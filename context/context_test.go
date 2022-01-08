@@ -3,16 +3,19 @@ package context_test
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/ease"
+	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
 	"github.com/shasderias/ilysa/timer"
 )
 
 func TestContextTimer(t *testing.T) {
 	t.Run("Sequence", func(t *testing.T) {
-		proj := context.NewMockProject(t, 3)
-		proj.Sequence(timer.SeqFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
+		proj := context.NewMockProject(t)
+		ctx := context.Base(proj)
+		ctx.WSeq(timer.Seq(0, 2, 4), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -21,11 +24,15 @@ func TestContextTimer(t *testing.T) {
 			{2, 2, 1, 1, 0, 2, nil, 0},
 		}
 
-		proj.Cmp(want)
+		if diff := cmp.Diff(proj.RefTimings(), want); diff != "" {
+			t.Fatal(diff)
+		}
 	})
+
 	t.Run("Range", func(t *testing.T) {
-		proj := context.NewMockProject(t, 3)
-		proj.Range(timer.Rng(1, 2, 5, ease.Linear), func(ctx context.Context) {
+		proj := context.NewMockProject(t)
+		ctx := context.Base(proj)
+		ctx.WRng(timer.Rng(1, 2, 5, ease.Linear), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -37,12 +44,16 @@ func TestContextTimer(t *testing.T) {
 			{2.00, 2.00, 1.00, 1.00, 2.00, 0.25, nil, 0},
 		}
 
-		proj.Cmp(want)
+		if diff := cmp.Diff(proj.RefTimings(), want); diff != "" {
+			t.Fatal(diff)
+		}
 	})
+
 	t.Run("RangeInterval1", func(t *testing.T) {
-		proj := context.NewMockProject(t, 3)
+		proj := context.NewMockProject(t)
+		ctx := context.Base(proj)
 
-		proj.Range(timer.RngInterval(1, 2, 4, ease.Linear), func(ctx context.Context) {
+		ctx.WRng(timer.RngInterval(1, 2, 4, ease.Linear), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -54,12 +65,16 @@ func TestContextTimer(t *testing.T) {
 			{2.00, 2.00, 1.00, 1.00, 2.00, 0.25, nil, 0},
 		}
 
-		proj.Cmp(want)
+		if diff := cmp.Diff(proj.RefTimings(), want); diff != "" {
+			t.Fatal(diff)
+		}
 	})
-	t.Run("RangeInterval2", func(t *testing.T) {
-		proj := context.NewMockProject(t, 3)
 
-		proj.Range(timer.RngInterval(1, 2, 8, ease.Linear), func(ctx context.Context) {
+	t.Run("RangeInterval2", func(t *testing.T) {
+		proj := context.NewMockProject(t)
+		ctx := context.Base(proj)
+
+		ctx.WRng(timer.RngInterval(1, 2, 8, ease.Linear), func(ctx context.Context) {
 			proj.AddRefTimingFromCtx(ctx)
 		})
 
@@ -75,16 +90,21 @@ func TestContextTimer(t *testing.T) {
 			{2.000, 2.000, 1.000, 1.000, 2.000, 0.125, nil, 0},
 		}
 
-		proj.Cmp(want)
+		if diff := cmp.Diff(proj.RefTimings(), want); diff != "" {
+			t.Fatal(diff)
+		}
 	})
+
 	t.Run("BOffset/Sequence/Range/Light", func(t *testing.T) {
-		proj := context.NewMockProject(t, 3)
-		light := proj.MockLight()
-		ctx := context.WithBOffset(context.Base(proj), 2)
-		ctx.Sequence(timer.SeqFromSlice([]float64{0, 2, 4}), func(ctx context.Context) {
-			ctx.Range(timer.Rng(0, 1, 3, ease.Linear), func(ctx context.Context) {
-				ctx.Light(light, func(ctx context.LightContext) {
-					ctx.NewRGBLighting()
+		proj := context.NewMockProject(t)
+		light := proj.MockLight(3)
+
+		ctx := context.Base(proj)
+		ctx = ctx.WBOffset(2)
+		ctx.WSeq(timer.Seq(0, 2, 4), func(ctx context.Context) {
+			ctx.WRng(timer.Rng(0, 1, 3, ease.Linear), func(ctx context.Context) {
+				ctx.WLight(light, func(ctx context.LightContext, e evt.Events) {
+
 				})
 			})
 		})
@@ -109,6 +129,9 @@ func TestContextTimer(t *testing.T) {
 			{1.0, 5.0, 1.0, 1, 0, 2, lightid.ID{2}, 0.5},
 			{1.0, 5.0, 1.0, 1, 0, 2, lightid.ID{3}, 1.0},
 		}
-		proj.Cmp(want)
+
+		if diff := cmp.Diff(proj.RefTimings(), want); diff != "" {
+			t.Fatal(diff)
+		}
 	})
 }

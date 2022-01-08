@@ -27,45 +27,40 @@ type Sequencer struct {
 	g float64
 }
 
-func Seq(seq []float64, ghostBeat float64) Sequencer {
-	return Sequencer{
-		s: seq,
-		g: ghostBeat,
+func Seq(beats ...float64) Sequencer {
+	if len(beats) == 0 {
+		panic("sequence must contain at least one beat")
 	}
+	if len(beats) == 1 {
+		return Sequencer{beats, beats[0]}
+	}
+	return Sequencer{beats[:len(beats)-1], beats[len(beats)-1]}
 }
 
-func Beat(beat float64) Sequencer {
-	return Sequencer{
-		s: []float64{beat},
-		g: beat,
-	}
-}
-
-func Interval(startBeat, duration float64, count int) Sequencer {
-	s := []float64{}
-	for i := 0; i < count; i++ {
-		s = append(s, startBeat+duration*float64(i))
-	}
-	return Sequencer{
-		s: s,
-		g: startBeat + duration*float64(count),
-	}
-}
-
-func SeqFromSlice(seq []float64) Sequencer {
-	l := len(seq)
-	if l < 2 {
-		panic("sequence must have at least one beat and one ghost beat")
-	}
-
-	return Sequencer{
-		s: seq[:l-1],
-		g: seq[l-1],
-	}
-}
+//// Interval creates a Sequencer that triggers events every duration beats
+//// starting from startBeat until count triggers are triggered.
+//func Interval(startBeat, duration float64, count int) Sequencer {
+//	s := []float64{}
+//	for i := 0; i < count; i++ {
+//		s = append(s, startBeat+duration*float64(i))
+//	}
+//	return Sequencer{
+//		s: s,
+//		g: startBeat + duration*float64(count),
+//	}
+//}
+//
+//// SeqInterval creates a Sequencer that triggers events every 1/interval beat
+//// starting from startB and ending on endB.
+//func SeqInterval(startB, endB, interval float64) Sequencer {
+//	count := int(math.RoundToEven(endB-startB)*interval) + 1
+//	return Interval(startB, 1/interval, count)
+//}
 
 func (s Sequencer) Idx(i int) float64 { return s.s[calc.WraparoundIdx(s.Len(), i)] }
 func (s Sequencer) Len() int          { return len(s.s) }
+func (s Sequencer) First() float64    { return s.s[0] }
+func (s Sequencer) Last() float64     { return s.s[s.Len()-1] }
 
 func (s Sequencer) Iterate() Sequence {
 	return &SequenceIterator{s, -1}

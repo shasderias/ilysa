@@ -1,26 +1,25 @@
 package evt
 
-import "github.com/shasderias/ilysa/chroma"
+import (
+	"github.com/shasderias/ilysa/chroma"
+)
 
 type ChromaGradient struct {
 	Base
 	chroma.Gradient
 }
 
-type ChromaGradientOpt interface {
-	applyChromaGradient(*ChromaGradient)
-}
-
-func NewChromaGradient(opts ...ChromaGradientOpt) ChromaGradient {
-	e := ChromaGradient{Base: NewBase(WithRGBLightingDefaults())}
+// NewChromaGradient creates a new Chroma 2.0 gradient.
+func NewChromaGradient(opts ...Option) *ChromaGradient {
+	e := &ChromaGradient{Base: NewBase()}
 	for _, opt := range opts {
-		opt.applyChromaGradient(&e)
+		opt.Apply(e)
 	}
 	return e
 }
 
-func (e *ChromaGradient) Apply(opts ...ChromaGradientOpt) {
+func (e *ChromaGradient) Apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.applyChromaGradient(e)
+		opt.Apply(e)
 	}
 }

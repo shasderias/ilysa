@@ -5,64 +5,91 @@ import (
 
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
+	"github.com/shasderias/ilysa/opt"
 	"github.com/shasderias/ilysa/scale"
 	"github.com/shasderias/ilysa/timer"
 )
 
-func ZeroSpeedRandomizedLasers(ctx context.Context, l evt.DirectionalLaser) *evt.PreciseLaser {
-	return ctx.NewPreciseLaser(
-		evt.WithDirectionalLaser(l),
-		evt.WithIntValue(1),
-		evt.WithPreciseLaserSpeed(0),
-	)
+//func ZeroSpeedRandomizedLasers(ctx context.Context, l evt.DirectionalLaser) *evt.ChromaLaserSpeed {
+//	return ctx.NewPreciseLaser(
+//		evt.WithDirectionalLaser(l),
+//		evt.WithIntValue(1),
+//		evt.WithPreciseLaserSpeed(0),
+//	)
+//}
+//
+
+type slowMotionLaserConfig struct {
+	lockFirst bool
 }
 
-func SlowMotionLasers(ctx context.Context, rng timer.Ranger, l evt.DirectionalLaser, startSpeed, endSpeed float64,
-	opts ...slowMotionLasersOpt) evt.Events {
+type SlowMotionLaserOpt interface {
+	apply(*slowMotionLaserConfig)
+}
 
-	defaultOpts := slowMotionLasersOpts{
-		preciseLaserOpts: evt.Opts{},
-	}
+func OptSlowMotionLasersLockFirst() SlowMotionLaserOpt {
+	return slowMotionLaserLockFirst{}
+}
+
+type slowMotionLaserLockFirst struct{}
+
+func (o slowMotionLaserLockFirst) apply(c *slowMotionLaserConfig) {
+	c.lockFirst = true
+}
+
+func SlowMotionLasers(ctx context.Context,
+	rng timer.Ranger, t evt.Type, startSpeed, endSpeed float64,
+	opts ...SlowMotionLaserOpt) evt.Events {
+	conf := slowMotionLaserConfig{}
 	for _, o := range opts {
-		o.apply(&defaultOpts)
+		o.apply(&conf)
 	}
 
 	events := evt.NewEvents()
 
 	speedScaler := scale.FromUnitClamp(startSpeed, endSpeed)
 
-	ctx.Range(rng, func(ctx context.Context) {
+	ctx.WRng(rng, func(ctx context.Context) {
 		speed := speedScaler(ctx.T())
 		intSpeed := int(math.Round(speed))
 
-		preciseLaserOpts := evt.NewOpts(evt.WithLaserSpeed(intSpeed), evt.WithPreciseLaserSpeed(speed))
-		preciseLaserOpts.Add(defaultOpts.preciseLaserOpts...)
-		if !ctx.First() {
-			preciseLaserOpts.Add(evt.WithLockPosition(true))
-		}
+		optSet := opt.NewSet(
+			ctx,
+			evt.OptType(t),
+			evt.OptIntValue(intSpeed),
+			evt.OptChromaLaserSpeed(speed),
+		)
 
-		events.Add(ctx.NewPreciseLaser(evt.WithDirectionalLaser(l), preciseLaserOpts))
+		if conf.lockFirst && ctx.First() {
+			optSet.Add(evt.OptChromaLaserSpeedLockPosition(true))
+		}
+		if !ctx.First() {
+			optSet.Add(evt.OptChromaLaserSpeedLockPosition(true))
+		}
+		e := evt.NewChromaLaserSpeed(optSet)
+		events.Add(e)
 	})
 
 	return events
 }
 
-type slowMotionLasersOpts struct {
-	preciseLaserOpts evt.Opts
-}
-
-type slowMotionLasersOpt interface {
-	apply(opt *slowMotionLasersOpts)
-}
-
-type withPreciseLaserOpt struct {
-	opts evt.Opts
-}
-
-func WithPreciseLaserOpts(opts ...evt.Opt) slowMotionLasersOpt {
-	return withPreciseLaserOpt{opts}
-}
-
-func (o withPreciseLaserOpt) apply(opt *slowMotionLasersOpts) {
-	opt.preciseLaserOpts = o.opts
-}
+//
+//type slowMotionLasersOpts struct {
+//	preciseLaserOpts Options
+//}
+//
+//type slowMotionLasersOpt interface {
+//	apply(opt *slowMotionLasersOpts)
+//}
+//
+//type withPreciseLaserOpt struct {
+//	opts Options
+//}
+//
+//func WithPreciseLaserOpts(opts ...Option) slowMotionLasersOpt {
+//	return withPreciseLaserOpt{opts}
+//}
+//
+//func (o withPreciseLaserOpt) apply(opt *slowMotionLasersOpts) {
+//	opt.preciseLaserOpts = o.opts
+//}

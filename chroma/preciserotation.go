@@ -2,10 +2,10 @@ package chroma
 
 import "encoding/json"
 
-type PreciseRotation struct {
+type RingRotation struct {
 	NameFilter  string        `json:"_nameFilter,omitempty"`
 	Reset       bool          `json:"_reset,omitempty"`
-	Rotation    float64       `json:"_rotation,omitempty"`
+	Rotation    float64       `json:"_rotation"`
 	Step        float64       `json:"_step"`
 	Prop        float64       `json:"_prop,omitempty"`
 	Speed       float64       `json:"_speed,omitempty"`
@@ -13,6 +13,6 @@ type PreciseRotation struct {
 	CounterSpin bool          `json:"_counterSpin,omitempty"`
 }
 
-func (r PreciseRotation) CustomData() (json.RawMessage, error) {
+func (r RingRotation) CustomData() (json.RawMessage, error) {
 	return json.Marshal(r)
 }

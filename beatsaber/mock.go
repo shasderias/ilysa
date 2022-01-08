@@ -9,7 +9,6 @@ import (
 type MockMap struct {
 	bpm        float64
 	bpmRegions []bpmRegion
-	envProfile *EnvProfile
 }
 
 func NewMockMap(envName EnvironmentName, bpm float64, bpmRegionsJSON string) (MockMap, error) {
@@ -23,13 +22,6 @@ func NewMockMap(envName EnvironmentName, bpm float64, bpmRegionsJSON string) (Mo
 	}
 
 	mockMap.calculateBPMRegions(bpmChanges)
-
-	envProfile, err := LoadEnv(string(envName))
-	if err != nil {
-		return MockMap{}, err
-	}
-
-	mockMap.envProfile = envProfile
 
 	return mockMap, nil
 }
@@ -83,16 +75,4 @@ func (MockMap) SaveEvents(events []Event) error {
 
 func (MockMap) Events() []Event {
 	return []Event{}
-}
-
-func (m MockMap) ActiveDifficulty() *Difficulty {
-	return nil
-}
-
-func (m MockMap) ActiveDifficultyProfile() *EnvProfile {
-	return m.envProfile
-}
-
-func (m MockMap) SetActiveDifficulty(c Characteristic, d BeatmapDifficulty) error {
-	return nil
 }

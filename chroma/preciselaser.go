@@ -6,13 +6,13 @@ import (
 	"github.com/shasderias/ilysa/internal/imath"
 )
 
-type PreciseLaser struct {
+type LaserSpeed struct {
 	LockPosition bool          `json:"_lockPosition"`
 	Speed        float64       `json:"_speed"`
 	Direction    SpinDirection `json:"_direction"`
 }
 
-func (pl *PreciseLaser) CustomData() (json.RawMessage, error) {
+func (pl *LaserSpeed) CustomData() (json.RawMessage, error) {
 	pl.Speed = imath.Round(pl.Speed, 2)
 	return json.Marshal(pl)
 }

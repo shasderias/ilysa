@@ -176,7 +176,9 @@ func ReverseSet() reverseSet {
 	return reverseSet{false}
 }
 
-func (r reverseSet) do(set lightid.Set) lightid.Set {
+func (r reverseSet) do(oldSet lightid.Set) lightid.Set {
+	set := lightid.NewSet(oldSet...)
+
 	for i := len(set)/2 - 1; i >= 0; i-- {
 		opp := len(set) - 1 - i
 		set[i], set[opp] = set[opp], set[i]

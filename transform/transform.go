@@ -31,6 +31,7 @@ func Light(l context.Light, tfers ...LightTransformer) context.Light {
 	}
 	return l
 }
+
 func applyLightIDTransformer(l context.Light, fn func(id lightid.ID) lightid.Set, sequence bool) context.Light {
 	if !sequence {
 		transformableLight, ok := l.(LightIDTransformableLight)

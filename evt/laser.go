@@ -1,54 +1,90 @@
 package evt
 
 import (
-	"encoding/json"
-
 	"github.com/shasderias/ilysa/chroma"
 )
 
-func NewLaser(opts ...LaserOpt) Laser {
-	e := Laser{NewBase(WithInvalidDefaults())}
+// NewLaserSpeed returns a laser speed event.
+func NewLaserSpeed(opts ...Option) *LaserSpeed {
+	e := &LaserSpeed{NewBase()}
 	for _, opt := range opts {
-		opt.applyLaser(&e)
+		opt.Apply(e)
 	}
 	return e
 }
 
-type Laser struct {
+type LaserSpeed struct {
 	Base
 }
 
-type LaserOpt interface {
-	applyLaser(*Laser)
-}
+func (e *LaserSpeed) SetLaserSpeed(speed int) { e.SetIntValue(speed) }
+func (e *LaserSpeed) LaserSpeed() int         { return e.IntValue() }
 
-func (e *Laser) Apply(opts ...LaserOpt) {
+func (e *LaserSpeed) Apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.applyLaser(e)
+		opt.Apply(e)
 	}
 }
 
-func (e Laser) CustomData() (json.RawMessage, error) { return nil, nil }
-
-func NewPreciseLaser(opts ...PreciseLaserOpt) PreciseLaser {
-	e := PreciseLaser{Base: NewBase(WithInvalidDefaults())}
+// NewChromaLaserSpeed returns a Chroma precise laser event.
+func NewChromaLaserSpeed(opts ...Option) *ChromaLaserSpeed {
+	e := &ChromaLaserSpeed{Base: NewBase()}
 	for _, opt := range opts {
-		opt.applyPreciseLaser(&e)
+		opt.Apply(e)
 	}
 	return e
 }
 
-type PreciseLaser struct {
+type ChromaLaserSpeed struct {
 	Base
-	chroma.PreciseLaser
+	chroma.LaserSpeed
 }
 
-type PreciseLaserOpt interface {
-	applyPreciseLaser(*PreciseLaser)
+func (e *ChromaLaserSpeed) ChromaLaserSpeedLockPosition() bool     { return e.LaserSpeed.LockPosition }
+func (e *ChromaLaserSpeed) SetChromaLaserSpeedLockPosition(l bool) { e.LaserSpeed.LockPosition = l }
+func (e *ChromaLaserSpeed) ChromaLaserSpeed() float64              { return e.LaserSpeed.Speed }
+func (e *ChromaLaserSpeed) SetChromaLaserSpeed(speed float64)      { e.LaserSpeed.Speed = speed }
+func (e *ChromaLaserSpeed) ChromaLaserSpeedSpinDirection() chroma.SpinDirection {
+	return e.LaserSpeed.Direction
+}
+func (e *ChromaLaserSpeed) SetChromaLaserSpeedSpinDirection(dir chroma.SpinDirection) {
+	e.LaserSpeed.Direction = dir
 }
 
-func (e *PreciseLaser) Apply(opts ...PreciseLaserOpt) {
+func (e *ChromaLaserSpeed) Apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.applyPreciseLaser(e)
+		opt.Apply(e)
 	}
+}
+
+type optChromaLaserSpeed struct {
+	s float64
+}
+
+func (o optChromaLaserSpeed) Apply(evt Event) {
+	clse, ok := evt.(*ChromaLaserSpeed)
+	if !ok {
+		return
+	}
+	clse.SetChromaLaserSpeed(o.s)
+}
+
+func OptChromaLaserSpeed(s float64) Option {
+	return &optChromaLaserSpeed{s}
+}
+
+type optChromaLaserSpeedLockPosition struct {
+	l bool
+}
+
+func (o optChromaLaserSpeedLockPosition) Apply(evt Event) {
+	clse, ok := evt.(*ChromaLaserSpeed)
+	if !ok {
+		return
+	}
+	clse.SetChromaLaserSpeedLockPosition(o.l)
+}
+
+func OptChromaLaserSpeedLockPosition(l bool) Option {
+	return &optChromaLaserSpeedLockPosition{l}
 }

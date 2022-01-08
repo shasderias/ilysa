@@ -5,6 +5,8 @@ type SpinDirection int
 const (
 	CounterClockwise SpinDirection = 0
 	Clockwise        SpinDirection = 1
+	CCW                            = CounterClockwise
+	CW                             = Clockwise
 )
 
 func (d SpinDirection) Reverse() SpinDirection {

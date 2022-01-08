@@ -1,9 +1,13 @@
 // Package ease implements Robert Penner's easing functions.
+//
 // http://robertpenner.com/easing/
+//
 // See https://easings.net/ for visualizations of the easing functions.
 package ease
 
-import "math"
+import (
+	"math"
+)
 
 var (
 	pow  = math.Pow
@@ -42,11 +46,12 @@ func bounceOut(x float64) float64 {
 	}
 }
 
-func Linear(x float64) float64 { return x }
+var Linear Func = func(x float64) float64 { return x }
+var Step Func = func(x float64) float64 { return math.Floor(x) }
 
-func InQuad(x float64) float64  { return x * x }
-func OutQuad(x float64) float64 { return 1 - (1-x)*(1-x) }
-func InOutQuad(x float64) float64 {
+var InQuad Func = func(x float64) float64 { return x * x }
+var OutQuad Func = func(x float64) float64 { return 1 - (1-x)*(1-x) }
+var InOutQuad Func = func(x float64) float64 {
 	if x < 0.5 {
 		return 2 * x * x
 	} else {
@@ -54,9 +59,9 @@ func InOutQuad(x float64) float64 {
 	}
 }
 
-func InCubic(x float64) float64  { return x * x * x }
-func OutCubic(x float64) float64 { return 1 - pow(1-x, 3) }
-func InOutCubic(x float64) float64 {
+var InCubic Func = func(x float64) float64 { return x * x * x }
+var OutCubic Func = func(x float64) float64 { return 1 - pow(1-x, 3) }
+var InOutCubic Func = func(x float64) float64 {
 	if x < 0.5 {
 		return 4 * x * x * x
 	} else {
@@ -64,9 +69,9 @@ func InOutCubic(x float64) float64 {
 	}
 }
 
-func InQuart(x float64) float64  { return x * x * x * x }
-func OutQuart(x float64) float64 { return 1 - pow(1-x, 4) }
-func InOutQuart(x float64) float64 {
+var InQuart Func = func(x float64) float64 { return x * x * x * x }
+var OutQuart Func = func(x float64) float64 { return 1 - pow(1-x, 4) }
+var InOutQuart Func = func(x float64) float64 {
 	if x < 0.5 {
 		return 8 * x * x * x * x
 	} else {
@@ -74,34 +79,34 @@ func InOutQuart(x float64) float64 {
 	}
 }
 
-func InQuint(x float64) float64  { return x * x * x * x * x }
-func OutQuint(x float64) float64 { return 1 - pow(1-x, 5) }
-func InOutQuint(x float64) float64 {
+var InQuint Func = func(x float64) float64 { return x * x * x * x * x }
+var OutQuint Func = func(x float64) float64 { return 1 - pow(1-x, 5) }
+var InOutQuint Func = func(x float64) float64 {
 	if x < 0.5 {
 		return 16 * x * x * x * x * x
 	} else {
 		return 1 - pow(-2*x+2, 5)/2
 	}
 }
-func InSin(x float64) float64    { return 1 - cos((x*pi)/2) }
-func OutSin(x float64) float64   { return sin((x * pi) / 2) }
-func InOutSin(x float64) float64 { return -(cos(pi*x) - 1) / 2 }
+var InSin Func = func(x float64) float64 { return 1 - cos((x*pi)/2) }
+var OutSin Func = func(x float64) float64 { return sin((x * pi) / 2) }
+var InOutSin Func = func(x float64) float64 { return -(cos(pi*x) - 1) / 2 }
 
-func InExpo(x float64) float64 {
+var InExpo Func = func(x float64) float64 {
 	if x == 0 {
 		return 0
 	} else {
 		return pow(2, 10*x-10)
 	}
 }
-func OutExpo(x float64) float64 {
+var OutExpo Func = func(x float64) float64 {
 	if x == 1 {
 		return 1
 	} else {
 		return 1 - pow(2, -10*x)
 	}
 }
-func InOutExpo(x float64) float64 {
+var InOutExpo Func = func(x float64) float64 {
 	switch {
 	case x == 0:
 		return 0
@@ -114,9 +119,9 @@ func InOutExpo(x float64) float64 {
 	}
 }
 
-func InCirc(x float64) float64  { return 1 - sqrt(1-pow(x, 2)) }
-func OutCirc(x float64) float64 { return sqrt(1 - pow(x-1, 2)) }
-func InOutCirc(x float64) float64 {
+var InCirc Func = func(x float64) float64 { return 1 - sqrt(1-pow(x, 2)) }
+var OutCirc Func = func(x float64) float64 { return sqrt(1 - pow(x-1, 2)) }
+var InOutCirc Func = func(x float64) float64 {
 	if x < 0.5 {
 		return (1 - sqrt(1-pow(2*x, 2))) / 2
 	} else {
@@ -124,9 +129,9 @@ func InOutCirc(x float64) float64 {
 	}
 }
 
-func InBack(x float64) float64  { return c3*x*x*x - c1*x*x }
-func OutBack(x float64) float64 { return 1 + c3*pow(x-1, 3) + c1*pow(x-1, 2) }
-func InOutBack(x float64) float64 {
+var InBack Func = func(x float64) float64 { return c3*x*x*x - c1*x*x }
+var OutBack Func = func(x float64) float64 { return 1 + c3*pow(x-1, 3) + c1*pow(x-1, 2) }
+var InOutBack Func = func(x float64) float64 {
 	if x < 0.5 {
 		return (pow(2*x, 2) * ((c2+1)*2*x - c2)) / 2
 	} else {
@@ -134,7 +139,7 @@ func InOutBack(x float64) float64 {
 	}
 }
 
-func InElastic(x float64) float64 {
+var InElastic Func = func(x float64) float64 {
 	switch {
 	case x == 0:
 		return 0
@@ -144,7 +149,7 @@ func InElastic(x float64) float64 {
 		return -pow(2, 10*x-10) * sin((x*10-10.75)*c4)
 	}
 }
-func OutElastic(x float64) float64 {
+var OutElastic Func = func(x float64) float64 {
 	switch {
 	case x == 0:
 		return 0
@@ -154,7 +159,7 @@ func OutElastic(x float64) float64 {
 		return pow(2, -10*x)*sin((x*10-0.75)*c4) + 1
 	}
 }
-func InOutElastic(x float64) float64 {
+var InOutElastic Func = func(x float64) float64 {
 	switch {
 	case x == 0:
 		return 0
@@ -167,11 +172,11 @@ func InOutElastic(x float64) float64 {
 	}
 }
 
-func InBounce(x float64) float64 {
+var InBounce Func = func(x float64) float64 {
 	return 1 - bounceOut(1-x)
 }
-func OutBounce(x float64) float64 { return bounceOut(x) }
-func InOutBounce(x float64) float64 {
+var OutBounce Func = func(x float64) float64 { return bounceOut(x) }
+var InOutBounce Func = func(x float64) float64 {
 	if x < 0.5 {
 		return (1 - bounceOut(1-2*x)) / 2
 	} else {

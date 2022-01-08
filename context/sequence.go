@@ -3,142 +3,114 @@ package context
 import (
 	"math/rand"
 
-	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
 
-func WithSequence(parent Context, s timer.Sequencer, callback func(ctx Context)) {
+func newSeqCtx(parent Context, s Sequencer, callback func(ctx Context)) {
 	iter := s.Iterate()
 	for iter.Next() {
-		ctx := seqTimerCtx{
-			parent:    parent,
+		ctx := seqCtx{
+			Context:   parent,
 			seq:       iter,
 			fixedRand: rand.Float64(),
 		}
-		ctx.eventer = newEventer(ctx)
 		callback(ctx)
 	}
 }
 
-type seqTimerCtx struct {
-	parent    Context
+type seqCtx struct {
+	Context
 	seq       timer.Sequence
 	fixedRand float64
-	eventer
 }
 
-// public
-func (c seqTimerCtx) BOffset(o float64) Context { return WithBOffset(c, o) }
-func (c seqTimerCtx) Sequence(s timer.Sequencer, callback func(ctx Context)) {
-	WithSequence(c, s, callback)
-}
-func (c seqTimerCtx) Range(r timer.Ranger, callback func(ctx Context)) {
-	WithRange(c, r, callback)
-}
-func (c seqTimerCtx) Beat(beat float64, callback func(ctx Context)) {
-	WithSequence(c, timer.Beat(beat), callback)
-}
-func (c seqTimerCtx) BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context)) {
-	WithSequence(c, timer.Seq(seq, ghostBeat), callback)
-}
-func (c seqTimerCtx) BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context)) {
-	WithRange(c, timer.Rng(startB, endB, steps, easeFn), callback)
-}
-func (c seqTimerCtx) BeatRangeInterval(startB, endB, interval float64, easeFn ease.Func, callback func(ctx Context)) {
-	WithRange(c, timer.RngInterval(startB, endB, interval, easeFn), callback)
-}
-
-func (c seqTimerCtx) Light(l Light, callback func(ctx LightContext)) {
-	WithLight(c, l, callback)
-}
-
-func (c seqTimerCtx) FixedRand() float64 {
-	return c.fixedRand
+func (c seqCtx) Apply(e evt.Event) {
+	e.SetBeat(c.B() + c.BOffset())
+	c.AddEvents(e)
 }
 
 // private
-func (c seqTimerCtx) base() base      { return c.parent.base() }
-func (c seqTimerCtx) baseTimer() bool { return false }
-func (c seqTimerCtx) offset() float64 { return c.parent.offset() + c.seq.ToRange().B() }
+func (c seqCtx) baseCtx() bool { return false }
 
-// passthrough to base
-func (c seqTimerCtx) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
-	return c.parent.FilterEvents(f)
+// public
+func (c seqCtx) WSeq(s Sequencer, callback func(ctx Context)) { newSeqCtx(c, s, callback) }
+func (c seqCtx) WRng(r Ranger, callback func(ctx Context))    { newRngCtx(c, r, callback) }
+func (c seqCtx) WLight(l Light, callback func(ctx LightContext, e evt.Events)) {
+	newLightCtx(c, l, callback)
 }
-func (c seqTimerCtx) MapEvents(f func(e evt.Event) evt.Event) {
-	c.parent.MapEvents(f)
-}
-func (c seqTimerCtx) MaxLightID(t evt.LightType) int { return c.parent.MaxLightID(t) }
-func (c seqTimerCtx) addEvents(events ...evt.Event)  { c.parent.addEvents(events...) }
+func (c seqCtx) WBOffset(o float64) Context { return newBOffsetCtx(c, o) }
 
 // passthrough to sequence timer
-func (c seqTimerCtx) SeqT() float64              { return c.seq.SeqT() }
-func (c seqTimerCtx) SeqOrdinal() int            { return c.seq.SeqOrdinal() }
-func (c seqTimerCtx) SeqLen() int                { return c.seq.SeqLen() }
-func (c seqTimerCtx) SeqNextB() float64          { return c.seq.SeqNextB() }
-func (c seqTimerCtx) SeqNextBOffset() float64    { return c.seq.SeqNextBOffset() }
-func (c seqTimerCtx) SeqPrevB() float64          { return c.seq.SeqPrevB() }
-func (c seqTimerCtx) SeqPrevBOffset() float64    { return c.seq.SeqPrevBOffset() }
-func (c seqTimerCtx) SeqFirst() bool             { return c.seq.SeqFirst() }
-func (c seqTimerCtx) SeqLast() bool              { return c.seq.SeqLast() }
-func (c seqTimerCtx) Next() bool                 { return c.seq.Next() }
-func (c seqTimerCtx) ToRange() timer.Range       { return c.seq.ToRange() }
-func (c seqTimerCtx) ToSequence() timer.Sequence { return c.seq.ToSequence() }
+func (c seqCtx) SeqT() float64              { return c.seq.SeqT() }
+func (c seqCtx) SeqOrdinal() int            { return c.seq.SeqOrdinal() }
+func (c seqCtx) SeqLen() int                { return c.seq.SeqLen() }
+func (c seqCtx) SeqNextB() float64          { return c.seq.SeqNextB() }
+func (c seqCtx) SeqNextBOffset() float64    { return c.seq.SeqNextBOffset() }
+func (c seqCtx) SeqPrevB() float64          { return c.seq.SeqPrevB() }
+func (c seqCtx) SeqPrevBOffset() float64    { return c.seq.SeqPrevBOffset() }
+func (c seqCtx) SeqFirst() bool             { return c.seq.SeqFirst() }
+func (c seqCtx) SeqLast() bool              { return c.seq.SeqLast() }
+func (c seqCtx) Next() bool                 { return c.seq.Next() }
+func (c seqCtx) ToRange() timer.Range       { return c.seq.ToRange() }
+func (c seqCtx) ToSequence() timer.Sequence { return c.seq.ToSequence() }
 
-// pass up to range timer, fallback to conversion if closest range timer is base
-func (c seqTimerCtx) B() float64 {
-	if c.parent.baseTimer() {
-		return c.seq.ToRange().B()
-	}
-	return c.parent.B()
+// pass up to range context, fallback to conversion if closest range timer is base
+func (c seqCtx) B() float64 {
+	//if c.Context.baseCtx() {
+	//	b := c.seq.ToRange().B()
+	//	return b
+	//}
+	return c.seq.ToRange().B()
 }
 
-func (c seqTimerCtx) T() float64 {
-	if c.parent.baseTimer() {
+func (c seqCtx) BOffset() float64 { return c.Context.BOffset() + c.Context.B() }
+
+func (c seqCtx) T() float64 {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().T()
 	}
-	return c.parent.T()
+	return c.Context.T()
 }
 
-func (c seqTimerCtx) Ordinal() int {
-	if c.parent.baseTimer() {
+func (c seqCtx) Ordinal() int {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().Ordinal()
 	}
-	return c.parent.Ordinal()
+	return c.Context.Ordinal()
 }
 
-func (c seqTimerCtx) StartB() float64 {
-	if c.parent.baseTimer() {
+func (c seqCtx) StartB() float64 {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().StartB()
 	}
-	return c.parent.StartB()
+	return c.Context.StartB()
 }
 
-func (c seqTimerCtx) EndB() float64 {
-	if c.parent.baseTimer() {
+func (c seqCtx) EndB() float64 {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().EndB()
 	}
-	return c.parent.EndB()
+	return c.Context.EndB()
 }
 
-func (c seqTimerCtx) Duration() float64 {
-	if c.parent.baseTimer() {
+func (c seqCtx) Duration() float64 {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().Duration()
 	}
-	return c.parent.Duration()
+	return c.Context.Duration()
 }
 
-func (c seqTimerCtx) First() bool {
-	if c.parent.baseTimer() {
+func (c seqCtx) First() bool {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().First()
 	}
-	return c.parent.First()
+	return c.Context.First()
 }
 
-func (c seqTimerCtx) Last() bool {
-	if c.parent.baseTimer() {
+func (c seqCtx) Last() bool {
+	if c.Context.baseCtx() {
 		return c.seq.ToRange().Last()
 	}
-	return c.parent.Last()
+	return c.Context.Last()
 }

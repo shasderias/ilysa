@@ -13,8 +13,8 @@ func randString(n int) string {
 	return string(b)
 }
 
-const lightIDLen = 8
+const lightNameLen = 8
 
 func getLightUID() string {
-	return randString(lightIDLen)
+	return randString(lightNameLen)
 }

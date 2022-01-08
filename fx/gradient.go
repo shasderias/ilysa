@@ -6,14 +6,10 @@ import (
 	"github.com/shasderias/ilysa/evt"
 )
 
-func Gradient(ctx context.LightContext, table gradient.Table) evt.RGBLightingEvents {
-	return ctx.NewRGBLighting(
-		evt.WithColor(table.Lerp(ctx.LightIDT())),
-	)
+func Gradient(ctx context.LightContext, e evt.Events, table gradient.Table) {
+	e.Apply(evt.OptColor(table.Lerp(ctx.LightT())))
 }
 
-func GradientT(ctx context.LightContext, table gradient.Table) evt.RGBLightingEvents {
-	return ctx.NewRGBLighting(
-		evt.WithColor(table.Lerp(ctx.T())),
-	)
+func GradientT(ctx context.LightContext, e evt.Events, table gradient.Table) {
+	e.Apply(evt.OptColor(table.Lerp(ctx.T())))
 }

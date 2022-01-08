@@ -16,3 +16,18 @@ func NewFromInterval(from, to int) ID {
 	}
 	return id
 }
+
+func (lightIDs *ID) Add(id ...int) {
+	*lightIDs = append(*lightIDs, id...)
+}
+
+func (lightIDs ID) Has(wantIDs ...int) bool {
+	for _, wantID := range wantIDs {
+		for _, lid := range lightIDs {
+			if wantID == lid {
+				return true
+			}
+		}
+	}
+	return false
+}

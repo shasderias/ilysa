@@ -9,15 +9,21 @@ type LightID []int
 
 func (l *LightID) UnmarshalJSON(raw []byte) error {
 	if bytes.ContainsRune(raw, '[') {
-		return json.Unmarshal(raw, &l)
-	}
-	var singleLightID int
-	if err := json.Unmarshal(raw, &singleLightID); err != nil {
-		return err
-	}
+		var lightIDAry []int
+		if err := json.Unmarshal(raw, &lightIDAry); err != nil {
+			return err
+		}
+		*l = lightIDAry
+		return nil
+	} else {
+		var lightIDNumber int
+		if err := json.Unmarshal(raw, &lightIDNumber); err != nil {
+			return err
+		}
 
-	*l = LightID{singleLightID}
-	return nil
+		*l = LightID{lightIDNumber}
+		return nil
+	}
 }
 
 func (l LightID) MarshalJSON() ([]byte, error) {
@@ -27,10 +33,12 @@ func (l LightID) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]int(l))
 }
 
-func (l LightID) Has(t int) bool {
+func (l LightID) Has(t ...int) bool {
 	for _, id := range l {
-		if id == t {
-			return true
+		for _, targetID := range t {
+			if id == targetID {
+				return true
+			}
 		}
 	}
 	return false

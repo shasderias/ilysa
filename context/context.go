@@ -1,91 +1,58 @@
 package context
 
 import (
-	"github.com/shasderias/ilysa/chroma"
-	"github.com/shasderias/ilysa/colorful"
-	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
 
+type Project interface {
+	Events() *evt.Events
+}
+
+type Sequencer interface {
+	Iterate() timer.Sequence
+}
+
+type Ranger interface {
+	Iterate() timer.Range
+}
+
+type Light interface {
+	GenerateEvents(LightContext) evt.Events
+	LightLen() int
+	Name() []string
+}
+
 type Context interface {
 	timer.Sequence
 	timer.Range
+	BOffset() float64
 	FixedRand() float64
 
-	Eventer
-	MaxLightID(t evt.LightType) int
+	base() *base
+	baseCtx() bool
 
-	BOffset(float64) Context
+	WSeq(s Sequencer, callback func(ctx Context))
+	WRng(r Ranger, callback func(ctx Context))
+	WLight(l Light, callback func(ctx LightContext, e evt.Events))
+	WBOffset(float64) Context
 
-	Sequence(s timer.Sequencer, callback func(ctx Context))
-	Range(r timer.Ranger, callback func(ctx Context))
-
-	// Beat is syntax sugar for Sequence(timer.Beat())
-	Beat(beat float64, callback func(ctx Context))
-	// BeatSequence is syntax sugar for Sequence(timer.Sequence())
-	BeatSequence(seq []float64, ghostBeat float64, callback func(ctx Context))
-	// BeatRange is syntax sugar for Range(timer.Rng())
-	BeatRange(startB, endB float64, steps int, easeFn ease.Func, callback func(ctx Context))
-	// BeatRangeInterval is syntax sugar for Range(timer.RngInterval())
-	BeatRangeInterval(startB, endB, interval float64, easeFn ease.Func, callback func(ctx Context))
-
-	Light(l Light, callback func(ctx LightContext))
-
-	MapEvents(func(e evt.Event) evt.Event)
-	FilterEvents(func(e evt.Event) bool) *[]evt.Event
-
-	addEvents(events ...evt.Event)
-	base() base
-	baseTimer() bool
-	offset() float64
+	Apply(e evt.Event)
+	AddEvents(events ...evt.Event)
+	Events() *evt.Events
 }
 
 type LightContext interface {
 	timer.Sequence
 	timer.Range
-	timer.Light
+	BOffset() float64
+
+	LightT() float64
+	LightOrdinal() int
+	LightLen() int
+	LightCur() int
+
+	Apply(e evt.Event)
 	FixedRand() float64
-
-	LightEventer
-}
-
-type Eventer interface {
-	NewLighting(opts ...evt.LightingOpt) *evt.Lighting
-	NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting
-	NewLaser(opts ...evt.LaserOpt) *evt.Laser
-	NewPreciseLaser(opts ...evt.PreciseLaserOpt) *evt.PreciseLaser
-	NewRotation(opts ...evt.RotationOpt) *evt.Rotation
-	NewPreciseRotation(opts ...evt.PreciseRotationOpt) *evt.PreciseRotation
-	NewZoom(opts ...evt.ZoomOpt) *evt.Zoom
-	NewPreciseZoom(opts ...evt.PreciseZoomOpt) *evt.PreciseZoom
-	NewChromaGradient(opts ...evt.ChromaGradientOpt) *evt.ChromaGradient
-
-	EZLighting(typ evt.LightType, val evt.LightValue) *evt.Lighting
-	EZRGBLighting(color colorful.Color) *evt.RGBLighting
-	EZLaser(laser evt.DirectionalLaser, speed int) *evt.Laser
-	EZPreciseLaser(laser evt.DirectionalLaser, speed float64) *evt.PreciseLaser
-	EZRotation() *evt.Rotation
-	EZPreciseRotation(rotation, step, prop, speed float64, direction chroma.SpinDirection) *evt.PreciseRotation
-	EZZoom() *evt.Zoom
-	EZPreciseZoom(step float64) *evt.PreciseZoom
-}
-
-type LightEventer interface {
-	NewRGBLighting(opts ...evt.RGBLightingOpt) evt.RGBLightingEvents
-	EZRGBLighting(color colorful.Color) evt.RGBLightingEvents
-}
-
-type LightRGBLightingContext interface {
-	timer.Sequence
-	timer.Range
-	timer.Light
-	FixedRand() float64
-	NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting
-}
-
-type Light interface {
-	NewRGBLighting(ctx LightRGBLightingContext) evt.RGBLightingEvents
-	LightIDLen() int
-	Name() []string
+	AddEvents(events ...evt.Event)
 }
