@@ -28,3 +28,11 @@ func (s Set) Slice(i, j int) Set {
 func (s Set) Len() int {
 	return len(s)
 }
+
+func (s Set) Clone() Set {
+	clonedSet := NewSet()
+	for _, id := range s {
+		clonedSet.Add(id.Clone())
+	}
+	return clonedSet
+}

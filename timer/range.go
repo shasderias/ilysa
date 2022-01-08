@@ -32,22 +32,26 @@ type Ranger struct {
 	tToBeat   func(float64) float64
 }
 
-func Rng(startBeat, endBeat float64, steps int, fn ease.Func) Ranger {
+// Rng specifies a range of beats that starts on startB, ends on endB, has a total of
+// n beats, eased using fn.
+func Rng(startB, endB float64, n int, fn ease.Func) Ranger {
 	return Ranger{
-		startBeat: startBeat,
-		endBeat:   endBeat,
-		steps:     steps,
+		startBeat: startB,
+		endBeat:   endB,
+		steps:     n,
 		easeFn:    fn,
-		tToBeat:   scale.FromUnitClamp(startBeat, endBeat),
+		tToBeat:   scale.FromUnitClamp(startB, endB),
 	}
 }
 
-func RngInterval(startBeat, endBeat, interval float64, fn ease.Func) Ranger {
-	steps := int(math.RoundToEven(endBeat-startBeat)*interval) + 1
-	if steps < 1 {
-		steps = 1
+// RngInterval specifies a range of beats that starts on startB, ends on endB, has a
+// beat every 1/interval beats. The range is then eased using fn.
+func RngInterval(startB, endB, interval float64, fn ease.Func) Ranger {
+	n := int(math.RoundToEven(endB-startB)*interval) + 1
+	if n < 1 {
+		n = 1
 	}
-	return Rng(startBeat, endBeat, steps, fn)
+	return Rng(startB, endB, n, fn)
 }
 
 func (r Ranger) Iterate() Range {

@@ -2,6 +2,7 @@ package timer
 
 import (
 	"github.com/shasderias/ilysa/internal/calc"
+	"github.com/shasderias/ilysa/internal/errors"
 )
 
 type Sequence interface {
@@ -27,45 +28,33 @@ type Sequencer struct {
 	g float64
 }
 
-func Seq(seq []float64, ghostBeat float64) Sequencer {
-	return Sequencer{
-		s: seq,
-		g: ghostBeat,
+// Seq specifies a sequence of beats.
+func Seq(beats ...float64) Sequencer {
+	if len(beats) == 0 {
+		panic(errors.Errorf("sequence must contain at least one beat"))
 	}
+	return Sequencer{beats, beats[len(beats)-1] + 1}
 }
 
-func Beat(beat float64) Sequencer {
-	return Sequencer{
-		s: []float64{beat},
-		g: beat,
+// SeqInterval specifies a beat sequence that starts on startB, ends on endB,
+// and has a beat every 1/interval beats.
+func SeqInterval(startB, endB, interval float64) Sequencer {
+	beats := []float64{}
+	for b := startB; b <= endB; b += 1 / interval {
+		beats = append(beats, b)
 	}
-}
-
-func Interval(startBeat, duration float64, count int) Sequencer {
-	s := []float64{}
-	for i := 0; i < count; i++ {
-		s = append(s, startBeat+duration*float64(i))
-	}
-	return Sequencer{
-		s: s,
-		g: startBeat + duration*float64(count),
-	}
-}
-
-func SeqFromSlice(seq []float64) Sequencer {
-	l := len(seq)
-	if l < 2 {
-		panic("sequence must have at least one beat and one ghost beat")
-	}
-
-	return Sequencer{
-		s: seq[:l-1],
-		g: seq[l-1],
-	}
+	beats = append(beats, endB+1/interval)
+	return Seq(beats...)
 }
 
 func (s Sequencer) Idx(i int) float64 { return s.s[calc.WraparoundIdx(s.Len(), i)] }
 func (s Sequencer) Len() int          { return len(s.s) }
+func (s Sequencer) First() float64    { return s.s[0] }
+func (s Sequencer) Last() float64     { return s.s[s.Len()-1] }
+func (s Sequencer) G(gb float64) Sequencer {
+	s.g = gb
+	return s
+}
 
 func (s Sequencer) Iterate() Sequence {
 	return &SequenceIterator{s, -1}

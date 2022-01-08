@@ -195,6 +195,9 @@ func MarshalWith(target interface{}, spilloverName string) ([]byte, error) {
 	merged := map[string]*json.RawMessage{}
 
 	for i := 0; i < me.NumField(); i++ {
+		if !typ.Field(i).IsExported() {
+			continue
+		}
 		var (
 			structField = typ.Field(i)
 			name        = structField.Name

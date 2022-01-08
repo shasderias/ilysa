@@ -3,6 +3,7 @@ package gradient
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa/colorful"
 	"github.com/shasderias/ilysa/internal/calc"
 )
 
@@ -21,6 +22,14 @@ func NewSet(gradients ...Table) Set {
 		gradients: append([]Table{}, gradients...),
 		i:         &i,
 	}
+}
+
+func Combine(tables ...Table) Table {
+	colors := []colorful.Color{}
+	for _, table := range tables {
+		colors = append(colors, table.Colors()...)
+	}
+	return New(colors...)
 }
 
 // Index returns the gradient at the ith position. If i is out of range, i is
@@ -49,4 +58,8 @@ func (s Set) Next() Table {
 // Rand returns a random gradient from the Set.
 func (s Set) Rand() Table {
 	return s.gradients[rand.Intn(len(s.gradients))]
+}
+
+func (s Set) SeqOrdinalIdx(ctx interface{ SeqOrdinal() int }) Table {
+	return s.Index(ctx.SeqOrdinal())
 }

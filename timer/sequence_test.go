@@ -1,59 +1,34 @@
 package timer
 
-import "testing"
+import "fmt"
 
-func TestSeq_Idx(t *testing.T) {
-	tests := []struct {
-		name     string
-		seq      []float64
-		subTests []struct {
-			idx  int
-			want float64
-		}
-	}{
-		{"Sanity", []float64{0, 1}, []struct {
-			idx  int
-			want float64
-		}{{0, 0}, {1, 0}, {-1, 0}}},
+func ExampleSeq() {
+	seq := Seq(1, 2, 3, 4, 4+1)
+	iter := seq.Iterate()
+	for iter.Next() {
+		fmt.Println(iter.ToRange().B())
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			seq := SeqFromSlice(tt.seq)
-			for _, st := range tt.subTests {
-				if got := seq.Idx(st.idx); got != st.want {
-					t.Errorf("Idx(%d) = %v, want %v", st.idx, got, st.want)
-				}
-			}
-		})
-	}
+	// Output:
+	// 1
+	// 2
+	// 3
+	// 4
 }
 
-func TestSeq_NextBOffset(t *testing.T) {
-	tests := []struct {
-		name     string
-		seq      []float64
-		subTests []struct {
-			idx  int
-			want float64
-		}
-	}{
-		{"Sanity", []float64{0, 1}, []struct {
-			idx  int
-			want float64
-		}{{0, 1}, {1, 1}, {-1, 1}}},
-		{"TwoBeats", []float64{0, 1, 2}, []struct {
-			idx  int
-			want float64
-		}{{0, 1}, {1, 1}, {-1, 1}}},
+func ExampleSeqInterval() {
+	seq := SeqInterval(1, 3, 4)
+	iter := seq.Iterate()
+	for iter.Next() {
+		fmt.Println(iter.ToRange().B())
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			seq := SeqFromSlice(tt.seq)
-			for _, st := range tt.subTests {
-				if got := seq.NextBOffset(st.idx); got != st.want {
-					t.Errorf("Idx(%d) = %v, want %v", st.idx, got, st.want)
-				}
-			}
-		})
-	}
+	// Output:
+	// 1
+	// 1.25
+	// 1.5
+	// 1.75
+	// 2
+	// 2.25
+	// 2.5
+	// 2.75
+	// 3
 }

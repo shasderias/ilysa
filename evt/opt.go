@@ -1,59 +1,15 @@
 package evt
 
-type Opt interface {
-	apply(e Event)
+func OptB(b float64) Option          { return NewFuncOpt(func(e Event) { e.SetBeat(b) }) }
+func OptShiftB(b float64) Option     { return NewFuncOpt(func(e Event) { e.SetBeat(e.Beat() + b) }) }
+func OptType(t Type) Option          { return NewFuncOpt(func(e Event) { e.SetType(t) }) }
+func OptValue(v Value) Option        { return NewFuncOpt(func(e Event) { e.SetValue(v) }) }
+func OptIntValue(v int) Option       { return NewFuncOpt(func(e Event) { e.SetValue(Value(v)) }) }
+func OptFloatValue(f float64) Option { return NewFuncOpt(func(e Event) { e.SetFloatValue(f) }) }
+
+type FuncOpt struct {
+	applyFn func(Event)
 }
 
-func Apply(e Event, opts ...Opt) {
-	for _, opt := range opts {
-		opt.apply(e)
-	}
-}
-
-type Opts []Opt
-
-func NewOpts(opts ...Opt) Opts {
-	return opts
-}
-
-func (o *Opts) Add(opts ...Opt) {
-	*o = append(*o, opts...)
-}
-
-func (o Opts) apply(e Event) {
-	for _, opt := range o {
-		opt.apply(e)
-	}
-}
-
-// TODO: expand to all event types
-
-func (o Opts) applyRGBLighting(e *RGBLighting) {
-	for _, opt := range o {
-		lo, ok := opt.(RGBLightingOpt)
-		if !ok {
-			continue
-		}
-		lo.applyRGBLighting(e)
-	}
-}
-
-func (o Opts) applyPreciseLaser(e *PreciseLaser) {
-	for _, opt := range o {
-		lo, ok := opt.(PreciseLaserOpt)
-		if !ok {
-			continue
-		}
-		lo.applyPreciseLaser(e)
-	}
-}
-
-func (o Opts) applyPreciseRotation(e *PreciseRotation) {
-	for _, opt := range o {
-		lo, ok := opt.(PreciseRotationOpt)
-		if !ok {
-			continue
-		}
-		lo.applyPreciseRotation(e)
-	}
-}
+func NewFuncOpt(applyFn func(e Event)) FuncOpt { return FuncOpt{applyFn} }
+func (o FuncOpt) Apply(e Event)                { o.applyFn(e) }

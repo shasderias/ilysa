@@ -1,59 +1,88 @@
 package evt
 
 import (
-	"encoding/json"
-
 	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/chroma"
 )
 
-func NewZoom(opts ...ZoomOpt) Zoom {
-	e := Zoom{NewBase(
-		WithType(beatsaber.EventTypeRingZoom),
-	)}
+// NewZoom returns a new base game zoom event.
+func NewZoom(opts ...Option) *Zoom {
+	e := Zoom{NewBase()}
+	e.SetType(TypeRingZoom)
 	for _, opt := range opts {
-		opt.applyZoom(&e)
+		opt.Apply(&e)
 	}
-	return e
+	return &e
 }
 
 type Zoom struct {
 	Base
 }
 
-type ZoomOpt interface {
-	applyZoom(*Zoom)
-}
-
-func (e Zoom) CustomData() (json.RawMessage, error) { return nil, nil }
-
-func (e *Zoom) Apply(opts ...ZoomOpt) {
+func (e *Zoom) Apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.applyZoom(e)
+		opt.Apply(e)
 	}
 }
 
-func NewPreciseZoom(opts ...PreciseZoomOpt) PreciseZoom {
-	e := PreciseZoom{Base: NewBase(
-		WithType(beatsaber.EventTypeRingZoom),
-	)}
+// NewChromaZoom returns a Chroma precise zoom event.
+func NewChromaZoom(opts ...Option) *ChromaZoom {
+	e := ChromaZoom{Base: NewBase()}
+	e.SetType(TypeRingZoom)
+
 	for _, opt := range opts {
-		opt.applyPreciseZoom(&e)
+		opt.Apply(&e)
 	}
-	return e
+	return &e
 }
 
-type PreciseZoom struct {
+type ChromaZoom struct {
 	Base
-	chroma.PreciseZoom
+	chroma.Zoom
 }
 
-type PreciseZoomOpt interface {
-	applyPreciseZoom(*PreciseZoom)
-}
-
-func (e *PreciseZoom) Apply(opts ...PreciseZoomOpt) {
+func (e *ChromaZoom) Apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.applyPreciseZoom(e)
+		opt.Apply(e)
 	}
+}
+
+func (e ChromaZoom) EventV220() beatsaber.EventV220 {
+	cd, err := e.Zoom.CustomData()
+	if err != nil {
+		panic(err)
+	}
+	return e.Base.EventV220WithCD(cd)
+}
+
+func (e ChromaZoom) EventV250() beatsaber.EventV250 {
+	cd, err := e.Zoom.CustomData()
+	if err != nil {
+		panic(err)
+	}
+	return e.Base.EventV250WithCD(cd)
+}
+
+func (e *ChromaZoom) ChromaZoomStep() float64            { return e.Step.Value }
+func (e *ChromaZoom) SetChromaZoomStep(zoomStep float64) { e.Step.Set(zoomStep) }
+func OptChromaZoomStep(s float64) Option {
+	return NewFuncOpt(func(e Event) {
+		cz, ok := e.(*ChromaZoom)
+		if !ok {
+			return
+		}
+		cz.SetChromaZoomStep(s)
+	})
+}
+
+func (e *ChromaZoom) ChromaZoomSpeed() float64             { return e.Speed.Value }
+func (e *ChromaZoom) SetChromaZoomSpeed(zoomSpeed float64) { e.Speed.Set(zoomSpeed) }
+func OptChromaZoomSpeed(s float64) Option {
+	return NewFuncOpt(func(e Event) {
+		cz, ok := e.(*ChromaZoom)
+		if !ok {
+			return
+		}
+		cz.SetChromaZoomSpeed(s)
+	})
 }

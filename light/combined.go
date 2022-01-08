@@ -7,7 +7,6 @@ import (
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
 	"github.com/shasderias/ilysa/scale"
-	"github.com/shasderias/ilysa/timer"
 )
 
 type Combined struct {
@@ -18,25 +17,24 @@ func Combine(lights ...context.Light) Combined {
 	return Combined{lights}
 }
 
-func (c Combined) NewRGBLighting(ctx context.LightRGBLightingContext) evt.RGBLightingEvents {
-	events := evt.RGBLightingEvents{}
+func (c Combined) GenerateEvents(ctx context.LightContext) evt.Events {
+	events := evt.NewEvents()
 
-	maxLightIDLen := c.LightIDLen()
+	maxLightLen := c.LightLen()
 
 	for _, l := range c.lights {
-		if l.LightIDLen() < c.LightIDLen() {
-			lightIDScale := scale.Clamp(1, float64(l.LightIDLen()), 1, float64(maxLightIDLen))
-			for i := 1; i <= l.LightIDLen(); i++ {
-				if int(math.RoundToEven(lightIDScale(float64(i)))) == ctx.LightIDCur() {
-					lt := timer.NewLighter(l)
-					lctx := context.WithLightTimer(ctx, lt.IterateFrom(i-1))
-					events.Add(l.NewRGBLighting(lctx)...)
+		if l.LightLen() < c.LightLen() {
+			lightIDScale := scale.Clamp(1, float64(l.LightLen()), 1, float64(maxLightLen))
+			for i := 1; i <= l.LightLen(); i++ {
+				if int(math.RoundToEven(lightIDScale(float64(i)))) == ctx.LightCur() {
+					lctx := context.LightContextAtOrdinal(ctx, l, i-1)
+					events.Add(l.GenerateEvents(lctx)...)
 					goto end
 				}
 			}
 			continue
 		}
-		events.Add(l.NewRGBLighting(ctx)...)
+		events.Add(l.GenerateEvents(ctx)...)
 	end:
 	}
 
@@ -47,11 +45,11 @@ func (c *Combined) Add(lights ...context.Light) {
 	c.lights = append(c.lights, lights...)
 }
 
-func (c Combined) LightIDLen() int {
+func (c Combined) LightLen() int {
 	max := 0
 	for _, l := range c.lights {
-		if l.LightIDLen() > max {
-			max = l.LightIDLen()
+		if l.LightLen() > max {
+			max = l.LightLen()
 		}
 	}
 	return max

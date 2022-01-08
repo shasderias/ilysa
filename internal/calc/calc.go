@@ -8,3 +8,7 @@ func Abs(n int64) int64 {
 func WraparoundIdx(len, idx int) int {
 	return ((idx % len) + len) % len
 }
+
+func IndexWraparound[T any](slice []T, index int) T {
+	return slice[WraparoundIdx(len(slice), index)]
+}

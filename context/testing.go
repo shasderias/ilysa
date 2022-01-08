@@ -1,14 +1,10 @@
 package context
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/lightid"
-	"github.com/shasderias/ilysa/timer"
 )
 
 type RefTiming struct {
@@ -23,11 +19,9 @@ type RefTiming struct {
 }
 
 func refTimingFromContext(ctx Context) RefTiming {
-	e := ctx.NewRGBLighting()
-
 	return RefTiming{
 		B:              ctx.B(),
-		BWOffset:       e.Beat(),
+		BWOffset:       ctx.B() + ctx.BOffset(),
 		T:              ctx.T(),
 		SeqT:           ctx.SeqT(),
 		SeqNextB:       ctx.SeqNextB(),
@@ -35,122 +29,72 @@ func refTimingFromContext(ctx Context) RefTiming {
 	}
 }
 
-func refTimingFromLightContext(ctx LightRGBLightingContext) RefTiming {
-	e := ctx.NewRGBLighting()
-
+func refTimingFromLightContext(ctx LightContext) RefTiming {
 	return RefTiming{
 		B:              ctx.B(),
-		BWOffset:       e.Beat(),
+		BWOffset:       ctx.B() + ctx.BOffset(),
 		T:              ctx.T(),
 		SeqT:           ctx.SeqT(),
 		SeqNextB:       ctx.SeqNextB(),
 		SeqNextBOffset: ctx.SeqNextBOffset(),
-		LightIDT:       ctx.LightIDT(),
+		LightIDT:       ctx.LightT(),
 	}
 }
 
 type MockProject struct {
 	t          *testing.T
-	maxLightID int
-	events     []evt.Event
+	events     *evt.Events
 	refTimings []RefTiming
 }
 
-func NewMockProject(t *testing.T, maxLightID int) *MockProject {
+func NewMockProject(t *testing.T) *MockProject {
+	events := evt.NewEvents()
+
 	return &MockProject{
-		t:          t,
-		maxLightID: maxLightID,
-		events:     make([]evt.Event, 0),
+		t:      t,
+		events: &events,
 	}
 }
-
-func (p *MockProject) MaxLightID(t evt.LightType) int {
-	return p.maxLightID
-}
-
-func (p *MockProject) AddEvents(events ...evt.Event) {
-	p.events = append(p.events, events...)
-}
-
-func (p *MockProject) MockLight() MockLight {
-	return newMockLight(p)
-}
-
 func (p *MockProject) addRefTiming(t RefTiming) {
 	p.refTimings = append(p.refTimings, t)
 }
 
 func (p *MockProject) AddRefTimingFromCtx(ctx Context) {
 	ref := refTimingFromContext(ctx)
-
-	e := ctx.NewRGBLighting()
-	ref.BWOffset = e.Beat()
-
 	p.addRefTiming(ref)
-}
-
-type MockLight struct {
-	*MockProject
-}
-
-func newMockLight(p *MockProject) MockLight {
-	return MockLight{p}
-}
-
-func (l MockLight) NewRGBLighting(ctx LightRGBLightingContext) evt.RGBLightingEvents {
-	t := refTimingFromLightContext(ctx)
-
-	e := ctx.NewRGBLighting(evt.WithLightID(lightid.New(ctx.LightIDCur())))
-	t.LightID = lightid.ID(e.LightID)
-
-	l.addRefTiming(t)
-
-	return evt.RGBLightingEvents{e}
-}
-
-func (l MockLight) LightIDLen() int {
-	return l.MockProject.maxLightID
-}
-
-func (l MockLight) Name() []string {
-	return []string{fmt.Sprintf("MockLight")}
-}
-
-func (p *MockProject) Cmp(t []RefTiming) {
-	if diff := cmp.Diff(t, p.refTimings, cmpopts.EquateApprox(0.000001, 0)); diff != "" {
-		p.t.Fatal(diff)
-	}
-}
-
-func (p *MockProject) Events() *[]evt.Event {
-	return &p.events
 }
 
 func (p *MockProject) RefTimings() []RefTiming {
 	return p.refTimings
 }
 
-func (p *MockProject) Sequence(s timer.Sequencer, callback func(ctx Context)) {
-	Base(p).Sequence(s, callback)
+func (p *MockProject) Events() *evt.Events {
+	return p.events
 }
 
-func (p *MockProject) Range(r timer.Ranger, callback func(ctx Context)) {
-	Base(p).Range(r, callback)
-}
-
-func (p *MockProject) FilterEvents(f func(e evt.Event) bool) *[]evt.Event {
-	filteredEvents := make([]evt.Event, 0)
-	for _, e := range p.events {
-		if f(e) {
-			filteredEvents = append(filteredEvents, e)
-		}
+func (p *MockProject) MockLight(maxLightID int) Light {
+	return &mockLight{
+		MockProject: p,
+		maxLightID:  maxLightID,
 	}
-	p.events = filteredEvents
-	return &filteredEvents
 }
 
-func (p *MockProject) MapEvents(f func(e evt.Event) evt.Event) {
-	for i := range p.events {
-		p.events[i] = f(p.events[i])
-	}
+type mockLight struct {
+	*MockProject
+	maxLightID int
+}
+
+func (m mockLight) GenerateEvents(ctx LightContext) evt.Events {
+	refTiming := refTimingFromLightContext(ctx)
+	refTiming.LightID = lightid.New(ctx.LightCur())
+	m.addRefTiming(refTiming)
+	return evt.NewEvents()
+}
+
+func (m mockLight) LightLen() int {
+	return m.maxLightID
+}
+
+func (m mockLight) Name() []string {
+	return []string{"MockLight"}
 }

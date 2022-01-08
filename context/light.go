@@ -1,95 +1,57 @@
 package context
 
 import (
-	"github.com/shasderias/ilysa/colorful"
 	"github.com/shasderias/ilysa/evt"
-	"github.com/shasderias/ilysa/timer"
 )
-
-func WithLight(parent Context, l Light, callback func(ctx LightContext)) {
-	iter := timer.NewLighter(l).Iterate()
-	for iter.Next() {
-		ctx := lightTimerCtx{
-			Context: parent,
-			Light:   iter,
-			l:       l,
-		}
-		callback(ctx)
-	}
-}
-
-type lightTimerCtx struct {
-	Context
-	timer.Light
-	l Light
-}
-
-func (c lightTimerCtx) Next() bool {
-	return c.Light.Next()
-}
-
-//func (c lightTimerCtx) offset() float64 {
-//	return c.Context.offset()
-//}
-
-func (c lightTimerCtx) NewRGBLighting(opts ...evt.RGBLightingOpt) evt.RGBLightingEvents {
-	e := c.l.NewRGBLighting(newLightCtx(c.Context, c.Light, c.l, opts))
-	return e
-}
-
-func (c lightTimerCtx) EZRGBLighting(color colorful.Color) evt.RGBLightingEvents {
-	return c.NewRGBLighting(evt.WithColor(color))
-}
-
-func newLightCtx(ctx Context, lightTimer timer.Light, l Light, opts []evt.RGBLightingOpt) lightCtx {
-	lightCtx := lightCtx{
-		Context: ctx,
-		Light:   lightTimer,
-		l:       l,
-	}
-
-	lightCtx.defaultOptsPre = []evt.Opt{evt.WithBeat(ctx.B()), evt.WithTag(l.Name()...)}
-	lightCtx.userOpts = opts
-	lightCtx.defaultOptsPost = []evt.Opt{evt.WithBOffset(ctx.offset() - ctx.B())}
-	return lightCtx
-}
 
 type lightCtx struct {
 	Context
-	timer.Light
-	l Light
-
-	defaultOptsPre  []evt.Opt
-	userOpts        []evt.RGBLightingOpt
-	defaultOptsPost []evt.Opt
+	ordinal int
+	l       Light
 }
 
-func (c lightCtx) NewRGBLighting(opts ...evt.RGBLightingOpt) *evt.RGBLighting {
-	e := evt.NewRGBLighting()
-	evt.Apply(&e, c.defaultOptsPre...)
-	e.Apply(opts...)
-	e.Apply(c.userOpts...)
-	evt.Apply(&e, c.defaultOptsPost...)
-	c.addEvents(&e)
-	return &e
-}
-
-func (c lightCtx) Next() bool {
-	return c.Light.Next()
-}
-
-func WithLightTimer(ctx LightRGBLightingContext, t timer.Light) LightRGBLightingContext {
-	c, ok := ctx.(lightCtx)
-	if !ok {
-		return c
+func (c *lightCtx) LightT() float64 {
+	if c.LightLen() == 1 {
+		return 1
 	}
+	return float64(c.ordinal) / float64(c.LightLen()-1)
+}
+func (c *lightCtx) LightOrdinal() int { return c.ordinal }
+func (c *lightCtx) LightLen() int     { return c.l.LightLen() }
+func (c *lightCtx) LightCur() int     { return c.ordinal + 1 }
+func (c *lightCtx) Next() bool {
+	c.ordinal++
+	if c.ordinal == c.l.LightLen() {
+		return false
+	}
+	return true
+}
+func (c *lightCtx) Apply(e evt.Event) {
+	e.SetBeat(c.B() + c.BOffset())
+	e.SetTag(c.l.Name()...)
+	c.AddEvents(e)
+}
 
-	return lightCtx{
-		Context:         c.Context,
-		Light:           t,
-		l:               c.l,
-		defaultOptsPre:  c.defaultOptsPre,
-		userOpts:        c.userOpts,
-		defaultOptsPost: c.defaultOptsPost,
+func newLightCtx(parent Context, l Light, callback func(ctx LightContext, e evt.Events)) {
+	lctx := &lightCtx{
+		Context: parent,
+		ordinal: -1,
+		l:       l,
+	}
+	for lctx.Next() {
+		events := l.GenerateEvents(lctx)
+		callback(lctx, events)
+	}
+}
+
+func LightContextAtOrdinal(ctx LightContext, l Light, ordinal int) LightContext {
+	lctx, ok := ctx.(*lightCtx)
+	if !ok {
+		panic("LightContextAtOrdinal: invalid context")
+	}
+	return &lightCtx{
+		Context: lctx.Context,
+		ordinal: ordinal,
+		l:       l,
 	}
 }
