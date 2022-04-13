@@ -9,6 +9,10 @@ func New(ids ...int) ID {
 	return append(ID{}, ids...)
 }
 
+func (lightIDs ID) Clone() ID {
+	return append(ID{}, lightIDs...)
+}
+
 func NewFromInterval(from, to int) ID {
 	id := make(ID, 0, to-from+1)
 	for i := from; i <= to; i++ {

@@ -15,3 +15,9 @@ func Ripple(ctx context.LightContext, e evt.Events, step float64) {
 func RippleT(ctx context.LightContext, e evt.Events, delay float64) {
 	e.Apply(evt.OptShiftB(ctx.LightT() * delay))
 }
+
+func RippleT2(ctx context.LightContext, delay float64) evt.Option {
+	return evt.NewFuncOpt(func(e evt.Event) {
+		e.Apply(evt.OptShiftB(ctx.LightT() * delay))
+	})
+}

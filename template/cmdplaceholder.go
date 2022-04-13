@@ -11,6 +11,6 @@ const (
 	difficulty     = beatsaber.BeatmapDifficultyExpertPlus
 )
 
-func Ilysa(ctx context.Context) error {
+func IlysaMain(ctx context.Context) error {
 	return nil
 }

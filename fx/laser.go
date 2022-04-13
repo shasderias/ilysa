@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/shasderias/ilysa/context"
+	"github.com/shasderias/ilysa/ease"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/opt"
 	"github.com/shasderias/ilysa/scale"
@@ -38,7 +39,7 @@ func (o slowMotionLaserLockFirst) apply(c *slowMotionLaserConfig) {
 }
 
 func SlowMotionLasers(ctx context.Context,
-	rng timer.Ranger, t evt.Type, startSpeed, endSpeed float64,
+	rng timer.Ranger, t evt.Type, startSpeed, endSpeed float64, easeFn ease.Func,
 	opts ...SlowMotionLaserOpt) evt.Events {
 	conf := slowMotionLaserConfig{}
 	for _, o := range opts {
@@ -50,7 +51,7 @@ func SlowMotionLasers(ctx context.Context,
 	speedScaler := scale.FromUnitClamp(startSpeed, endSpeed)
 
 	ctx.WRng(rng, func(ctx context.Context) {
-		speed := speedScaler(ctx.T())
+		speed := speedScaler(easeFn(ctx.T()))
 		intSpeed := int(math.Round(speed))
 
 		optSet := opt.NewSet(

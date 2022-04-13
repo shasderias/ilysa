@@ -28,7 +28,7 @@ func do() error {
 
 	ctx := ilysa.New(diff)
 
-	err = Ilysa(ctx)
+	err = IlysaMain(ctx)
 	if err != nil {
 		return err
 	}

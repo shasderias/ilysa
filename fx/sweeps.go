@@ -41,6 +41,12 @@ func ColorSweep(ctx context.LightContext, e evt.Events, sweepSpeed float64, grad
 	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
 	e.Apply(evt.OptColor(grad.Lerp(gradPos(ctx))))
 }
+func ColorSweep2(ctx context.LightContext, sweepSpeed float64, grad gradient.Table) evt.Option {
+	return evt.NewFuncOpt(func(e evt.Event) {
+		gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
+		e.Apply(evt.OptColor(grad.Lerp(gradPos(ctx))))
+	})
+}
 
 //
 //func AlphaShimmer(ctx context.LightContext, events evt.RGBLightingEvents, shimmerSpeed float64) {
