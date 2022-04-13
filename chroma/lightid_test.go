@@ -14,6 +14,7 @@ func TestLightID_MarshalJSON(t *testing.T) {
 	}{
 		{[]int{1}, "1"},
 		{[]int{1, 2}, "[1,2]"},
+		{[]int{3, 1, 2}, "[1,2,3]"},
 	}
 
 	for _, tt := range testCases {

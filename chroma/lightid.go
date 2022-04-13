@@ -3,6 +3,7 @@ package chroma
 import (
 	"bytes"
 	"encoding/json"
+	"sort"
 )
 
 type LightID []int
@@ -27,6 +28,7 @@ func (l *LightID) UnmarshalJSON(raw []byte) error {
 }
 
 func (l LightID) MarshalJSON() ([]byte, error) {
+	sort.Ints(l)
 	if len(l) == 1 {
 		return json.Marshal(l[0])
 	}

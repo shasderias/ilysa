@@ -9,136 +9,85 @@ import (
 	"github.com/shasderias/ilysa/lightid"
 )
 
-type identity struct{}
-
-func Identity() identity {
-	return identity{}
+func Identity() LightTransformer {
+	return newLightTransformer(func(l context.Light) context.Light {
+		return l
+	})
 }
 
-func (i identity) LightTransform(l context.Light) context.Light { return l }
-
-func DivideSingle() divideSingle {
-	return divideSingle{false}
+// DivideSingle divides each set of light IDs by the number of light IDs that set has.
+// e.g. [1,2,3,4] -> [1], [2], [3], [4]
+func DivideSingle() lightIDToLightIDSetTransformer {
+	return newLightIDToLightIDSetTransformer(func(id lightid.ID) lightid.Set {
+		set := lightid.NewSet()
+		for _, i := range id {
+			set.Add(lightid.New(i))
+		}
+		return set
+	})
 }
 
-type divideSingle struct {
-	sequence bool
-}
-
-func (d divideSingle) do(id lightid.ID) lightid.Set {
-	set := lightid.NewSet()
-	for _, i := range id {
-		set.Add(lightid.New(i))
+func divideSingle[T any](elems []T) [][]T {
+	set := make([][]T, 0)
+	for _, elem := range elems {
+		set = append(set, []T{elem})
 	}
 	return set
 }
 
-func (d divideSingle) LightTransform(l context.Light) context.Light {
-	return applyLightIDTransformer(l, d.do, d.sequence)
+// Divide divides each set of light IDs into divisor groups.
+// e.g. [1,2,3,4,5] -> Divide(3) -> [1,2], [3,4], [5]
+func Divide(divisor int) lightIDToLightIDSetTransformer {
+	return newLightIDToLightIDSetTransformer(func(id lightid.ID) lightid.Set {
+		divisor := divisor
+
+		groupSize := len(id) / divisor
+
+		set := lightid.NewSet()
+		for i := 0; i < divisor; i++ {
+			set.Add(id[0:groupSize])
+			id = id[groupSize:]
+		}
+		set[divisor-1] = append(set[divisor-1], id...)
+
+		return set
+	})
 }
 
-func (d divideSingle) Sequence() LightTransformer {
-	return divideSingle{true}
+// Fan divides each set of light IDs into groupCount groups with successive light IDs being allocated to
+// successive groups (wrapping around to the first group when the last group is reached) until all light IDs
+// have been allocated.
+// e.g. [1,2,3,4,5,6,7,8] -> Fan(2) -> [1,3,5,7], [2,4,6,8]
+// e.g. [1,2,3,4,5,6,7,8] -> Fan(3) -> [1,4,7], [2,5,8], [3,6]
+func Fan(groupCount int) lightIDToLightIDSetTransformer {
+	return newLightIDToLightIDSetTransformer(func(id lightid.ID) lightid.Set {
+		set := make(lightid.Set, groupCount)
+
+		for i := range set {
+			set[i] = lightid.New()
+		}
+
+		for i, lightID := range id {
+			set[i%groupCount] = append(set[i%groupCount], lightID)
+		}
+
+		return set
+	})
 }
 
-// Divide returns a Transformer that divides a light ID into groupSize equal
-// groups. If the light ID cannot be divided into groupSize equal groups, the
-// remainder light IDs are placed in the last group.
-func Divide(divisor int) divide {
-	return divide{divisor, false}
-}
+func DivideIntoGroups(groupSize int) lightIDToLightIDSetTransformer {
+	return newLightIDToLightIDSetTransformer(func(id lightid.ID) lightid.Set {
+		set := lightid.NewSet()
 
-type divide struct {
-	divisor  int
-	sequence bool
-}
+		for len(id) > groupSize {
+			set.Add(id[0:groupSize])
+			id = id[groupSize:]
+		}
 
-func (d divide) do(id lightid.ID) lightid.Set {
-	divisor := d.divisor
+		set.Add(lightid.New(id...))
 
-	groupSize := len(id) / divisor
-
-	set := lightid.NewSet()
-	for i := 0; i < divisor; i++ {
-		set.Add(id[0:groupSize])
-		id = id[groupSize:]
-	}
-	set[divisor-1] = append(set[divisor-1], id...)
-
-	return set
-}
-
-func (d divide) LightTransform(l context.Light) context.Light {
-	return applyLightIDTransformer(l, d.do, d.sequence)
-}
-
-func (d divide) Sequence() divide {
-	return divide{d.divisor, true}
-}
-
-type fan struct {
-	groupCount int
-	sequence   bool
-}
-
-func Fan(groupCount int) fan {
-	return fan{groupCount, false}
-}
-
-func (f fan) do(id lightid.ID) lightid.Set {
-	groupCount := f.groupCount
-
-	set := make(lightid.Set, groupCount)
-
-	for i := range set {
-		set[i] = lightid.New()
-	}
-
-	for i, lightID := range id {
-		set[i%groupCount] = append(set[i%groupCount], lightID)
-	}
-
-	return set
-}
-
-func (f fan) LightTransform(l context.Light) context.Light {
-	return applyLightIDTransformer(l, f.do, f.sequence)
-}
-
-func (f fan) Sequence() fan {
-	return fan{f.groupCount, true}
-}
-
-func DivideIntoGroups(groupSize int) divideIntoGroups {
-	return divideIntoGroups{groupSize, false}
-}
-
-type divideIntoGroups struct {
-	groupSize int
-	sequence  bool
-}
-
-func (d divideIntoGroups) do(id lightid.ID) lightid.Set {
-	groupSize := d.groupSize
-
-	set := lightid.NewSet()
-
-	for len(id) > groupSize {
-		set.Add(id[0:groupSize])
-		id = id[groupSize:]
-	}
-
-	set.Add(lightid.New(id...))
-
-	return set
-}
-
-func (d divideIntoGroups) LightTransform(l context.Light) context.Light {
-	return applyLightIDTransformer(l, d.do, d.sequence)
-}
-
-func (d divideIntoGroups) Sequence() divideIntoGroups {
-	return divideIntoGroups{d.groupSize, true}
+		return set
+	})
 }
 
 type reverse struct {
@@ -217,6 +166,31 @@ func (s shuffle) Sequence() shuffle {
 	return shuffle{true}
 }
 
+type shuffleSet struct {
+	sequence bool
+}
+
+func ShuffleSet() shuffleSet {
+	return shuffleSet{}
+}
+
+func (s shuffleSet) do(oldSet lightid.Set) lightid.Set {
+	set := lightid.NewSet(oldSet...)
+
+	rand.Shuffle(len(set), func(i, j int) {
+		set[i], set[j] = set[j], set[i]
+	})
+	return set
+}
+
+func (s shuffleSet) LightTransform(l context.Light) context.Light {
+	return applyLightIDSetTransformer(l, s.do, s.sequence)
+}
+
+func (s shuffleSet) Sequence() shuffleSet {
+	return shuffleSet{true}
+}
+
 type shuffleSeed struct {
 	sequence bool
 	seed     int64
@@ -242,53 +216,6 @@ func (s shuffleSeed) Sequence() shuffleSeed {
 	return shuffleSeed{true, s.seed, s.randSrc}
 }
 
-//func Even(lightID ID) Set {
-//	evenIDs := New()
-//
-//	for _, id := range lightID {
-//		if id%2 == 0 {
-//			evenIDs = append(evenIDs, id)
-//		}
-//	}
-//
-//	return NewSet(evenIDs)
-//}
-
-//func Odd(lightID lightid.ID) lightid.Set {
-//	evenIDs := lightid.New()
-//
-//	for _, id := range lightID {
-//		if id%2 == 1 {
-//			evenIDs = append(evenIDs, id)
-//		}
-//	}
-//
-//	return lightid.NewSet(evenIDs)
-//}
-//
-//
-//func ToLightIDSetTransformer(tfer Transformer) SetTransformer {
-//	return func(set lightid.Set) lightid.Set {
-//		newSet := lightid.NewSet()
-//
-//		for _, id := range set {
-//			newSet.Add(tfer(id)...)
-//		}
-//
-//		return newSet
-//	}
-//}
-//
-////func divideSingle(id lightid.ID) lightid.Set {
-////	set := lightid.NewSet()
-////	for _, lightID := range id {
-////		set.Add(lightid.ID{lightID})
-////	}
-////	return set
-////}
-//
-//
-//
 type rotate struct {
 	steps    int
 	sequence bool

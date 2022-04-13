@@ -4,66 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"os"
-	"sort"
 
 	"github.com/shasderias/ilysa/internal/swallowjson"
 	"github.com/shasderias/ilysa/scale"
 )
 
-type Difficulty struct {
-	info       *Info
-	filepath   string
-	bpmRegions []bpmRegion
+type Difficulty interface {
+	calculateBPMRegions()
 
-	Version string  `json:"_version"`
-	Notes   []Note  `json:"_notes"`
-	Events  []Event `json:"_events"`
-
-	CustomData DifficultyCustomData `json:"_customData"`
-
-	Extra map[string]*json.RawMessage `json:"-"`
-}
-
-func (d *Difficulty) UnmarshalJSON(raw []byte) error {
-	return swallowjson.UnmarshalWith(d, "Extra", raw)
-}
-
-func (d Difficulty) MarshalJSON() ([]byte, error) {
-	return swallowjson.MarshalWith(d, "Extra")
-}
-
-func (d *Difficulty) Save() error {
-	sort.Slice(d.Events, func(i, j int) bool {
-		return d.Events[i].Time < d.Events[j].Time
-	})
-
-	bytes, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(d.filepath, bytes, 0644)
-
-	//f, err := os.OpenFile(d.filepath, os.O_RDWR|os.O_TRUNC, 0755)
-	//if err != nil {
-	//	return err
-	//}
-	//defer f.Close()
-	//
-	//enc := json.NewEncoder(f)
-	//
-	//fmt.Println(d)
-	//err = enc.Encode(d)
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//return nil
-}
-
-func (d *Difficulty) GetEvents() *[]Event {
-	return &d.Events
+	json.Marshaler
+	json.Unmarshaler
+	Save() error
+	SetEvents(events interface{})
+	UnscaleTime(beat float64) Time
+	DifficultyVersion() DifficultyVersion
 }
 
 type Note struct {
@@ -81,7 +35,7 @@ type NoteType int
 type CutDirection int
 
 type DifficultyCustomData struct {
-	BPMChanges []BPMChange `json:"_BPMChanges"`
+	BPMChanges []BPMChange `json:"_BPMChanges,omitempty"`
 
 	Extra map[string]*json.RawMessage `json:"-"`
 }
@@ -92,25 +46,6 @@ func (dcd *DifficultyCustomData) UnmarshalJSON(raw []byte) error {
 
 func (dcd DifficultyCustomData) MarshalJSON() ([]byte, error) {
 	return swallowjson.MarshalWith(dcd, "Extra")
-}
-
-type Event struct {
-	Time       Time    `json:"_time"`
-	Type       int     `json:"_type"`
-	Value      int     `json:"_value"`
-	FloatValue float64 `json:"_floatValue"`
-
-	CustomData json.RawMessage `json:"_customData,omitempty"`
-
-	Extra map[string]*json.RawMessage `json:"-"`
-}
-
-func (e *Event) UnmarshalJSON(raw []byte) error {
-	return swallowjson.UnmarshalWith(e, "Extra", raw)
-}
-
-func (e Event) MarshalJSON() ([]byte, error) {
-	return swallowjson.MarshalWith(e, "Extra")
 }
 
 type BPMChange struct {
@@ -136,11 +71,7 @@ type bpmRegion struct {
 	startBeat float64
 }
 
-func (d *Difficulty) calculateBPMRegions() {
-	startBPM := d.info.BPM
-
-	bpmChanges := d.CustomData.BPMChanges
-
+func calculateBPMRegions(startBPM float64, bpmChanges []BPMChange) []bpmRegion {
 	bpmRegions := []bpmRegion{{
 		0,
 		startBPM,
@@ -162,13 +93,10 @@ func (d *Difficulty) calculateBPMRegions() {
 		})
 	}
 
-	d.bpmRegions = bpmRegions
+	return bpmRegions
 }
 
-func (d *Difficulty) UnscaleTime(beat float64) Time {
-	startBPM := d.info.BPM
-	bpmRegions := d.bpmRegions
-
+func unscaleTime(startBPM float64, bpmRegions []bpmRegion, beat float64) Time {
 	for i := len(bpmRegions) - 1; i >= 0; i-- {
 		region := bpmRegions[i]
 

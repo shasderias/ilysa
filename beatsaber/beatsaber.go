@@ -27,14 +27,14 @@ func Open(dir string) (*Map, error) {
 	}, nil
 }
 
-func (m *Map) OpenDifficulty(characteristic Characteristic, difficulty BeatmapDifficulty) (*Difficulty, error) {
+func (m *Map) OpenDifficulty(characteristic Characteristic, difficulty BeatmapDifficulty) (Difficulty, error) {
 	var beatmapSet *BeatmapSet
 
-	in := m.Info
+	infoDat := m.Info
 
-	for i, set := range in.BeatmapSets {
+	for i, set := range infoDat.BeatmapSets {
 		if set.Characteristic == characteristic {
-			beatmapSet = &in.BeatmapSets[i]
+			beatmapSet = &infoDat.BeatmapSets[i]
 			goto foundCharacteristic
 		}
 	}
@@ -54,21 +54,36 @@ foundDifficulty:
 
 	difficultyPath := filepath.Join(m.workingDir, difficultyFilename)
 
-	f, err := os.ReadFile(difficultyPath)
+	version, err := parseDifficultyVersion(difficultyPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var diff Difficulty
-
-	err = json.Unmarshal(f, &diff)
-	if err != nil {
-		return nil, err
+	versionSupport, ok := SupportedDifficultyVersions[version]
+	if !ok {
+		return nil, fmt.Errorf("unsupported difficulty version '%s'", version)
 	}
 
-	diff.info = m.Info
-	diff.filepath = difficultyPath
-	diff.calculateBPMRegions()
+	return versionSupport.OpenFunc(infoDat, difficultyPath)
+}
 
-	return &diff, nil
+func parseDifficultyVersion(path string) (DifficultyVersion, error) {
+	type diffVersionOnly struct {
+		Version string `json:"_version"`
+	}
+
+	f, err := os.Open(path)
+	if err != nil {
+		return DifficultyVersionNil, err
+	}
+
+	j := json.NewDecoder(f)
+
+	var dvo diffVersionOnly
+
+	if err := j.Decode(&dvo); err != nil {
+		return DifficultyVersionNil, err
+	}
+
+	return NewDifficultyVersion(dvo.Version), nil
 }

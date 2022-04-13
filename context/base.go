@@ -3,6 +3,7 @@ package context
 import (
 	"math/rand"
 
+	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -11,6 +12,7 @@ func Base(project Project) Context {
 	ctx := base{
 		project:   project,
 		fixedRand: rand.Float64(),
+		config:    config{},
 	}
 	return &ctx
 }
@@ -19,6 +21,7 @@ type base struct {
 	project                   Project
 	fixedRand                 float64
 	cumulativePreciseRotation float64
+	config                    config
 }
 
 func (b *base) base() *base   { return b }
@@ -63,3 +66,6 @@ func (b *base) SeqLast() bool              { panic("implement me") }
 func (b *base) ToRange() timer.Range       { return b }
 func (b *base) ToSequence() timer.Sequence { return b }
 func (b *base) Next() bool                 { return false }
+
+func (b *base) SetMapVersion(v beatsaber.DifficultyVersion) { b.config.mapVersion = v }
+func (b *base) GetMapVersion() beatsaber.DifficultyVersion  { return b.config.mapVersion }

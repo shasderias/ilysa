@@ -1,3 +1,4 @@
+// Package transform provides functions for manipulating light ID based lights.
 package transform
 
 import (
@@ -62,4 +63,48 @@ func applyLightIDSetTransformer(l context.Light, fn func(set lightid.Set) lighti
 		return l
 	}
 	return transformableLight.LightIDSetSequenceTransform(fn)
+}
+
+type lightTransformer struct {
+	fn func(context.Light) context.Light
+}
+
+func newLightTransformer(fn func(l context.Light) context.Light) LightTransformer {
+	return lightTransformer{fn}
+}
+func (tf lightTransformer) LightTransform(l context.Light) context.Light {
+	return tf.fn(l)
+}
+
+type lightIDToLightIDSetTransformer struct {
+	fn       func(set lightid.ID) lightid.Set
+	sequence bool
+}
+
+func newLightIDToLightIDSetTransformer(fn func(set lightid.ID) lightid.Set) lightIDToLightIDSetTransformer {
+	return lightIDToLightIDSetTransformer{fn, false}
+}
+func (tf lightIDToLightIDSetTransformer) LightTransform(light context.Light) context.Light {
+	return applyLightIDTransformer(light, tf.fn, tf.sequence)
+}
+func (tf lightIDToLightIDSetTransformer) Sequence() {
+	tf.sequence = true
+}
+func (tf lightIDToLightIDSetTransformer) do(id lightid.ID) lightid.Set {
+	return tf.fn(id)
+}
+
+type lightIDSetToLightIDSetTransformer struct {
+	fn       func(set lightid.Set) lightid.Set
+	sequence bool
+}
+
+func newLightIDSetToLightIDSetTransformer(fn func(set lightid.Set) lightid.Set) lightIDSetToLightIDSetTransformer {
+	return lightIDSetToLightIDSetTransformer{fn, false}
+}
+func (tf lightIDSetToLightIDSetTransformer) Sequence() {
+	tf.sequence = true
+}
+func (tf lightIDSetToLightIDSetTransformer) LightTransform(light context.Light) context.Light {
+	return applyLightIDSetTransformer(light, tf.fn, tf.sequence)
 }

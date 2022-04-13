@@ -1,5 +1,11 @@
 package evt
 
+import (
+	"encoding/json"
+
+	"github.com/shasderias/ilysa/beatsaber"
+)
+
 // Base represents the attributes common to all Beat Saber events - beat, type
 // and value. Beat here refers to the scaled beat (i.e. after BPM changes).
 // Ilysa unscales the beat on save.
@@ -32,6 +38,8 @@ func NewBase(opts ...Option) Base {
 	return e
 }
 
+// baseWrapper exists to allow options to be applied to a Base event as Base
+// being designed to be implemented, cannot implement the Apply method.
 type baseWrapper struct {
 	*Base
 }
@@ -76,4 +84,31 @@ func (e *Base) HasTag(tag ...string) bool {
 
 func (e *Base) ClearTag(tag string) {
 	delete(e.tags, tag)
+}
+
+func (e *Base) Copy() Base {
+	return Base{
+		beat:     e.beat,
+		offset:   e.offset,
+		typ:      e.typ,
+		val:      e.val,
+		floatVal: e.floatVal,
+		tags:     make(map[string]struct{}),
+	}
+}
+
+func (e Base) EventV220() beatsaber.EventV220 {
+	return beatsaber.NewEventV220(e.beat, int(e.typ), int(e.val), nil)
+}
+
+func (e Base) EventV250() beatsaber.EventV250 {
+	return beatsaber.NewEventV250(e.beat, int(e.typ), int(e.val), e.floatVal, nil)
+}
+
+func (e Base) EventV220WithCD(cd json.RawMessage) beatsaber.EventV220 {
+	return beatsaber.NewEventV220(e.beat, int(e.typ), int(e.val), cd)
+}
+
+func (e Base) EventV250WithCD(cd json.RawMessage) beatsaber.EventV250 {
+	return beatsaber.NewEventV250(e.beat, int(e.typ), int(e.val), e.floatVal, cd)
 }

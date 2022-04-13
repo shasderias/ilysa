@@ -43,3 +43,12 @@ func (r Lighting) CustomData() (json.RawMessage, error) {
 
 	return json.Marshal(cd)
 }
+
+func (r Lighting) Copy() Lighting {
+	return Lighting{
+		LightID:  r.LightID,
+		Color:    r.Color,
+		Easing:   r.Easing,
+		LerpType: r.LerpType,
+	}
+}

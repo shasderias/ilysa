@@ -1,6 +1,7 @@
 package context
 
 import (
+	"github.com/shasderias/ilysa/beatsaber"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/timer"
 )
@@ -24,6 +25,8 @@ type Light interface {
 }
 
 type Context interface {
+	ConfigContext
+
 	timer.Sequence
 	timer.Range
 	BOffset() float64
@@ -55,4 +58,9 @@ type LightContext interface {
 	Apply(e evt.Event)
 	FixedRand() float64
 	AddEvents(events ...evt.Event)
+}
+
+type ConfigContext interface {
+	SetMapVersion(v beatsaber.DifficultyVersion)
+	GetMapVersion() beatsaber.DifficultyVersion
 }

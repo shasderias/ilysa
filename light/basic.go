@@ -26,19 +26,15 @@ func (l Basic) GenerateEvents(ctx context.LightContext) evt.Events {
 		),
 	)
 }
-
 func (l Basic) LightLen() int {
 	return 1
 }
-
 func (l Basic) Name() []string {
 	return []string{fmt.Sprintf("Basic-%d", l.evtType)}
 }
-
 func (l Basic) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	return NewComposite(l.evtType, fn(lightid.NewFromInterval(1, l.len)))
 }
-
 func (l Basic) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	sl := NewSequence()
 
