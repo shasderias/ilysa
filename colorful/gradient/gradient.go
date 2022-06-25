@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/mitchellh/copystructure"
+
 	"github.com/shasderias/ilysa/colorful"
 )
 
@@ -141,6 +142,20 @@ func (gt Table) Rotate(n int) Table {
 func (gt Table) RotateRand() Table {
 	n := rand.Intn(len(gt))
 	return gt.Rotate(n)
+}
+
+func (gt Table) Shuffle() Table {
+	colors := gt.Colors()
+
+	rand.Shuffle(len(colors), func(i, j int) {
+		colors[i], colors[j] = colors[j], colors[i]
+	})
+
+	for i, color := range colors {
+		gt[i].Col = color
+	}
+
+	return gt
 }
 
 // ToSet returns the gradient's colors as a colorful.Set.

@@ -5,18 +5,16 @@ import (
 	"github.com/shasderias/ilysa/evt"
 )
 
-// Ripple offsets each successive lightID by step beats
-func Ripple(ctx context.LightContext, e evt.Events, step float64) {
-	e.Apply(evt.OptShiftB(float64(ctx.LightOrdinal()) * step))
+// Ripple offsets each successive lightID by step beats.
+func Ripple(ctx context.LightContext, step float64) evt.Option {
+	return evt.NewFuncOpt(func(e evt.Event) {
+		e.Apply(evt.OptShiftB(float64(ctx.LightOrdinal()) * step))
+	})
 }
 
-// RippleT offsets each successive lightID by a number of beats such that the last
-// lightID triggers delay beats after the first
-func RippleT(ctx context.LightContext, e evt.Events, delay float64) {
-	e.Apply(evt.OptShiftB(ctx.LightT() * delay))
-}
-
-func RippleT2(ctx context.LightContext, delay float64) evt.Option {
+// RippleT offsets each successive lightID such that the last lightID triggers
+// delay beats after the first.
+func RippleT(ctx context.LightContext, delay float64) evt.Option {
 	return evt.NewFuncOpt(func(e evt.Event) {
 		e.Apply(evt.OptShiftB(ctx.LightT() * delay))
 	})

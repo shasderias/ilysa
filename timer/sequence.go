@@ -2,6 +2,7 @@ package timer
 
 import (
 	"github.com/shasderias/ilysa/internal/calc"
+	"github.com/shasderias/ilysa/internal/errors"
 )
 
 type Sequence interface {
@@ -27,17 +28,12 @@ type Sequencer struct {
 	g float64
 }
 
-// Seq specifies a sequence of beats. The last beat is treated as a ghost beat.
-// If only a single beat is specified, a ghost beat equal to that beat is added.
-// i.e. Seq(1) is equivalent to Seq(1, 1).
+// Seq specifies a sequence of beats.
 func Seq(beats ...float64) Sequencer {
 	if len(beats) == 0 {
-		panic("sequence must contain at least one beat")
+		panic(errors.Errorf("sequence must contain at least one beat"))
 	}
-	if len(beats) == 1 {
-		return Sequencer{beats, beats[0]}
-	}
-	return Sequencer{beats[:len(beats)-1], beats[len(beats)-1]}
+	return Sequencer{beats, beats[len(beats)-1] + 1}
 }
 
 // SeqInterval specifies a beat sequence that starts on startB, ends on endB,
@@ -55,6 +51,10 @@ func (s Sequencer) Idx(i int) float64 { return s.s[calc.WraparoundIdx(s.Len(), i
 func (s Sequencer) Len() int          { return len(s.s) }
 func (s Sequencer) First() float64    { return s.s[0] }
 func (s Sequencer) Last() float64     { return s.s[s.Len()-1] }
+func (s Sequencer) G(gb float64) Sequencer {
+	s.g = gb
+	return s
+}
 
 func (s Sequencer) Iterate() Sequence {
 	return &SequenceIterator{s, -1}

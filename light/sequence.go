@@ -1,53 +1,33 @@
 package light
 
 import (
-	"math"
 	"math/rand"
 
 	"github.com/shasderias/ilysa/context"
 	"github.com/shasderias/ilysa/evt"
 	"github.com/shasderias/ilysa/internal/calc"
 	"github.com/shasderias/ilysa/lightid"
-	"github.com/shasderias/ilysa/scale"
 )
 
-type Sequence struct {
-	lights []context.Light
-	offset int
-}
+type Sequence []context.Light
 
 func NewSequence(lights ...context.Light) Sequence {
-	return Sequence{append([]context.Light{}, lights...), 0}
+	return lights
 }
 
 func (s *Sequence) Add(lights ...context.Light) {
-	s.lights = append(s.lights, lights...)
-}
-
-func (s *Sequence) IncOffset() {
-	s.offset++
+	*s = append(*s, lights...)
 }
 
 func (s Sequence) GenerateEvents(ctx context.LightContext) evt.Events {
-	l := s.Idx(ctx.SeqOrdinal() + s.offset)
-	if l.LightLen() == s.LightLen() {
-		return l.GenerateEvents(ctx)
-	}
+	l := s.Idx(ctx.SeqOrdinal())
 
-	lightIDScale := scale.Clamp(1, float64(l.LightLen()), 1, float64(s.LightLen()))
-	for i := 1; i <= l.LightLen(); i++ {
-		if int(math.RoundToEven(lightIDScale(float64(i)))) == ctx.LightCur() {
-			lctx := context.LightContextAtOrdinal(ctx, l, i-1)
-			return l.GenerateEvents(lctx)
-		}
-	}
-
-	return evt.Events{}
+	return l.GenerateEvents(ctx)
 }
 
 func (s Sequence) LightLen() int {
 	max := 0
-	for _, l := range s.lights {
+	for _, l := range s {
 		if l.LightLen() > max {
 			max = l.LightLen()
 		}
@@ -56,33 +36,33 @@ func (s Sequence) LightLen() int {
 }
 
 func (s Sequence) Idx(i int) context.Light {
-	return s.lights[calc.WraparoundIdx(len(s.lights), i)]
+	return s[calc.WraparoundIdx(len(s), i)]
 }
 
 func (s Sequence) Len() int {
-	return len(s.lights)
+	return len(s)
 }
 
 func (s Sequence) Lights() []context.Light {
-	return s.lights
+	return s
 }
 
 func (s Sequence) Shuffle() Sequence {
-	rand.Shuffle(len(s.lights), func(i, j int) {
-		s.lights[i], s.lights[j] = s.lights[j], s.lights[i]
+	clone := make(Sequence, len(s))
+	copy(clone, s)
+	rand.Shuffle(len(clone), func(i, j int) {
+		clone[i], clone[j] = clone[j], clone[i]
 	})
-	return Sequence{
-		lights: s.lights,
-	}
+	return clone
 }
 
 func (s Sequence) Slice(i, j int) Sequence {
-	return Sequence{lights: s.lights[i:j]}
+	return s[i:j]
 }
 
 func (s Sequence) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	seq := NewSequence()
-	for _, l := range s.lights {
+	for _, l := range s {
 		tfl, ok := l.(LightIDTransformableLight)
 		if !ok {
 			seq.Add(l)
@@ -95,7 +75,7 @@ func (s Sequence) LightIDTransform(fn func(lightid.ID) lightid.Set) context.Ligh
 
 func (s Sequence) LightIDSetTransform(fn func(lightid.Set) lightid.Set) context.Light {
 	seq := NewSequence()
-	for _, l := range s.lights {
+	for _, l := range s {
 		tfl, ok := l.(LightIDSetTransformableLight)
 		if !ok {
 			seq.Add(l)
@@ -108,13 +88,13 @@ func (s Sequence) LightIDSetTransform(fn func(lightid.Set) lightid.Set) context.
 
 func (s Sequence) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) context.Light {
 	seq := NewSequence()
-	for _, l := range s.lights {
+	for _, l := range s {
 		tfl, ok := l.(LightIDSequenceTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
 			subSeq := tfl.LightIDSequenceTransform(fn).(Sequence)
-			seq.Add(subSeq.lights...)
+			seq.Add(subSeq...)
 		}
 	}
 	return seq
@@ -122,13 +102,13 @@ func (s Sequence) LightIDSequenceTransform(fn func(lightid.ID) lightid.Set) cont
 
 func (s Sequence) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set) context.Light {
 	seq := NewSequence()
-	for _, l := range s.lights {
+	for _, l := range s {
 		tfl, ok := l.(LightIDSetSequenceTransformableLight)
 		if !ok {
 			seq.Add(l)
 		} else {
 			subSeq := tfl.LightIDSetSequenceTransform(fn).(Sequence)
-			seq.Add(subSeq.lights...)
+			seq.Add(subSeq...)
 		}
 	}
 	return seq
@@ -136,7 +116,7 @@ func (s Sequence) LightIDSetSequenceTransform(fn func(lightid.Set) lightid.Set) 
 
 func (s Sequence) Name() []string {
 	name := []string{}
-	for _, l := range s.lights {
+	for _, l := range s {
 		name = append(name, l.Name()...)
 	}
 	return name

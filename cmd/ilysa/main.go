@@ -13,6 +13,7 @@ func main() {
 	var (
 		runCmd   = makeRunCmd()
 		watchCmd = makeWatchCmd()
+		buildCmd = makeBuildCmd()
 	)
 
 	rootFlagSet := flag.NewFlagSet("root", flag.ExitOnError)
@@ -20,7 +21,7 @@ func main() {
 	root := &ffcli.Command{
 		FlagSet:     rootFlagSet,
 		ShortUsage:  "ilysa <subcommand>",
-		Subcommands: []*ffcli.Command{runCmd, watchCmd},
+		Subcommands: []*ffcli.Command{runCmd, watchCmd, buildCmd},
 		Exec: func(ctx context.Context, args []string) error {
 			return flag.ErrHelp
 		},

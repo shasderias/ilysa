@@ -15,14 +15,7 @@ var (
 	sin = math.Sin
 )
 
-//func SinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContext) float64 {
-//	return func(ctx context.LightContext) float64 {
-//		a := sin(ctx.T()*sweepSpeed/ctx.Duration() + ctx.LightT()*pi + offset)
-//		return a
-//	}
-//}
-//
-func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContext) float64 {
+func absSinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContext) float64 {
 	s := scale.ToUnitClamp(-1, 1)
 	return func(ctx context.LightContext) float64 {
 		a := s(sin(ctx.T()*sweepSpeed*ctx.Duration() + ctx.LightT()*pi + offset*sweepSpeed*pi))
@@ -30,6 +23,20 @@ func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContex
 	}
 }
 
+func ColorSweep(ctx context.LightContext, sweepSpeed float64, grad gradient.Table) evt.Option {
+	return evt.NewFuncOpt(func(e evt.Event) {
+		gradPos := absSinSweepLightID(sweepSpeed, ctx.FixedRand())
+		e.Apply(evt.OptColor(grad.Lerp(gradPos(ctx))))
+	})
+}
+
+//func SinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContext) float64 {
+//	return func(ctx context.LightContext) float64 {
+//		a := sin(ctx.T()*sweepSpeed/ctx.Duration() + ctx.LightT()*pi + offset)
+//		return a
+//	}
+//}
+//
 //
 //func BiasedColorSweep(ctx context.LightContext, sweepSpeed float64, grad gradient.Table) evt.RGBLightingEvents {
 //	gradPos := SinSweepLightID(sweepSpeed, ctx.FixedRand())
@@ -37,16 +44,6 @@ func AbsSinSweepLightID(sweepSpeed, offset float64) func(ctx context.LightContex
 //	return e
 //}
 //
-func ColorSweep(ctx context.LightContext, e evt.Events, sweepSpeed float64, grad gradient.Table) {
-	gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
-	e.Apply(evt.OptColor(grad.Lerp(gradPos(ctx))))
-}
-func ColorSweep2(ctx context.LightContext, sweepSpeed float64, grad gradient.Table) evt.Option {
-	return evt.NewFuncOpt(func(e evt.Event) {
-		gradPos := AbsSinSweepLightID(sweepSpeed, ctx.FixedRand())
-		e.Apply(evt.OptColor(grad.Lerp(gradPos(ctx))))
-	})
-}
 
 //
 //func AlphaShimmer(ctx context.LightContext, events evt.RGBLightingEvents, shimmerSpeed float64) {

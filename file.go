@@ -27,7 +27,7 @@ type Pkg struct {
 	GoFiles []string
 }
 
-func Invoke(path string) error {
+func Invoke(path string, args ...string) error {
 	goFiles, err := goList(path)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func Invoke(path string) error {
 		return err
 	}
 
-	if err := RunCompiled(outputPath); err != nil {
+	if err := RunCompiled(outputPath, args...); err != nil {
 		return err
 	}
 
@@ -89,8 +89,8 @@ func Compile(path, compileTo string, goFiles []string) error {
 	return nil
 }
 
-func RunCompiled(exePath string) error {
-	cmd := exec.Command(exePath)
+func RunCompiled(exePath string, args ...string) error {
+	cmd := exec.Command(exePath, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()

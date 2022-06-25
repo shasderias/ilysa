@@ -20,11 +20,15 @@ func NewBasic(t evt.Type, len int) Basic {
 }
 
 func (l Basic) GenerateEvents(ctx context.LightContext) evt.Events {
-	return evt.NewEvents(
-		evt.NewChromaLighting(ctx,
-			evt.OptType(l.evtType),
-		),
-	)
+	if ctx.First() {
+		return evt.NewEvents(
+			evt.NewChromaLighting(ctx,
+				evt.OptType(l.evtType),
+				evt.OptValue(evt.ValueLightRedOn),
+			),
+		)
+	}
+	return evt.NewEvents()
 }
 func (l Basic) LightLen() int {
 	return 1
